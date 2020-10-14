@@ -222,20 +222,16 @@ public class FXMLDocumentController implements Initializable {
     private void  initPixelsColors() {
         colorMatrix = new Color[imageWidth][imageHeight];
     } 
-    
-    private void  setImageSize(Image image) {
-        imageWidth = (int)image.getWidth();
-        imageHeight = (int)image.getHeight();
-    }
-    
-    private void setImageSize2(int width, int height) {
+      
+    private void setImageSize(int width, int height) {
         imageWidth = width;
         imageHeight = height;
+        setDimensionsLabel();
     }
     
         
     private void setDimensionsLabel() {
-        infoDimensionsImage.setText("Width: " + imageWidth + " pixels. Heigh: " + imageHeight + " pixels.");
+        infoDimensionsImage.setText("Width: " + imageWidth + "px. Heigh: " + imageHeight + "px.");
     }
     
     private void  setPixelsFormatLabel() {
@@ -276,9 +272,6 @@ public class FXMLDocumentController implements Initializable {
                         g = 1;
                     if(b > 1)
                         b = 1;
-                        
-                        
-                    
                     Color brightness = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,brightness);
                 }
@@ -317,7 +310,7 @@ public class FXMLDocumentController implements Initializable {
         int width = Integer.parseInt(widthString.trim());
         int height = Integer.parseInt(heightString.trim());
         
-        setImageSize2(width, height);
+        setImageSize(width, height);
 
     }
 
@@ -328,7 +321,7 @@ public class FXMLDocumentController implements Initializable {
     private void bmpLoader(File path) {
         uniqueColorsList = new ArrayList();
         image = new Image("file:" + path.getAbsolutePath());
-        setImageSize(image);
+        setImageSize((int)image.getWidth(), (int)image.getHeight());
         pixelReader = image.getPixelReader();
         writableImage = new WritableImage(imageWidth, imageHeight);
         initPixelsColors();
@@ -337,7 +330,6 @@ public class FXMLDocumentController implements Initializable {
         imageView.setImage(image);
         labelLoadMessage.setText("Loaded successfully!");
         setPixelsFormatLabel();
-        setDimensionsLabel();
         setUniqueColor();
     }
     
@@ -351,17 +343,21 @@ public class FXMLDocumentController implements Initializable {
             while(scan.hasNextLine()){
                 String line = scan.nextLine();
                 if(!line.startsWith("#")) {
-                    if(lineNumber == 1) {
-                        setNumberMagic(line);
-                        lineNumber++;
-                    } else if( lineNumber == 2) {
-                        setDimensions(line);
-                        lineNumber++;
-                    } else {
-                        line = line.replaceAll("\\s+","");
-                        setMatrix(line, row);
-                        row++;
-                        lineNumber++;   
+                    switch (lineNumber) {
+                        case 1:
+                            setNumberMagic(line);
+                            lineNumber++;
+                            break;
+                        case 2:
+                            setDimensions(line);
+                            lineNumber++;
+                            break;
+                        default:
+                            line = line.replaceAll("\\s+","");   
+                            setMatrix(line, row);
+                            row++;
+                            lineNumber++;
+                            break;
                     }
                 }
             }            
@@ -372,7 +368,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private void setMatrix(String line, int row) {
-        
+//        colorMatrix[row][imageHeight]
     }
 
 
