@@ -98,8 +98,8 @@ public class FXMLDocumentController implements Initializable {
         fileChooser.setTitle("Load image in BMP or Netpbm format");
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("BMP", "*.bmp"),
-                new FileChooser.ExtensionFilter("Netpbm", "*.pbm", "*.pgm", "*.ppm")
+                new FileChooser.ExtensionFilter("Netpbm", "*.pbm", "*.pgm", "*.ppm"),
+                new FileChooser.ExtensionFilter("BMP", "*.bmp")
         );
 
         File imgPath = fileChooser.showOpenDialog(null);
@@ -108,20 +108,24 @@ public class FXMLDocumentController implements Initializable {
             String fileName = imgPath.getName();           
             String fileFormat = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());           
             switch(fileFormat) {
-            case "bmp":
-                bmpLoader(imgPath);
-                break;
-            case "pbm":
-            case "pgm":
-            case "ppm":
-                netpbmLoader(imgPath);
-                break;
-            default:
-                labelLoadMessage.setText("Incompatible Format.");            
+                case "bmp":                
+                    uniqueColorsList = new ArrayList();
+                    bmpLoader(imgPath);
+                    break;
+                case "pbm":
+                case "pgm":
+                case "ppm":
+                    uniqueColorsList = new ArrayList();
+                    netpbmLoader(imgPath);
+                    break;
+                default:
+                    labelLoadMessage.setText("Incompatible Format.");
+                    break;
+            }
         }
-            
-            
-        }
+        
+        
+        
     }
     
     @FXML
@@ -204,7 +208,7 @@ public class FXMLDocumentController implements Initializable {
     }
  
     
-    private void  setPixelsColors() {
+    private void  setPixelsColorsBMP() {
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 colorMatrix[x][y] = pixelReader.getColor(x, y);
@@ -226,6 +230,7 @@ public class FXMLDocumentController implements Initializable {
     private void setImageSize(int width, int height) {
         imageWidth = width;
         imageHeight = height;
+        initPixelsColors();
         setDimensionsLabel();
     }
     
@@ -265,7 +270,6 @@ public class FXMLDocumentController implements Initializable {
                     double r = colorMatrix[x][y].getRed() + brightnessValue;
                     double g = colorMatrix[x][y].getGreen() + brightnessValue;
                     double b = colorMatrix[x][y].getBlue() + brightnessValue;
-
                     if(r > 1)
                         r = 1;
                     if(g > 1)
@@ -292,7 +296,6 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private void setDimensions(String line) {
-//        System.out.println(line.length());
         String widthString = "", heightString = "";
         boolean secondEntry = false;
         
@@ -319,13 +322,11 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void bmpLoader(File path) {
-        uniqueColorsList = new ArrayList();
         image = new Image("file:" + path.getAbsolutePath());
         setImageSize((int)image.getWidth(), (int)image.getHeight());
         pixelReader = image.getPixelReader();
         writableImage = new WritableImage(imageWidth, imageHeight);
-        initPixelsColors();
-        setPixelsColors();
+        setPixelsColorsBMP();
         imageView.setPreserveRatio(true);
         imageView.setImage(image);
         labelLoadMessage.setText("Loaded successfully!");
@@ -354,21 +355,53 @@ public class FXMLDocumentController implements Initializable {
                             break;
                         default:
                             line = line.replaceAll("\\s+","");   
-                            setMatrix(line, row);
+                            setPixelsColorsNetbpm(line, row);
                             row++;
                             lineNumber++;
                             break;
                     }
                 }
-            }            
+            }
+            renderImageNetbpm();
             
         } catch (FileNotFoundException ex) {
             System.out.println("Fail Load");
         }
     }
     
-    private void setMatrix(String line, int row) {
-//        colorMatrix[row][imageHeight]
+    private void setPixelsColorsNetbpm(String line, int row) {       
+        int i = 0;
+        int x = i;
+        while(i < line.length()) {
+            double color = Character.getNumericValue(line.charAt(i));
+            colorMatrix[x][row] = new Color(color, color, color, 1.0);
+            i++;
+            x++;
+            if(x == imageWidth) {
+                x = 0;
+                row++;
+            }
+            
+        }
+    }
+    
+    private void renderImageNetbpm() {
+        writableImage = new WritableImage(imageWidth, imageHeight);
+        pixelWriter = writableImage.getPixelWriter();
+
+        for (int y = 0; y < imageHeight; y++) {
+           for (int x = 0; x < imageWidth; x++) {
+               Color pbm;
+               if(colorMatrix[x][y].getRed() == 1){
+                   pbm = new Color(0,0,0,1.0);
+               } else {
+                   pbm = new Color(1,1,1,1.0);
+               }
+               pixelWriter.setColor(x,y,pbm);
+           }
+        }
+        imageView.setPreserveRatio(true);
+        imageView.setImage(writableImage);           
     }
 
 
