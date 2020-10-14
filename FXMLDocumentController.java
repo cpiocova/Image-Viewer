@@ -6,6 +6,7 @@
 package piopdi1;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -23,6 +24,9 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 
@@ -72,6 +76,12 @@ public class FXMLDocumentController implements Initializable {
     private Slider sliderToBrightness;
     @FXML
     private Label valueBrightness;
+    @FXML
+    private Button btnUndo;
+    @FXML
+    private Button btnRedo;
+    
+    private String numberMagic;
 
 
 
@@ -95,19 +105,22 @@ public class FXMLDocumentController implements Initializable {
         File imgPath = fileChooser.showOpenDialog(null);
 
         if (imgPath != null) {
-            uniqueColorsList = new ArrayList();
-            image = new Image("file:" + imgPath.getAbsolutePath());
-            setImageSize(image);
-            pixelReader = image.getPixelReader();
-            writableImage = new WritableImage(imageWidth, imageHeight);
-            initPixelsColors();
-            setPixelsColors();
-            imageView.setPreserveRatio(true);
-            imageView.setImage(image);
-            labelLoadMessage.setText("Loaded successfully!");
-            setPixelsFormatLabel();
-            setDimensionsLabel();
-            setUniqueColor();
+            String fileName = imgPath.getName();           
+            String fileFormat = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());           
+            switch(fileFormat) {
+            case "bmp":
+                bmpLoader(imgPath);
+                break;
+            case "pbm":
+            case "pgm":
+            case "ppm":
+                netpbmLoader(imgPath);
+                break;
+            default:
+                labelLoadMessage.setText("Incompatible Format.");            
+        }
+            
+            
         }
     }
     
@@ -215,6 +228,10 @@ public class FXMLDocumentController implements Initializable {
         imageHeight = (int)image.getHeight();
     }
     
+    private void setImageSize2(int width, int height) {
+        imageWidth = width;
+        imageHeight = height;
+    }
     
         
     private void setDimensionsLabel() {
@@ -267,11 +284,96 @@ public class FXMLDocumentController implements Initializable {
                 }
             }
             imageView.setImage(writableImage);
-            int text = (int) (brightnessValue * 250);
-            valueBrightness.setText(" " + text );           
+            int text = (int) (brightnessValue * 100);
+            valueBrightness.setText(" " + text + "%");           
         }
 
     }
 
+    @FXML
+    private void handleUndo(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleRedo(ActionEvent event) {
+    }
     
+    private void setDimensions(String line) {
+//        System.out.println(line.length());
+        String widthString = "", heightString = "";
+        boolean secondEntry = false;
+        
+        for (int i = 0; i < line.length(); i++) {
+            if (line.charAt(i) == ' '){
+                secondEntry = true;
+                continue;
+            }
+            if(!secondEntry){
+                widthString = widthString + line.charAt(i);
+            }else {
+                heightString = heightString + line.charAt(i);
+            }
+        }
+        int width = Integer.parseInt(widthString.trim());
+        int height = Integer.parseInt(heightString.trim());
+        
+        setImageSize2(width, height);
+
+    }
+
+    private void setNumberMagic(String line) {
+        numberMagic = line;
+    }
+
+    private void bmpLoader(File path) {
+        uniqueColorsList = new ArrayList();
+        image = new Image("file:" + path.getAbsolutePath());
+        setImageSize(image);
+        pixelReader = image.getPixelReader();
+        writableImage = new WritableImage(imageWidth, imageHeight);
+        initPixelsColors();
+        setPixelsColors();
+        imageView.setPreserveRatio(true);
+        imageView.setImage(image);
+        labelLoadMessage.setText("Loaded successfully!");
+        setPixelsFormatLabel();
+        setDimensionsLabel();
+        setUniqueColor();
+    }
+    
+    private void netpbmLoader(File path) {
+        File pathAbs = path.getAbsoluteFile();
+        Scanner scan;
+        try {
+            scan = new Scanner(pathAbs);           
+            int lineNumber = 1;
+            int row = 0;
+            while(scan.hasNextLine()){
+                String line = scan.nextLine();
+                if(!line.startsWith("#")) {
+                    if(lineNumber == 1) {
+                        setNumberMagic(line);
+                        lineNumber++;
+                    } else if( lineNumber == 2) {
+                        setDimensions(line);
+                        lineNumber++;
+                    } else {
+                        line = line.replaceAll("\\s+","");
+                        setMatrix(line, row);
+                        row++;
+                        lineNumber++;   
+                    }
+                }
+            }            
+            
+        } catch (FileNotFoundException ex) {
+            System.out.println("Fail Load");
+        }
+    }
+    
+    private void setMatrix(String line, int row) {
+        
+    }
+
+
 }
