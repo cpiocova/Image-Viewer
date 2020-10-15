@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package controller;
+import model.BlankPic;
+import model.ImageSize;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,6 +48,9 @@ import javafx.stage.Stage;
  * @author Jose Pio
  */
 public class MainController implements Initializable {
+    
+    private BlankPic pic;
+    private ImageSize dimensions;
 
     @FXML
     private Button btnLoadImage;
@@ -71,7 +77,6 @@ public class MainController implements Initializable {
     private Button buttonToBlackWhite;
     @FXML
     private Label labelLoadMessage;
-    private Label infoImage;
     @FXML
     private Label infoDimensionsImage;
     @FXML
@@ -126,9 +131,12 @@ public class MainController implements Initializable {
         File imgPath = fileChooser.showOpenDialog(null);
 
         if (imgPath != null) {
-            String fileName = imgPath.getName();           
-            fileFormat = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());           
-            switch(fileFormat) {
+            pic = new BlankPic();
+            pic.setFileFormat(
+                    imgPath.getName().substring(imgPath.getName().lastIndexOf(".") + 1,
+                    imgPath.getName().length())
+            );
+            switch(pic.getFileFormat()) {
                 case "bmp":                
                     uniqueColorsList = new ArrayList();
                     bmpLoader(imgPath);
@@ -137,7 +145,7 @@ public class MainController implements Initializable {
                 case "pgm":
                 case "ppm":
                     uniqueColorsList = new ArrayList();
-                    netpbmLoader(imgPath, fileFormat);
+                    netpbmLoader(imgPath, pic.getFileFormat());
                     break;
                 default:
                     labelLoadMessage.setText("Incompatible Format.");
@@ -365,7 +373,12 @@ public class MainController implements Initializable {
 
     private void bmpLoader(File path) {
         imageLoaded = new Image("file:" + path.getAbsolutePath());
+        Image imageLoad = new Image("file:" + path.getAbsolutePath());
+        pic.setImageDefault(imageLoad);
+        pic.setImageChanging(imageLoad);
         image = imageLoaded;
+        dimensions = new ImageSize((int)image.getWidth(), (int)image.getHeight());
+//        pic.set
         setImageSize((int)image.getWidth(), (int)image.getHeight());
         pixelReader = image.getPixelReader();
         writableImage = new WritableImage(imageWidth, imageHeight);

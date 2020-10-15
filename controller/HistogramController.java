@@ -12,7 +12,7 @@ import javafx.fxml.Initializable;
 /**
  * FXML Controller class
  *
- * @author thecnomacVZLA
+ * @author Jose Pio
  */
 public class HistogramController implements Initializable {
 
