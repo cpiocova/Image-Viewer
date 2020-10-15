@@ -28,6 +28,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
 
 
@@ -46,19 +47,20 @@ public class FXMLDocumentController implements Initializable {
     private ImageView imageView;
     
     private Image image;
+    private Image imageLoaded;
     private WritableImage writableImage;
 
     
     private PixelReader pixelReader;
     private PixelWriter pixelWriter;
     
+    private String fileFormat;
+    
     private int imageWidth;
     private int imageHeight;
     private Color [][] colorMatrix;
     @FXML
     private ToggleButton buttonToNegative;
-    @FXML
-    private ToggleButton buttonToGrayScale;
     @FXML
     private ToggleButton buttonToBlackWhite;
     @FXML
@@ -75,13 +77,20 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Slider sliderToBrightness;
     @FXML
-    private Label valueBrightness;
+    private TitledPane labelBrightness;
     @FXML
     private Button btnUndo;
     @FXML
     private Button btnRedo;
     
     private String numberMagic;
+    @FXML
+    private Button btnDefault;
+    @FXML
+    private TitledPane labelGrayscale;
+    @FXML
+    private Slider sliderToGrayscale;
+   
 
 
 
@@ -98,15 +107,16 @@ public class FXMLDocumentController implements Initializable {
         fileChooser.setTitle("Load image in BMP or Netpbm format");
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Netpbm", "*.pbm", "*.pgm", "*.ppm"),
-                new FileChooser.ExtensionFilter("BMP", "*.bmp")
+                new FileChooser.ExtensionFilter("Allowed formats (Bmp and Netpbm)", "*.bmp","*.pbm", "*.pgm", "*.ppm"),
+                new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
+                new FileChooser.ExtensionFilter("Netpbm", "*.pbm", "*.pgm", "*.ppm")
         );
 
         File imgPath = fileChooser.showOpenDialog(null);
 
         if (imgPath != null) {
             String fileName = imgPath.getName();           
-            String fileFormat = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());           
+            fileFormat = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());           
             switch(fileFormat) {
                 case "bmp":                
                     uniqueColorsList = new ArrayList();
@@ -116,7 +126,7 @@ public class FXMLDocumentController implements Initializable {
                 case "pgm":
                 case "ppm":
                     uniqueColorsList = new ArrayList();
-                    netpbmLoader(imgPath);
+                    netpbmLoader(imgPath, fileFormat);
                     break;
                 default:
                     labelLoadMessage.setText("Incompatible Format.");
@@ -151,31 +161,7 @@ public class FXMLDocumentController implements Initializable {
         }
     }
     
-    
-    
-    @FXML
-    private void convertToGrayScale(ActionEvent event) {
-        if(image != null) {
-            if(buttonToGrayScale.isSelected()) {
-                pixelWriter = writableImage.getPixelWriter();
-                for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {
-                       double average = (
-                               colorMatrix[x][y].getRed() +
-                               colorMatrix[x][y].getGreen() +
-                               colorMatrix[x][y].getBlue()
-                               )/3;
-                       Color grayScale = new Color(average, average, average, 1.0);
-                       pixelWriter.setColor(x,y,grayScale);
-                   }
-                }
-               imageView.setImage(writableImage);           
-            }else {
-                imageView.setImage(image);           
-            }
-        }
-    }
-    
+ 
     
     @FXML
     private void convertToBlackWhite(ActionEvent event) {        
@@ -259,6 +245,33 @@ public class FXMLDocumentController implements Initializable {
     private void setUniqueColor() {
         infoUniqueColorsImage.setText("The image contains " + uniqueColorsList.size() + " unique colors.");
     }
+    
+    @FXML
+    private void handleGrayscale(MouseEvent event) {
+            if(image != null) {
+            double gv = (double) sliderToGrayscale.getValue();
+            pixelWriter = writableImage.getPixelWriter();
+            double gred, ggreen, gblue;
+                for (int y = 0; y < imageHeight; y++) {
+                   for (int x = 0; x < imageWidth; x++) {
+                       gred = colorMatrix[x][y].getRed();
+                       ggreen = colorMatrix[x][y].getGreen();
+                       gblue = colorMatrix[x][y].getBlue();
+                       double average = (gred + ggreen + gblue)/3;
+                       Color grayScale = new Color(
+                               gred * (1 - gv) + average * gv,
+                               ggreen * (1 - gv) + average * gv,
+                               gblue * (1 - gv) + average * gv,
+                               1.0);
+                       pixelWriter.setColor(x,y,grayScale);
+                   }
+                }
+            imageView.setImage(writableImage);
+            int text = (int) (gv * 100);
+            labelGrayscale.setText("Grayscale: " + text + "%");           
+        }    
+    }
+
 
     @FXML
     private void handleBrightness(MouseEvent event) {
@@ -282,9 +295,8 @@ public class FXMLDocumentController implements Initializable {
             }
             imageView.setImage(writableImage);
             int text = (int) (brightnessValue * 100);
-            valueBrightness.setText(" " + text + "%");           
+            labelBrightness.setText("Brightness: " + text + "%");           
         }
-
     }
 
     @FXML
@@ -322,7 +334,8 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void bmpLoader(File path) {
-        image = new Image("file:" + path.getAbsolutePath());
+        imageLoaded = new Image("file:" + path.getAbsolutePath());
+        image = imageLoaded;
         setImageSize((int)image.getWidth(), (int)image.getHeight());
         pixelReader = image.getPixelReader();
         writableImage = new WritableImage(imageWidth, imageHeight);
@@ -332,9 +345,10 @@ public class FXMLDocumentController implements Initializable {
         labelLoadMessage.setText("Loaded successfully!");
         setPixelsFormatLabel();
         setUniqueColor();
+        
     }
     
-    private void netpbmLoader(File path) {
+    private void netpbmLoader(File path, String format) {
         File pathAbs = path.getAbsoluteFile();
         Scanner scan;
         try {
@@ -374,6 +388,11 @@ public class FXMLDocumentController implements Initializable {
         int x = i;
         while(i < line.length()) {
             double color = Character.getNumericValue(line.charAt(i));
+            if(color == 0) {
+                color = 1;
+            }else {
+                color = 0;
+            }
             colorMatrix[x][row] = new Color(color, color, color, 1.0);
             i++;
             x++;
@@ -392,7 +411,7 @@ public class FXMLDocumentController implements Initializable {
         for (int y = 0; y < imageHeight; y++) {
            for (int x = 0; x < imageWidth; x++) {
                Color pbm;
-               if(colorMatrix[x][y].getRed() == 1){
+               if(colorMatrix[x][y].getRed() == 0){
                    pbm = new Color(0,0,0,1.0);
                } else {
                    pbm = new Color(1,1,1,1.0);
@@ -400,9 +419,17 @@ public class FXMLDocumentController implements Initializable {
                pixelWriter.setColor(x,y,pbm);
            }
         }
+        imageLoaded = writableImage;
+        image = imageLoaded;
         imageView.setPreserveRatio(true);
         imageView.setImage(writableImage);           
     }
+
+    @FXML
+    private void convertToDefault(ActionEvent event) {
+        imageView.setImage(imageLoaded);
+    }
+
 
 
 }

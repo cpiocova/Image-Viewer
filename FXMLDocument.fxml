@@ -12,7 +12,7 @@
     <children>
       <GridPane alignment="CENTER" layoutX="45.0" layoutY="76.0" prefHeight="733.0" prefWidth="567.0" AnchorPane.bottomAnchor="58.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="563.0" minWidth="0.0" prefWidth="118.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="563.0" minWidth="0.0" prefWidth="129.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="563.0" minWidth="0.0" prefWidth="449.0" />
         </columnConstraints>
         <rowConstraints>
@@ -30,46 +30,32 @@
                   <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="344.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="145.0" minHeight="10.0" prefHeight="90.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="344.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <ToggleButton fx:id="buttonToNegative" mnemonicParsing="false" onAction="#convertToNegative" text="Negative" />
-                  <ToggleButton fx:id="buttonToGrayScale" mnemonicParsing="false" onAction="#convertToGrayScale" text="Gray Scale" GridPane.rowIndex="1" />
+                  <Button fx:id="btnDefault" mnemonicParsing="false" onAction="#convertToDefault" text="Default" />
+                  <ToggleButton fx:id="buttonToNegative" mnemonicParsing="false" onAction="#convertToNegative" text="Negative" GridPane.rowIndex="1" />
                   <ToggleButton fx:id="buttonToBlackWhite" mnemonicParsing="false" onAction="#convertToBlackWhite" text="Black / White" GridPane.rowIndex="2" />
-                  <GridPane GridPane.rowIndex="3">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <GridPane GridPane.rowIndex="1">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label prefHeight="12.0" prefWidth="90.0" text="Brightness:" />
-                              <Label fx:id="valueBrightness" text=" 0" GridPane.columnIndex="1" />
-                           </children>
-                        </GridPane>
-                        <Slider fx:id="sliderToBrightness" blockIncrement="0.004" max="1.0" onMouseDragged="#handleBrightness" />
-                     </children>
-                  </GridPane>
-                  <Slider GridPane.rowIndex="4" />
+                  <Accordion prefHeight="49.0" prefWidth="123.0" GridPane.rowIndex="3">
+                    <panes>
+                      <TitledPane fx:id="labelBrightness" animated="false" text="Brightness: 0%">
+                           <content>
+                              <Slider fx:id="sliderToBrightness" blockIncrement="0.004" max="1.0" onMouseDragged="#handleBrightness" prefHeight="14.0" prefWidth="123.0" />
+                           </content>
+                        </TitledPane>
+                      <TitledPane fx:id="labelGrayscale" animated="false" prefHeight="66.0" prefWidth="123.0" text="Grayscale: 0%">
+                           <content>
+                              <Slider fx:id="sliderToGrayscale" blockIncrement="0.1" max="1.0" onMouseDragged="#handleGrayscale" prefHeight="14.0" prefWidth="123.0" />
+                           </content>
+                        </TitledPane>
+                    </panes>
+                  </Accordion>
                </children>
             </GridPane>
               <Button fx:id="btnLoadImage" onAction="#handleLoadImage" text="Load File" />
             <Label fx:id="labelLoadMessage" prefHeight="17.0" prefWidth="125.0" GridPane.rowIndex="1" />
-            <ImageView fx:id="imageView" fitHeight="412.0" fitWidth="432.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ImageView fx:id="imageView" fitHeight="381.0" fitWidth="417.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
