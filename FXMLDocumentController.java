@@ -88,6 +88,10 @@ public class FXMLDocumentController implements Initializable {
     private TitledPane labelGrayscale;
     @FXML
     private Slider sliderToGrayscale;
+    @FXML
+    private TitledPane labelContrast;
+    @FXML
+    private Slider sliderToContrast;
    
 
 
@@ -271,7 +275,12 @@ public class FXMLDocumentController implements Initializable {
             labelGrayscale.setText("Grayscale: " + text + "%");           
         }    
     }
-
+    
+    private double truncatePixel(double pixel) {
+        if(pixel > 1) return pixel = 1;
+        if(pixel < 0) return pixel = 0;
+        return pixel;
+    }
 
     @FXML
     private void handleBrightness(MouseEvent event) {
@@ -280,15 +289,9 @@ public class FXMLDocumentController implements Initializable {
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
-                    double r = colorMatrix[x][y].getRed() + brightnessValue;
-                    double g = colorMatrix[x][y].getGreen() + brightnessValue;
-                    double b = colorMatrix[x][y].getBlue() + brightnessValue;
-                    if(r > 1) r = 1;
-                    if(r < 0) r = 0;
-                    if(g > 1) g = 1;
-                    if(g < 0) g = 0;
-                    if(b > 1) b = 1;
-                    if(b < 0) b = 0;
+                    double r = truncatePixel(colorMatrix[x][y].getRed() + brightnessValue);
+                    double g = truncatePixel(colorMatrix[x][y].getGreen() + brightnessValue);
+                    double b = truncatePixel(colorMatrix[x][y].getBlue() + brightnessValue);
                     Color brightness = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,brightness);
                 }
@@ -296,6 +299,33 @@ public class FXMLDocumentController implements Initializable {
             imageView.setImage(writableImage);
             int text = (int) (brightnessValue * 100);
             labelBrightness.setText("Brightness: " + text + "%");           
+        }
+    }
+    
+        @FXML
+    private void handleContrast(MouseEvent event) {
+        if(image != null) {
+            double contrastValue = (double) sliderToContrast.getValue();
+            double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    double r = truncatePixel(
+                        factor * (colorMatrix[x][y].getRed() - 0.5) + 0.5
+                    );
+                    double g = truncatePixel(
+                        factor * (colorMatrix[x][y].getGreen() - 0.5) + 0.5
+                    );
+                    double b = truncatePixel(
+                        factor * (colorMatrix[x][y].getBlue() - 0.5) + 0.5
+                    );
+                    Color contrast = new Color(r,g,b,1.0);
+                    pixelWriter.setColor(x,y,contrast);
+                }
+            }
+            imageView.setImage(writableImage);
+            int text = (int) (contrastValue * 100);
+            labelContrast.setText("Contrast: " + text + "%");           
         }
     }
 
@@ -420,9 +450,8 @@ public class FXMLDocumentController implements Initializable {
         imageView.setImage(writableImage);           
     }
     
-    
     @FXML
-    private void sliderContext(MouseEvent event) {
+        private void sliderContext() {
         pixelReader = writableImage.getPixelReader();
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
@@ -430,6 +459,23 @@ public class FXMLDocumentController implements Initializable {
             }
         }
     }
+    
+    @FXML
+    private void grayscaleContext(MouseEvent event) {
+        sliderContext();
+    }
+
+    @FXML
+    private void brightnessContext(MouseEvent event) {
+        sliderContext();
+
+    }
+
+    @FXML
+    private void contrastContext(MouseEvent event) {
+        sliderContext();
+    }
+
     
 
     @FXML
@@ -443,14 +489,16 @@ public class FXMLDocumentController implements Initializable {
         restartUI();
     }
 
-
-
     private void restartUI() {
         sliderToGrayscale.setValue(0);
         sliderToBrightness.setValue(0);
         labelGrayscale.setText("Grayscale: 0%");
         labelBrightness.setText("Brightness: 0%"); 
     }
+
+
+
+
 
 
   
