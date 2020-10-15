@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 
 
 
@@ -59,10 +60,11 @@ public class FXMLDocumentController implements Initializable {
     private int imageWidth;
     private int imageHeight;
     private Color [][] colorMatrix;
+    private Color [][] originalMatrix;
     @FXML
-    private ToggleButton buttonToNegative;
+    private Button buttonToNegative;
     @FXML
-    private ToggleButton buttonToBlackWhite;
+    private Button buttonToBlackWhite;
     @FXML
     private Label labelLoadMessage;
     private Label infoImage;
@@ -78,10 +80,6 @@ public class FXMLDocumentController implements Initializable {
     private Slider sliderToBrightness;
     @FXML
     private TitledPane labelBrightness;
-    @FXML
-    private Button btnUndo;
-    @FXML
-    private Button btnRedo;
     
     private String numberMagic;
     @FXML
@@ -99,7 +97,12 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
 
-    }    
+    }
+    
+    private void updateColorMatrix() {
+        
+    }
+
 
     @FXML
     private void handleLoadImage(ActionEvent event) {
@@ -141,23 +144,20 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void convertToNegative(ActionEvent event) {
         if(image != null) {
-            if(buttonToNegative.isSelected()) {
-                pixelWriter = writableImage.getPixelWriter();
-                for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {                
-                       Color negative = new Color(
-                               1 - colorMatrix[x][y].getRed(), 
-                               1 - colorMatrix[x][y].getGreen(),
-                               1 - colorMatrix[x][y].getBlue(),
-                               1.0
-                       );
-                       pixelWriter.setColor(x,y,negative);
-                   }
-                }
-               imageView.setImage(writableImage);           
-            }else {
-                imageView.setImage(image);           
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+               for (int x = 0; x < imageWidth; x++) {                
+                   Color negative = new Color(
+                           1 - colorMatrix[x][y].getRed(), 
+                           1 - colorMatrix[x][y].getGreen(),
+                           1 - colorMatrix[x][y].getBlue(),
+                           1.0
+                   );
+                   pixelWriter.setColor(x,y,negative);
+                   colorMatrix[x][y] = negative;
+               }
             }
+           imageView.setImage(writableImage);
         }
     }
     
@@ -166,7 +166,6 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void convertToBlackWhite(ActionEvent event) {        
         if(image != null) {
-            if(buttonToBlackWhite.isSelected()) {
                 pixelWriter = writableImage.getPixelWriter();
                 for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -183,13 +182,12 @@ public class FXMLDocumentController implements Initializable {
                             blackwhite = new Color(0, 0, 0, 1.0);
                         }
                         
-                       pixelWriter.setColor(x,y,blackwhite);
+                        pixelWriter.setColor(x,y,blackwhite);
+                        colorMatrix[x][y] = blackwhite;
+
                    }
                 }
                imageView.setImage(writableImage);           
-            }else {
-                imageView.setImage(image);           
-            }
         }
     }
  
@@ -198,6 +196,7 @@ public class FXMLDocumentController implements Initializable {
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 colorMatrix[x][y] = pixelReader.getColor(x, y);
+                originalMatrix[x][y] = colorMatrix[x][y];
                 checkUniqueColors(colorMatrix[x][y]);
             }
         }
@@ -210,6 +209,7 @@ public class FXMLDocumentController implements Initializable {
     }
         
     private void  initPixelsColors() {
+        originalMatrix = new Color[imageWidth][imageHeight];
         colorMatrix = new Color[imageWidth][imageHeight];
     } 
       
@@ -263,7 +263,7 @@ public class FXMLDocumentController implements Initializable {
                                ggreen * (1 - gv) + average * gv,
                                gblue * (1 - gv) + average * gv,
                                1.0);
-                       pixelWriter.setColor(x,y,grayScale);
+                        pixelWriter.setColor(x,y,grayScale);
                    }
                 }
             imageView.setImage(writableImage);
@@ -283,12 +283,12 @@ public class FXMLDocumentController implements Initializable {
                     double r = colorMatrix[x][y].getRed() + brightnessValue;
                     double g = colorMatrix[x][y].getGreen() + brightnessValue;
                     double b = colorMatrix[x][y].getBlue() + brightnessValue;
-                    if(r > 1)
-                        r = 1;
-                    if(g > 1)
-                        g = 1;
-                    if(b > 1)
-                        b = 1;
+                    if(r > 1) r = 1;
+                    if(r < 0) r = 0;
+                    if(g > 1) g = 1;
+                    if(g < 0) g = 0;
+                    if(b > 1) b = 1;
+                    if(b < 0) b = 0;
                     Color brightness = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,brightness);
                 }
@@ -299,13 +299,6 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleUndo(ActionEvent event) {
-    }
-
-    @FXML
-    private void handleRedo(ActionEvent event) {
-    }
     
     private void setDimensions(String line) {
         String widthString = "", heightString = "";
@@ -341,6 +334,8 @@ public class FXMLDocumentController implements Initializable {
         writableImage = new WritableImage(imageWidth, imageHeight);
         setPixelsColorsBMP();
         imageView.setPreserveRatio(true);
+        imageView.setFitWidth(347);
+        imageView.setFitHeight(532);        
         imageView.setImage(image);
         labelLoadMessage.setText("Loaded successfully!");
         setPixelsFormatLabel();
@@ -424,12 +419,39 @@ public class FXMLDocumentController implements Initializable {
         imageView.setPreserveRatio(true);
         imageView.setImage(writableImage);           
     }
+    
+    
+    @FXML
+    private void sliderContext(MouseEvent event) {
+        pixelReader = writableImage.getPixelReader();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                colorMatrix[x][y] = pixelReader.getColor(x, y);
+            }
+        }
+    }
+    
 
     @FXML
     private void convertToDefault(ActionEvent event) {
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                colorMatrix[x][y] = originalMatrix[x][y];
+            }
+        } 
         imageView.setImage(imageLoaded);
+        restartUI();
     }
 
 
 
+    private void restartUI() {
+        sliderToGrayscale.setValue(0);
+        sliderToBrightness.setValue(0);
+        labelGrayscale.setText("Grayscale: 0%");
+        labelBrightness.setText("Brightness: 0%"); 
+    }
+
+
+  
 }
