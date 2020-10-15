@@ -70,7 +70,7 @@
             <ImageView fx:id="imageView" fitHeight="313.0" fitWidth="279.0" layoutX="52.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </AnchorPane>
-      <Button fx:id="btnDefault" layoutX="14.0" layoutY="95.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="168.0" text="Restore Image" />
+      <Button fx:id="btnDefault" layoutX="14.0" layoutY="95.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="168.0" text="Reset Image" />
       <SplitPane dividerPositions="0.32450331125827814, 0.6754966887417219" layoutX="15.0" layoutY="629.0" orientation="VERTICAL" prefHeight="153.0" prefWidth="230.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">

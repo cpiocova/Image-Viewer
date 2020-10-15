@@ -53,9 +53,13 @@ public class MainController implements Initializable {
     
     private Image image;
     private WritableImage writableImage;
+    private WritableImage writableNetpbm;
+
     
     private PixelReader pixelReader;
     private PixelWriter pixelWriter;
+    private PixelWriter pixelWriterNetpbm;
+
     
     private int imageWidth;
     private int imageHeight;
@@ -216,14 +220,13 @@ public class MainController implements Initializable {
     }
  
     
-    private void  setPixelsColorsBMP() {
+    private void  setColorPixelsBmp() {
         Color [][] current = new Color[imageWidth][imageHeight];
         Color [][] original = new Color[imageWidth][imageHeight];
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
-                current[x][y] = pixelReader.getColor(x, y);
-                original[x][y] = current[x][y];
-//                checkUniqueColors(colorMatrix[x][y]);
+                original[x][y] = current[x][y] = pixelReader.getColor(x, y);
+                checkUniqueColors(current[x][y]);
             }
         }
         pic.setColorMatrix(current);
@@ -243,7 +246,7 @@ public class MainController implements Initializable {
     
         
     private void setDimensionsLabel() {
-        infoDimensionsImage.setText("Width: " + pic.getDimensions().getWidth() + "px. Heigh: " + pic.getDimensions().getHeight() + "px.");
+        infoDimensionsImage.setText("Width: " + imageWidth + "px. Heigh: " + imageHeight + "px.");
     }
     
     private void  setPixelsFormatLabel() {
@@ -399,8 +402,7 @@ public class MainController implements Initializable {
         pixelReader = pic.getImageOriginal().getPixelReader();
         writableImage = new WritableImage(width, height);
         
-        setPixelsColorsBMP();
-        
+        setColorPixelsBmp();
         configurationImageView();
         
     }
@@ -427,7 +429,7 @@ public class MainController implements Initializable {
                             break;
                         default:
                             line = line.replaceAll("\\s+","");   
-                            setPixelsColorsNetbpm(line, row);
+                            buildMatrixNetbpm(line, row);
                             row++;
                             lineNumber++;
                             break;
@@ -441,7 +443,7 @@ public class MainController implements Initializable {
         }
     }
     
-    private void setPixelsColorsNetbpm(String line, int row) {       
+    private void buildMatrixNetbpm(String line, int row) {       
         int i = 0;
         int x = i;
         while(i < line.length()) {
@@ -459,12 +461,30 @@ public class MainController implements Initializable {
                 row++;
             }
         }
-        pic.setColorMatrix(bufferNetpbm);
+    }
+    
+    private void setColorPixelsNetbpm() {
+        Color [][] current = new Color[imageWidth][imageHeight];
+        Color [][] original = new Color[imageWidth][imageHeight];
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                original[x][y] = current[x][y] = bufferNetpbm[x][y];
+                checkUniqueColors(current[x][y]);
+            }
+        }
+        pic.setColorMatrix(current);
+        pic.setOriginalMatrix(original);    
     }
     
     private void renderImageNetbpm() {
         writableImage = new WritableImage(imageWidth, imageHeight);
+        writableNetpbm = new WritableImage(imageWidth, imageHeight);
+        
         pixelWriter = writableImage.getPixelWriter();
+        pixelWriterNetpbm = writableNetpbm.getPixelWriter();
+
+        setColorPixelsNetbpm();
+        
         Color [][] current = pic.getColorMatrix();
         for (int y = 0; y < imageHeight; y++) {
            for (int x = 0; x < imageWidth; x++) {
@@ -475,13 +495,16 @@ public class MainController implements Initializable {
                    pbm = new Color(1,1,1,1.0);
                }
                pixelWriter.setColor(x,y,pbm);
+               pixelWriterNetpbm.setColor(x,y,pbm);
            }
         }
         
-        pixelReader = writableImage.getPixelReader();
-        pic.setImageOriginal(writableImage);
-        setImageLoaded(pic.getImageOriginal());
+        pic.setImageOriginal(writableNetpbm);
         
+        pixelReader = writableImage.getPixelReader();
+        
+        setImageLoaded(writableNetpbm);
+
         configurationImageView();       
     }
     
