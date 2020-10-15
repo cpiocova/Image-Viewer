@@ -50,35 +50,33 @@ import javafx.stage.Stage;
 public class MainController implements Initializable {
     
     private BlankPic pic;
-    private ImageSize dimensions;
-
-    @FXML
-    private Button btnLoadImage;
-    @FXML
-    private ImageView imageView;
     
     private Image image;
-    private Image imageLoaded;
     private WritableImage writableImage;
-
     
     private PixelReader pixelReader;
     private PixelWriter pixelWriter;
     
-    private String fileFormat;
-    
     private int imageWidth;
     private int imageHeight;
-    private Color [][] colorMatrix;
-    private Color [][] originalMatrix;
+    private Color [][] bufferNetpbm;
+
+    
+    @FXML
+    private ImageView imageView;
+    
     @FXML
     private Button buttonToNegative;
+    
     @FXML
     private Button buttonToBlackWhite;
+    
     @FXML
     private Label labelLoadMessage;
+    
     @FXML
     private Label infoDimensionsImage;
+    
     @FXML
     private Label infoFormatPixelImage;
     
@@ -112,9 +110,20 @@ public class MainController implements Initializable {
 
     }
     
-    private void updateColorMatrix() {
-        
+    private void setImageLoaded(Image image) {
+        this.image = image;
     }
+    
+    private void configurationImageView() {
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(347);
+        imageView.setFitHeight(532);        
+        imageView.setImage(pic.getImageOriginal());
+        labelLoadMessage.setText("Loaded successfully!");
+        setPixelsFormatLabel();
+        setUniqueColor();
+    }
+    
 
 
     @FXML
@@ -157,19 +166,21 @@ public class MainController implements Initializable {
     @FXML
     private void convertToNegative(ActionEvent event) {
         if(image != null) {
+            Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                for (int x = 0; x < imageWidth; x++) {                
                    Color negative = new Color(
-                           1 - colorMatrix[x][y].getRed(), 
-                           1 - colorMatrix[x][y].getGreen(),
-                           1 - colorMatrix[x][y].getBlue(),
+                           1 - current[x][y].getRed(), 
+                           1 - current[x][y].getGreen(),
+                           1 - current[x][y].getBlue(),
                            1.0
                    );
                    pixelWriter.setColor(x,y,negative);
-                   colorMatrix[x][y] = negative;
+                   current[x][y] = negative;
                }
             }
+            pic.setColorMatrix(current);
            imageView.setImage(writableImage);
         }
     }
@@ -179,40 +190,44 @@ public class MainController implements Initializable {
     @FXML
     private void convertToBlackWhite(ActionEvent event) {        
         if(image != null) {
+                Color [][] current = pic.getColorMatrix();
                 pixelWriter = writableImage.getPixelWriter();
                 for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
                        double average = (
-                               colorMatrix[x][y].getRed() +
-                               colorMatrix[x][y].getGreen() +
-                               colorMatrix[x][y].getBlue()
+                               current[x][y].getRed() +
+                               current[x][y].getGreen() +
+                               current[x][y].getBlue()
                                )/3;
                        Color blackwhite;
                         if(average > 0.5) {
                             blackwhite = new Color(1, 1, 1, 1.0);
-
                         } else {
                             blackwhite = new Color(0, 0, 0, 1.0);
                         }
                         
                         pixelWriter.setColor(x,y,blackwhite);
-                        colorMatrix[x][y] = blackwhite;
-
+                        current[x][y] = blackwhite;
                    }
                 }
-               imageView.setImage(writableImage);           
+                pic.setColorMatrix(current);
+                imageView.setImage(writableImage);           
         }
     }
  
     
     private void  setPixelsColorsBMP() {
+        Color [][] current = new Color[imageWidth][imageHeight];
+        Color [][] original = new Color[imageWidth][imageHeight];
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
-                colorMatrix[x][y] = pixelReader.getColor(x, y);
-                originalMatrix[x][y] = colorMatrix[x][y];
-                checkUniqueColors(colorMatrix[x][y]);
+                current[x][y] = pixelReader.getColor(x, y);
+                original[x][y] = current[x][y];
+//                checkUniqueColors(colorMatrix[x][y]);
             }
         }
+        pic.setColorMatrix(current);
+        pic.setOriginalMatrix(original);
     }
     
     private void  checkUniqueColors(Color colorPixel) {
@@ -221,21 +236,14 @@ public class MainController implements Initializable {
         }
     }
         
-    private void  initPixelsColors() {
-        originalMatrix = new Color[imageWidth][imageHeight];
-        colorMatrix = new Color[imageWidth][imageHeight];
-    } 
-      
     private void setImageSize(int width, int height) {
         imageWidth = width;
         imageHeight = height;
-        initPixelsColors();
-        setDimensionsLabel();
     }
     
         
     private void setDimensionsLabel() {
-        infoDimensionsImage.setText("Width: " + imageWidth + "px. Heigh: " + imageHeight + "px.");
+        infoDimensionsImage.setText("Width: " + pic.getDimensions().getWidth() + "px. Heigh: " + pic.getDimensions().getHeight() + "px.");
     }
     
     private void  setPixelsFormatLabel() {
@@ -263,15 +271,16 @@ public class MainController implements Initializable {
     private void handleGrayscale(MouseEvent event) {
             if(image != null) {
             restartBrightness();
-            restartContrast();                  
+            restartContrast();
+            Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
             double gred, ggreen, gblue;
                 for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
-                       gred = colorMatrix[x][y].getRed();
-                       ggreen = colorMatrix[x][y].getGreen();
-                       gblue = colorMatrix[x][y].getBlue();
+                       gred = current[x][y].getRed();
+                       ggreen = current[x][y].getGreen();
+                       gblue = current[x][y].getBlue();
                        double average = (gred + ggreen + gblue)/3;
                        Color grayScale = new Color(
                                gred * (1 - gv) + average * gv,
@@ -297,14 +306,15 @@ public class MainController implements Initializable {
     private void handleBrightness(MouseEvent event) {
         if(image != null) {
             restartGrayscale();
-            restartContrast();              
+            restartContrast();   
+            Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
-                    double r = truncatePixel(colorMatrix[x][y].getRed() + brightnessValue);
-                    double g = truncatePixel(colorMatrix[x][y].getGreen() + brightnessValue);
-                    double b = truncatePixel(colorMatrix[x][y].getBlue() + brightnessValue);
+                    double r = truncatePixel(current[x][y].getRed() + brightnessValue);
+                    double g = truncatePixel(current[x][y].getGreen() + brightnessValue);
+                    double b = truncatePixel(current[x][y].getBlue() + brightnessValue);
                     Color brightness = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,brightness);
                 }
@@ -320,19 +330,20 @@ public class MainController implements Initializable {
         if(image != null) {
             restartGrayscale();
             restartBrightness();
+            Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     double r = truncatePixel(
-                        factor * (colorMatrix[x][y].getRed() - 0.5) + 0.5
+                        factor * (current[x][y].getRed() - 0.5) + 0.5
                     );
                     double g = truncatePixel(
-                        factor * (colorMatrix[x][y].getGreen() - 0.5) + 0.5
+                        factor * (current[x][y].getGreen() - 0.5) + 0.5
                     );
                     double b = truncatePixel(
-                        factor * (colorMatrix[x][y].getBlue() - 0.5) + 0.5
+                        factor * (current[x][y].getBlue() - 0.5) + 0.5
                     );
                     Color contrast = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,contrast);
@@ -363,6 +374,7 @@ public class MainController implements Initializable {
         int width = Integer.parseInt(widthString.trim());
         int height = Integer.parseInt(heightString.trim());
         
+        pic.setDimensions(new ImageSize(width, height));
         setImageSize(width, height);
 
     }
@@ -372,24 +384,24 @@ public class MainController implements Initializable {
     }
 
     private void bmpLoader(File path) {
-        imageLoaded = new Image("file:" + path.getAbsolutePath());
-        Image imageLoad = new Image("file:" + path.getAbsolutePath());
-        pic.setImageDefault(imageLoad);
-        pic.setImageChanging(imageLoad);
-        image = imageLoaded;
-        dimensions = new ImageSize((int)image.getWidth(), (int)image.getHeight());
-//        pic.set
-        setImageSize((int)image.getWidth(), (int)image.getHeight());
-        pixelReader = image.getPixelReader();
-        writableImage = new WritableImage(imageWidth, imageHeight);
+        Image imageLoaded = new Image("file:" + path.getAbsolutePath());
+        pic.setImageOriginal(imageLoaded);
+        
+        setImageLoaded(pic.getImageOriginal());
+        
+        pic.setDimensions(new ImageSize((int)image.getWidth(), (int)image.getHeight()));
+        
+        int width = pic.getDimensions().getWidth();
+        int height = pic.getDimensions().getHeight();
+        
+        setImageSize(width, height);
+        
+        pixelReader = pic.getImageOriginal().getPixelReader();
+        writableImage = new WritableImage(width, height);
+        
         setPixelsColorsBMP();
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(347);
-        imageView.setFitHeight(532);        
-        imageView.setImage(image);
-        labelLoadMessage.setText("Loaded successfully!");
-        setPixelsFormatLabel();
-        setUniqueColor();
+        
+        configurationImageView();
         
     }
     
@@ -410,6 +422,7 @@ public class MainController implements Initializable {
                             break;
                         case 2:
                             setDimensions(line);
+                            bufferNetpbm = new Color[imageWidth][imageHeight];
                             lineNumber++;
                             break;
                         default:
@@ -438,25 +451,25 @@ public class MainController implements Initializable {
             }else {
                 color = 0;
             }
-            colorMatrix[x][row] = new Color(color, color, color, 1.0);
+            bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
             i++;
             x++;
             if(x == imageWidth) {
                 x = 0;
                 row++;
             }
-            
         }
+        pic.setColorMatrix(bufferNetpbm);
     }
     
     private void renderImageNetbpm() {
         writableImage = new WritableImage(imageWidth, imageHeight);
         pixelWriter = writableImage.getPixelWriter();
-
+        Color [][] current = pic.getColorMatrix();
         for (int y = 0; y < imageHeight; y++) {
            for (int x = 0; x < imageWidth; x++) {
                Color pbm;
-               if(colorMatrix[x][y].getRed() == 0){
+               if(current[x][y].getRed() == 0){
                    pbm = new Color(0,0,0,1.0);
                } else {
                    pbm = new Color(1,1,1,1.0);
@@ -464,20 +477,27 @@ public class MainController implements Initializable {
                pixelWriter.setColor(x,y,pbm);
            }
         }
-        imageLoaded = writableImage;
-        image = imageLoaded;
-        imageView.setPreserveRatio(true);
-        imageView.setImage(writableImage);           
+        
+        pixelReader = writableImage.getPixelReader();
+        pic.setImageOriginal(writableImage);
+        setImageLoaded(pic.getImageOriginal());
+        
+        configurationImageView();       
     }
     
     @FXML
-        private void sliderContext() {
-        pixelReader = writableImage.getPixelReader();
-        for (int y = 0; y < imageHeight; y++) {
-            for (int x = 0; x < imageWidth; x++) {
-                colorMatrix[x][y] = pixelReader.getColor(x, y);
+    private void sliderContext() {
+        if(image != null) {
+            Color [][] current = pic.getColorMatrix();
+            pixelReader = writableImage.getPixelReader();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    current[x][y] = pixelReader.getColor(x, y);
+                }
             }
+            pic.setColorMatrix(current);        
         }
+
     }
     
     @FXML
@@ -505,13 +525,19 @@ public class MainController implements Initializable {
 
     @FXML
     private void convertToDefault(ActionEvent event) {
-        for (int y = 0; y < imageHeight; y++) {
-            for (int x = 0; x < imageWidth; x++) {
-                colorMatrix[x][y] = originalMatrix[x][y];
+        if(image != null) {
+            Color [][] current = pic.getColorMatrix();
+            Color [][] original = pic.getOriginalMatrix();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    current[x][y] = original[x][y];
+                }
             }
-        } 
-        imageView.setImage(imageLoaded);
-        restartUI();
+            pic.setColorMatrix(current);
+            imageView.setImage(pic.getImageOriginal());
+            restartUI();    
+        }
+
     }
 
     private void restartUI() {

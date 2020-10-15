@@ -16,17 +16,9 @@ import javafx.scene.paint.Color;
  *
  * @author Jose Pio
  */
-public class BlankPic {
-    private WritableImage writableImage;
-    private PixelReader pixelReader;
-    private PixelWriter pixelWriter;
-    
-    private Image imageChanging;
-    private Image imageDefault;
-    
-    private int imageWidth;
-    private int imageHeight;
-    
+public class BlankPic {  
+    private Image imageOriginal;
+       
     private ImageSize dimensions;
     
     private Color [][] colorMatrix;
@@ -45,22 +37,13 @@ public class BlankPic {
         this.fileFormat = fileFormat;
     }
 
-    public Image getImageDefault() {
-        return imageDefault;
+    
+    public Image getImageOriginal() {
+        return imageOriginal;
     }
 
-
-    public void setImageDefault(Image imageDefault) {
-        this.imageDefault = imageDefault;
-    }    
-    
-    
-    public Image getImageChanging() {
-        return imageChanging;
-    }
-
-    public void setImageChanging(Image imageChanging) {
-        this.imageChanging = imageChanging;
+    public void setImageOriginal(Image imageChanging) {
+        this.imageOriginal = imageChanging;
     }
     
 
@@ -68,14 +51,33 @@ public class BlankPic {
        return dimensions;
    }
    
-    public void setImageSize(ImageSize dimensions) {
+    public void setDimensions(ImageSize dimensions) {
         this.dimensions = dimensions;
-    }   
-   
-    
+    }
 
-    
-    
+    public Color[][] getColorMatrix() {
+        return colorMatrix;
+    }
 
+    public void setColorMatrix(Color[][] colorMatrix) {
+        this.colorMatrix = colorMatrix;
+    }
+
+    public Color[][] getOriginalMatrix() {
+        return originalMatrix;
+    }
+
+    public void setOriginalMatrix(Color[][] originalMatrix) {
+        this.originalMatrix = originalMatrix;
+    }
+
+    public ArrayList getUniqueColorsList() {
+        return uniqueColorsList;
+    }
+
+    public void setUniqueColorsList(ArrayList uniqueColorsList) {
+        this.uniqueColorsList = uniqueColorsList;
+    }
+    
 }
 
