@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package piopdi1;
+package controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -14,7 +15,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
@@ -27,10 +27,14 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TouchEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 
 
@@ -40,7 +44,7 @@ import javafx.scene.input.TouchEvent;
  *
  * @author Jose Pio
  */
-public class FXMLDocumentController implements Initializable {
+public class MainController implements Initializable {
 
     @FXML
     private Button btnLoadImage;
@@ -139,10 +143,7 @@ public class FXMLDocumentController implements Initializable {
                     labelLoadMessage.setText("Incompatible Format.");
                     break;
             }
-        }
-        
-        
-        
+        }       
     }
     
     @FXML
@@ -253,6 +254,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleGrayscale(MouseEvent event) {
             if(image != null) {
+            restartBrightness();
+            restartContrast();                  
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
             double gred, ggreen, gblue;
@@ -285,6 +288,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleBrightness(MouseEvent event) {
         if(image != null) {
+            restartGrayscale();
+            restartContrast();              
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -305,6 +310,8 @@ public class FXMLDocumentController implements Initializable {
         @FXML
     private void handleContrast(MouseEvent event) {
         if(image != null) {
+            restartGrayscale();
+            restartBrightness();
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
             pixelWriter = writableImage.getPixelWriter();
@@ -461,19 +468,24 @@ public class FXMLDocumentController implements Initializable {
     }
     
     @FXML
-    private void grayscaleContext(MouseEvent event) {
+    private void grayscaleContext(ActionEvent event) {
         sliderContext();
+        sliderToGrayscale.setValue(0);
+        labelGrayscale.setText("Grayscale: 0%");
     }
 
     @FXML
-    private void brightnessContext(MouseEvent event) {
+    private void brightnessContext(ActionEvent event) {
         sliderContext();
-
+        sliderToBrightness.setValue(0);
+        labelBrightness.setText("Brightness: 0%");        
     }
 
     @FXML
-    private void contrastContext(MouseEvent event) {
+    private void contrastContext(ActionEvent event) {
         sliderContext();
+        sliderToContrast.setValue(0);        
+        labelContrast.setText("Contrast: 0%");        
     }
 
     
@@ -490,16 +502,44 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void restartUI() {
-        sliderToGrayscale.setValue(0);
-        sliderToBrightness.setValue(0);
-        labelGrayscale.setText("Grayscale: 0%");
-        labelBrightness.setText("Brightness: 0%"); 
+        restartGrayscale();
+        restartBrightness();
+        restartContrast();        
     }
 
+    private void restartGrayscale() {
+        sliderToGrayscale.setValue(0);
+        labelGrayscale.setText("Grayscale: 0%");        
+    }
+    private void restartBrightness() {
+        sliderToBrightness.setValue(0);
+        labelBrightness.setText("Brightness: 0%");     
+    }
+    private void restartContrast() {
+        sliderToContrast.setValue(0);        
+        labelContrast.setText("Contrast: 0%");     
+    }  
 
-
-
-
+    @FXML
+    private void generateHistogram(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load((getClass().getResource("/view/HistogramView.fxml")));
+            
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.showAndWait();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    
+    
+    
 
   
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package piopdi1;
+package model;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,13 +13,13 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author thecnomacVZLA
+ * @author Jose Pio
  */
-public class PioPDI1 extends Application {
+public class Main extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/view/MainView.fxml"));
         
         Scene scene = new Scene(root);
         
