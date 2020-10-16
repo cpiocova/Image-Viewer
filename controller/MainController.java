@@ -130,7 +130,6 @@ public class MainController implements Initializable {
         imageView.setFitWidth(347);
         imageView.setFitHeight(532);        
         imageView.setImage(pic.getImageOriginal());
-        pic.setImageModified(pic.getImageOriginal());
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
         displayUniqueColor();
@@ -404,6 +403,7 @@ public class MainController implements Initializable {
     private void bmpLoader(File path) {
         Image imageLoaded = new Image("file:" + path.getAbsolutePath());
         pic.setImageOriginal(imageLoaded);
+        pic.setImageModified(imageLoaded);
         
         setImageLoaded(pic.getImageOriginal());
         
@@ -521,6 +521,7 @@ public class MainController implements Initializable {
         }
         
         pic.setImageOriginal(writableNetpbm);
+        pic.setImageModified(writableNetpbm);
         pic.setUniqueColors(uniqueColorsList);
         setImageLoaded(writableNetpbm);
         configurationImageView();       
