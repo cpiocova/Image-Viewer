@@ -4,7 +4,9 @@
  * and open the template in the editor.
  */
 package controller;
-import model.BlankPic;
+import object.BlankPic;
+import object.DataColor;
+
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,42 +28,90 @@ public class HistogramController implements Initializable {
 
     @FXML
     private ImageView imageView;
-    private WritableImage writableImage;
+    private WritableImage writableHistogramImage;
+    private WritableImage imageApp;
     
-    private PixelReader pixelReader;
-    private PixelWriter pixelWriter;
+    private int imageWidth;
+    private int imageHeight;
+
+    
+    private PixelReader pixelReaderImage;
+    private PixelWriter pixelHistogramWriter;
+    
+    private Color [][] colorMatrix;
+    
+    private ArrayList arrayNormalColor;    
+    private DataColor dtc;
     
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }   
+    }
     
-    public void allColors(ArrayList uniqueColors) {
+    private void initMain() {
+  
+    }
+    
+    public void allColors(BlankPic pic) {
+
+        imageWidth = pic.getDimensions().getWidth();
+        imageHeight = pic.getDimensions().getHeight();
+        
+        arrayNormalColor = new ArrayList();
+        colorMatrix = pic.getColorMatrix();
+        imageApp = (WritableImage) pic.getImageModified();
+        pixelReaderImage = imageApp.getPixelReader();
+        
+        traverseMatrixColors();
+        
         int width = 256;
         int height = 200;
-//        int count[256]
-        writableImage = new WritableImage(width, height);       
-        pixelWriter = writableImage.getPixelWriter();
-        Color color = (Color) uniqueColors.get(0);
-        int r = (int)(color.getRed() * 255);
         
-//        int g = (int)(color.getGreen() * 255);
-//        int b = (int)(color.getBlue() * 255);
+        writableHistogramImage = new WritableImage(width, height);       
+        pixelHistogramWriter = writableHistogramImage.getPixelWriter();
         
-        System.out.println(r);
-//        for (int y = 0; y < height; y++) {
-//           for (int x = 0; x < width; x++) {
-//
-//               pixelWriter.setColor(x,y,pbm);
-// 
-//           }
-//        }
-//        
+      
+        for (int counter = 0; counter < arrayNormalColor.size(); counter++) { 		      
+            DataColor data = (DataColor) arrayNormalColor.get(counter);
+            System.out.println("--------------" + counter + "-----------------");            
+            System.out.println("color: " + data.getColor());
+            System.out.println("repetitions: " + data.getRepetitions());   
+        }
+      
         
-        imageView.setImage(writableImage);
+        imageView.setImage(writableHistogramImage);
     }
 
+    private int mappingRange(int x){
+        double ent1 = -16777216;
+        double ent2 = -1;
+        double ret1 = 0;
+        double ret2 = 255;
+        return (int) (((ret2 - ret1)/(ent2 - ent1)) * (x - ent2) + ret2);
+    }
    
+    private void  checkUniqueColors(int colorPixel) {
+        DataColor data = new DataColor(colorPixel);
+        if(!arrayNormalColor.contains(data)){
+            arrayNormalColor.add(data);
+        } else {
+            int index = arrayNormalColor.indexOf(data);
+            DataColor newData = (DataColor) arrayNormalColor.get(index);
+            int repeat = newData.getRepetitions() + 1;
+            newData.setRepetitions(repeat);
+            arrayNormalColor.set(index, newData);
+        }
+    }
+    
+    private void traverseMatrixColors() {
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                int color = mappingRange(pixelReaderImage.getArgb(x, y));
+                checkUniqueColors(color);
+            }
+        }
+    }
     
 }
+

@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 package controller;
-import model.BlankPic;
-import model.ImageSize;
+import object.BlankPic;
+import object.ImageSize;
 
 
 import java.io.File;
@@ -130,6 +130,7 @@ public class MainController implements Initializable {
         imageView.setFitWidth(347);
         imageView.setFitHeight(532);        
         imageView.setImage(pic.getImageOriginal());
+        pic.setImageModified(pic.getImageOriginal());
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
         displayUniqueColor();
@@ -193,6 +194,7 @@ public class MainController implements Initializable {
                }
             }
             pic.setColorMatrix(current);
+            pic.setImageModified(writableImage);
            imageView.setImage(writableImage);
         }
     }
@@ -223,6 +225,7 @@ public class MainController implements Initializable {
                    }
                 }
                 pic.setColorMatrix(current);
+                pic.setImageModified(writableImage);                
                 imageView.setImage(writableImage);           
         }
     }
@@ -231,20 +234,22 @@ public class MainController implements Initializable {
     private void  setColorPixelsBmp() {
         Color [][] current = new Color[imageWidth][imageHeight];
         Color [][] original = new Color[imageWidth][imageHeight];
+        
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 original[x][y] = current[x][y] = pixelReader.getColor(x, y);
-                checkUniqueColors(current[x][y]);
+                addColorsUnique(pixelReader.getArgb(x, y));
             }
         }
+        pic.setUniqueColors(uniqueColorsList);        
         pic.setColorMatrix(current);
         pic.setOriginalMatrix(original);
     }
     
-    private void  checkUniqueColors(Color colorPixel) {
+    private void  addColorsUnique(int colorPixel) {
         if(!uniqueColorsList.contains(colorPixel)){
             uniqueColorsList.add(colorPixel);
-        }
+        } 
     }
         
     private void setImageSize(int width, int height) {
@@ -479,7 +484,6 @@ public class MainController implements Initializable {
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 original[x][y] = current[x][y] = bufferNetpbm[x][y];
-                checkUniqueColors(current[x][y]);
             }
         }
         pic.setColorMatrix(current);
@@ -508,13 +512,17 @@ public class MainController implements Initializable {
                pixelWriterNetpbm.setColor(x,y,pbm);
            }
         }
+                
+        pixelReader = writableImage.getPixelReader();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                addColorsUnique(pixelReader.getArgb(x, y));
+            }
+        }
         
         pic.setImageOriginal(writableNetpbm);
-        
-        pixelReader = writableImage.getPixelReader();
-        
+        pic.setUniqueColors(uniqueColorsList);
         setImageLoaded(writableNetpbm);
-
         configurationImageView();       
     }
     
@@ -528,6 +536,7 @@ public class MainController implements Initializable {
                     current[x][y] = pixelReader.getColor(x, y);
                 }
             }
+            pic.setImageModified(writableImage);
             pic.setColorMatrix(current);        
         }
 
@@ -567,6 +576,7 @@ public class MainController implements Initializable {
                 }
             }
             pic.setColorMatrix(current);
+            pic.setImageModified(pic.getImageOriginal());
             imageView.setImage(pic.getImageOriginal());
             restartUI();    
         }
@@ -601,7 +611,7 @@ public class MainController implements Initializable {
                 
                 HistogramController histogramInstanceController = (HistogramController)loader.getController();
                 
-                histogramInstanceController.allColors(uniqueColorsList);
+                histogramInstanceController.allColors(pic);
                
                Scene scene = new Scene(root);
                Stage stage = new Stage();

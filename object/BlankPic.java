@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package object;
 
 import java.util.ArrayList;
 import javafx.scene.image.Image;
@@ -18,16 +18,18 @@ import javafx.scene.paint.Color;
  */
 public class BlankPic {  
     private Image imageOriginal;
+    private Image imageModified;
        
     private ImageSize dimensions;
     
     private Color [][] colorMatrix;
     private Color [][] originalMatrix;
     
-    private ArrayList uniqueColorsList;
+    private ArrayList uniqueColors;
     
     private String numberMagic;
     private String fileFormat;
+    
 
     public String getFileFormat() {
         return fileFormat;
@@ -45,6 +47,14 @@ public class BlankPic {
     public void setImageOriginal(Image imageChanging) {
         this.imageOriginal = imageChanging;
     }
+
+    public Image getImageModified() {
+        return imageModified;
+    }
+
+    public void setImageModified(Image imageModified) {
+        this.imageModified = imageModified;
+    }    
     
 
    public ImageSize getDimensions() {
@@ -71,12 +81,12 @@ public class BlankPic {
         this.originalMatrix = originalMatrix;
     }
 
-    public ArrayList getUniqueColorsList() {
-        return uniqueColorsList;
+    public ArrayList getUniqueColors() {
+        return uniqueColors;
     }
 
-    public void setUniqueColorsList(ArrayList uniqueColorsList) {
-        this.uniqueColorsList = uniqueColorsList;
+    public void setUniqueColors(ArrayList uniqueColorsList) {
+        this.uniqueColors = uniqueColorsList;
     }
     
 }
