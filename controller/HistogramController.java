@@ -83,7 +83,7 @@ public class HistogramController implements Initializable {
         writableHistogramImage = new WritableImage(viewWidth, viewHeight);       
         pixelHistogramWriter = writableHistogramImage.getPixelWriter();
         
-        test();
+//        test();
         drawHistogram();
            
         

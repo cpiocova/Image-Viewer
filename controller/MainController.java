@@ -136,8 +136,8 @@ public class MainController implements Initializable {
     
     private void configurationImageView() {
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(400);
-        imageView.setFitHeight(400);      
+        imageView.setFitWidth(300);
+        imageView.setFitHeight(300);      
     }
     
     
