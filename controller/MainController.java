@@ -35,7 +35,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -48,6 +50,8 @@ import javafx.stage.Stage;
  * @author Jose Pio
  */
 public class MainController implements Initializable {
+    
+    MainController mainInstanceController;
     
     private BlankPic pic;
     
@@ -103,6 +107,8 @@ public class MainController implements Initializable {
     private TitledPane labelContrast;
     @FXML
     private Slider sliderToContrast;
+    @FXML
+    private Button btnLoadImage;
    
 
 
@@ -111,6 +117,7 @@ public class MainController implements Initializable {
      @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        mainInstanceController = this;        
 
     }
     
@@ -124,8 +131,9 @@ public class MainController implements Initializable {
         imageView.setFitHeight(532);        
         imageView.setImage(pic.getImageOriginal());
         labelLoadMessage.setText("Loaded successfully!");
-        setPixelsFormatLabel();
-        setUniqueColor();
+        displayPixelsFormatLabel();
+        displayUniqueColor();
+        displayDimensionsLabel();
     }
     
 
@@ -245,11 +253,11 @@ public class MainController implements Initializable {
     }
     
         
-    private void setDimensionsLabel() {
+    private void displayDimensionsLabel() {
         infoDimensionsImage.setText("Width: " + imageWidth + "px. Heigh: " + imageHeight + "px.");
     }
     
-    private void  setPixelsFormatLabel() {
+    private void  displayPixelsFormatLabel() {
         PixelFormat.Type type = pixelReader.getPixelFormat​().getType();
         switch(type) {
             case INT_ARGB_PRE:
@@ -266,8 +274,10 @@ public class MainController implements Initializable {
         }
     }
  
-    private void setUniqueColor() {
-        infoUniqueColorsImage.setText("The image contains " + uniqueColorsList.size() + " unique colors.");
+    private void displayUniqueColor() {
+        infoUniqueColorsImage.setText(
+                "The image contains " + uniqueColorsList.size() + " unique colors."
+        );
     }
     
     @FXML
@@ -584,19 +594,33 @@ public class MainController implements Initializable {
 
     @FXML
     private void generateHistogram(ActionEvent event) {
-        try {
-            Parent root = FXMLLoader.load((getClass().getResource("/view/HistogramView.fxml")));
-            
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-            stage.showAndWait();
-            
-        } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        if(image != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/HistogramView.fxml")));
+                Parent root =  loader.load();
+                
+                HistogramController histogramInstanceController = (HistogramController)loader.getController();
+                
+                histogramInstanceController.allColors(uniqueColorsList);
+               
+               Scene scene = new Scene(root);
+               Stage stage = new Stage();
+               stage.initModality(Modality.APPLICATION_MODAL);
+               stage.setScene(scene);
+               stage.showAndWait();
+
+           } catch (IOException ex) {
+               Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+           }           
         }
+
     }
+
+
+    
+
+ 
+ 
     
     
     
