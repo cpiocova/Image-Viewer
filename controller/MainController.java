@@ -125,16 +125,21 @@ public class MainController implements Initializable {
         this.image = image;
     }
     
-    private void configurationImageView() {
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(347);
-        imageView.setFitHeight(532);        
+    private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
+        configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
         displayUniqueColor();
         displayDimensionsLabel();
     }
+    
+    private void configurationImageView() {
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(400);
+        imageView.setFitHeight(400);      
+    }
+    
     
 
 
@@ -195,6 +200,7 @@ public class MainController implements Initializable {
             pic.setColorMatrix(current);
             pic.setImageModified(writableImage);
            imageView.setImage(writableImage);
+           configurationImageView();
         }
     }
     
@@ -225,7 +231,8 @@ public class MainController implements Initializable {
                 }
                 pic.setColorMatrix(current);
                 pic.setImageModified(writableImage);                
-                imageView.setImage(writableImage);           
+                imageView.setImage(writableImage);
+                configurationImageView();
         }
     }
  
@@ -308,6 +315,7 @@ public class MainController implements Initializable {
                    }
                 }
             imageView.setImage(writableImage);
+            configurationImageView();
             int text = (int) (gv * 100);
             labelGrayscale.setText("Grayscale: " + text + "%");           
         }    
@@ -337,6 +345,7 @@ public class MainController implements Initializable {
                 }
             }
             imageView.setImage(writableImage);
+            configurationImageView();
             int text = (int) (brightnessValue * 100);
             labelBrightness.setText("Brightness: " + text + "%");           
         }
@@ -367,6 +376,7 @@ public class MainController implements Initializable {
                 }
             }
             imageView.setImage(writableImage);
+            configurationImageView();
             int text = (int) (contrastValue * 100);
             labelContrast.setText("Contrast: " + text + "%");           
         }
@@ -418,7 +428,7 @@ public class MainController implements Initializable {
         writableImage = new WritableImage(width, height);
         
         setColorPixelsBmp();
-        configurationImageView();
+        configurationInit();
         
     }
     
@@ -524,7 +534,7 @@ public class MainController implements Initializable {
         pic.setImageModified(writableNetpbm);
         pic.setUniqueColors(uniqueColorsList);
         setImageLoaded(writableNetpbm);
-        configurationImageView();       
+        configurationInit();       
     }
     
     @FXML
@@ -579,6 +589,7 @@ public class MainController implements Initializable {
             pic.setColorMatrix(current);
             pic.setImageModified(pic.getImageOriginal());
             imageView.setImage(pic.getImageOriginal());
+            configurationImageView();
             restartUI();    
         }
 

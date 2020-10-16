@@ -83,10 +83,15 @@ public class HistogramController implements Initializable {
         writableHistogramImage = new WritableImage(viewWidth, viewHeight);       
         pixelHistogramWriter = writableHistogramImage.getPixelWriter();
         
+        test();
         drawHistogram();
            
         
         imageView.setImage(writableHistogramImage);
+        imageView.setFitWidth(viewWidth);
+        imageView.setFitHeight(viewHeight);
+        imageView.setPreserveRatio(true);
+
     }
     
     private void drawHistogram() {
@@ -122,11 +127,11 @@ public class HistogramController implements Initializable {
     }
     
     private int mappingRangeRepeats(int x){
-        double ent1 = maxRepeat;
-        double ent2 = minRepeat;
+        double ent1 = minRepeat;
+        double ent2 = maxRepeat;
         double ret1 = 20;
         double ret2 = 180;
-        if(maxRepeat == minRepeat) return 90; 
+        if(maxRepeat == minRepeat) return 180; 
         return (int) (((ret2 - ret1)/(ent2 - ent1)) * (x - ent2) + ret2);
     }
 
@@ -158,6 +163,16 @@ public class HistogramController implements Initializable {
             newData.setRepetitions(repeat);
             arrayNormalColor.set(index, newData);
         }
-    }    
-}
+    }
 
+    private void  test() {
+        for (int counter = 0; counter < arrayNormalColor.size(); counter++) { 		      
+            DataColor data = (DataColor) arrayNormalColor.get(counter);
+            System.out.println("--------------" + counter + "-----------------");            
+            System.out.println("color: " + data.getColor());
+            System.out.println("repetitions: " + data.getRepetitions());   
+        }
+    }
+
+    
+}

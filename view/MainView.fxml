@@ -65,9 +65,9 @@
             </TitledPane>
         </panes>
       </Accordion>
-      <AnchorPane layoutX="245.0" layoutY="64.0" prefHeight="531.0" prefWidth="383.0">
+      <AnchorPane layoutX="245.0" layoutY="95.0" prefHeight="419.0" prefWidth="383.0">
          <children>
-            <ImageView fx:id="imageView" fitHeight="313.0" fitWidth="279.0" layoutX="52.0" layoutY="109.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="300.0" layoutX="42.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </AnchorPane>
       <Button fx:id="btnDefault" layoutX="14.0" layoutY="95.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="168.0" text="Reset Image" />
