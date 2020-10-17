@@ -30,6 +30,8 @@ public class BlankPic {
     private String numberMagic;
     private String fileFormat;
     
+    private int maxColor;
+    
 
     public String getFileFormat() {
         return fileFormat;
@@ -88,6 +90,16 @@ public class BlankPic {
     public void setUniqueColors(ArrayList uniqueColorsList) {
         this.uniqueColors = uniqueColorsList;
     }
+
+    public int getMaxColor() {
+        return maxColor;
+    }
+
+    public void setMaxColor(int maxColor) {
+        this.maxColor = maxColor;
+    }
+    
+    
     
 }
 

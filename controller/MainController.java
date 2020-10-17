@@ -166,18 +166,19 @@ public class MainController implements Initializable {
                     imgPath.getName().substring(imgPath.getName().lastIndexOf(".") + 1,
                     imgPath.getName().length())
             );
+            uniqueColorsList = new ArrayList();
             switch(pic.getFileFormat()) {
                 case "bmp":                
-                    uniqueColorsList = new ArrayList();
                     bmpLoader(imgPath);
                     break;
-                case "pbm":
-                case "pgm":
                 case "ppm":
-                    uniqueColorsList = new ArrayList();
-                    netpbmLoader(imgPath, pic.getFileFormat());
+                case "pbm":
+                    netpbmLoader(imgPath);
                     break;
-                default:
+                case "pgm":
+                    pgmLoader(imgPath);
+                    break;
+                  default:
                     labelLoadMessage.setText("Incompatible Format.");
                     break;
             }
@@ -484,7 +485,49 @@ public class MainController implements Initializable {
         
     }
     
-    private void netpbmLoader(File path, String format) {
+    private void pgmLoader(File path) {
+        File pathAbs = path.getAbsoluteFile();
+        Scanner scan; 
+        
+        try {
+            scan = new Scanner(pathAbs);           
+            int lineNumber = 1;
+            int row = 0;
+            while(scan.hasNextLine()){
+                String line = scan.nextLine();
+                if(!line.startsWith("#")) {
+                    switch (lineNumber) {
+                        case 1:
+                            setNumberMagic(line);
+                            lineNumber++;
+                            break;
+                        case 2:
+                            setDimensions(line);
+                            bufferNetpbm = new Color[imageWidth][imageHeight];
+                            lineNumber++;
+                            break;
+                        case 3:
+                            int maxColor = Integer.parseInt(line.trim());
+                            pic.setMaxColor(maxColor);
+                            lineNumber++;
+                            break;
+                        default:
+                            line = line.replaceAll("\\s+","");   
+                            buildMatrixNetbpm(line, row);
+                            row++;
+                            lineNumber++;
+                            break;
+                    }
+                }
+            }
+            renderImageNetbpm();
+            
+        } catch (FileNotFoundException ex) {
+            System.out.println("Fail Load");
+        }
+    }
+    
+    private void netpbmLoader(File path) {
         File pathAbs = path.getAbsoluteFile();
         Scanner scan;
         try {
