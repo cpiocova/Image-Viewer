@@ -99,7 +99,13 @@ public class BlankPic {
         this.maxColor = maxColor;
     }
     
-    
+    public double mapRangePgm(int number){
+        double ent1 = 0;
+        double ent2 = maxColor; 
+        double ret1 = 0;
+        double ret2 = 1;
+        return (double) (((ret2 - ret1)/(ent2 - ent1)) * (number - ent2) + ret2);
+    }
     
 }
 

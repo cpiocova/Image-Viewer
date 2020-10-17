@@ -68,6 +68,11 @@ public class MainController implements Initializable {
     private int imageWidth;
     private int imageHeight;
     private Color [][] bufferNetpbm;
+    
+    private int vw;
+    private int vh;
+
+    
 
     
     @FXML
@@ -129,8 +134,19 @@ public class MainController implements Initializable {
         this.image = image;
     }
     
+    private void setViewport() {
+        if(imageWidth > 300 || imageHeight > 300) {
+            vw = 300;
+            vh = 300;
+        } else {
+        vw = imageWidth;
+        vh = imageHeight;  
+        }
+    }
+     
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
+        setViewport();
         configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
@@ -140,8 +156,10 @@ public class MainController implements Initializable {
     
     private void configurationImageView() {
         imageView.setPreserveRatio(true);
+//        imageView.setFitWidth(vw);
+//        imageView.setFitHeight(vh);   
         imageView.setFitWidth(300);
-        imageView.setFitHeight(300);      
+        imageView.setFitHeight(300);   
     }
     
     
@@ -513,14 +531,14 @@ public class MainController implements Initializable {
                             break;
                         default:
                             line = line.replaceAll("\\s+","");   
-                            buildMatrixNetbpm(line, row);
+                            buildMatrixPgm(line, row);
                             row++;
                             lineNumber++;
                             break;
                     }
                 }
             }
-            renderImageNetbpm();
+            renderImagePgm();
             
         } catch (FileNotFoundException ex) {
             System.out.println("Fail Load");
@@ -583,6 +601,26 @@ public class MainController implements Initializable {
         }
     }
     
+        private void buildMatrixPgm(String line, int row) {       
+        int i = 0;
+        int x = i;
+        while(i < line.length()) {
+            int number = Character.getNumericValue(line.charAt(i));
+            double color = pic.mapRangePgm(number);
+            System.out.println("------------" + pic.getMaxColor() + "------------");            
+            System.out.println(color);
+            System.out.println(number);
+
+            bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
+            i++;
+            x++;
+            if(x == imageWidth) {
+                x = 0;
+                row++;
+            }
+        }
+    }
+    
     private void setColorPixelsNetbpm() {
         Color [][] current = new Color[imageWidth][imageHeight];
         Color [][] original = new Color[imageWidth][imageHeight];
@@ -615,6 +653,38 @@ public class MainController implements Initializable {
                }
                pixelWriter.setColor(x,y,pbm);
                pixelWriterNetpbm.setColor(x,y,pbm);
+           }
+        }
+                
+        pixelReader = writableImage.getPixelReader();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                addColorsUnique(pixelReader.getArgb(x, y));
+            }
+        }
+        
+        pic.setImageOriginal(writableNetpbm);
+        pic.setImageModified(writableNetpbm);
+        pic.setUniqueColors(uniqueColorsList);
+        setImageLoaded(writableNetpbm);
+        configurationInit();       
+    }
+    
+    private void renderImagePgm() {
+        writableImage = new WritableImage(imageWidth, imageHeight);
+        writableNetpbm = new WritableImage(imageWidth, imageHeight);
+        
+        pixelWriter = writableImage.getPixelWriter();
+        pixelWriterNetpbm = writableNetpbm.getPixelWriter();
+
+        setColorPixelsNetbpm();
+        
+        Color [][] current = pic.getColorMatrix();
+        for (int y = 0; y < imageHeight; y++) {
+           for (int x = 0; x < imageWidth; x++) {
+                Color pgm = current[x][y];
+                pixelWriter.setColor(x,y,pgm);
+                pixelWriterNetpbm.setColor(x,y,pgm);
            }
         }
                 
