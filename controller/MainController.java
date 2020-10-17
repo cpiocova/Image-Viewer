@@ -109,6 +109,10 @@ public class MainController implements Initializable {
     private Slider sliderToContrast;
     @FXML
     private Button btnLoadImage;
+    @FXML
+    private TitledPane labelThresholding;
+    @FXML
+    private Slider sliderToThresholding;
    
 
 
@@ -183,6 +187,10 @@ public class MainController implements Initializable {
     @FXML
     private void convertToNegative(ActionEvent event) {
         if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -209,30 +217,34 @@ public class MainController implements Initializable {
     @FXML
     private void convertToBlackWhite(ActionEvent event) {        
         if(image != null) {
-                Color [][] current = pic.getColorMatrix();
-                pixelWriter = writableImage.getPixelWriter();
-                for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {
-                       double average = (
-                               current[x][y].getRed() +
-                               current[x][y].getGreen() +
-                               current[x][y].getBlue()
-                               )/3;
-                       Color blackwhite;
-                        if(average > 0.5) {
-                            blackwhite = new Color(1, 1, 1, 1.0);
-                        } else {
-                            blackwhite = new Color(0, 0, 0, 1.0);
-                        }
-                        
-                        pixelWriter.setColor(x,y,blackwhite);
-                        current[x][y] = blackwhite;
-                   }
-                }
-                pic.setColorMatrix(current);
-                pic.setImageModified(writableImage);                
-                imageView.setImage(writableImage);
-                configurationImageView();
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();
+            restartThresholding();
+            Color [][] current = pic.getColorMatrix();
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+               for (int x = 0; x < imageWidth; x++) {
+                   double average = (
+                           current[x][y].getRed() +
+                           current[x][y].getGreen() +
+                           current[x][y].getBlue()
+                           )/3;
+                   Color blackwhite;
+                    if(average > 0.5) {
+                        blackwhite = new Color(1, 1, 1, 1.0);
+                    } else {
+                        blackwhite = new Color(0, 0, 0, 1.0);
+                    }
+
+                    pixelWriter.setColor(x,y,blackwhite);
+                    current[x][y] = blackwhite;
+               }
+            }
+            pic.setColorMatrix(current);
+            pic.setImageModified(writableImage);                
+            imageView.setImage(writableImage);
+            configurationImageView();
         }
     }
  
@@ -296,6 +308,7 @@ public class MainController implements Initializable {
             if(image != null) {
             restartBrightness();
             restartContrast();
+            restartThresholding();
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -331,7 +344,8 @@ public class MainController implements Initializable {
     private void handleBrightness(MouseEvent event) {
         if(image != null) {
             restartGrayscale();
-            restartContrast();   
+            restartContrast();
+            restartThresholding();
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -356,6 +370,7 @@ public class MainController implements Initializable {
         if(image != null) {
             restartGrayscale();
             restartBrightness();
+            restartThresholding();
             Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
@@ -382,6 +397,43 @@ public class MainController implements Initializable {
         }
     }
 
+    
+    
+        @FXML
+    private void handleThresholding(MouseEvent event) {
+        if(image != null) {
+            restartGrayscale();
+            restartBrightness();
+            restartContrast();
+            Color [][] current = pic.getColorMatrix();                        
+            double thresholdingValue = (double) sliderToThresholding.getValue();
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    double average = (
+                           current[x][y].getRed() +
+                           current[x][y].getGreen() +
+                           current[x][y].getBlue()
+                           )/3;
+                   Color thresholding;
+                    if(average > thresholdingValue) {
+                        thresholding = new Color(1, 1, 1, 1.0);
+                    }else{
+                        thresholding = new Color(0, 0, 0, 1.0);
+                    }
+  
+                    pixelWriter.setColor(x,y,thresholding);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+            int text = (int) (thresholdingValue * 255);
+            labelThresholding.setText("Thresholding: " + text);           
+        }        
+        
+    }
+    
+    
     
     private void setDimensions(String line) {
         String widthString = "", heightString = "";
@@ -574,7 +626,14 @@ public class MainController implements Initializable {
         labelContrast.setText("Contrast: 0%");        
     }
 
-    
+
+    @FXML
+    private void thresholdingContext(ActionEvent event) {
+        sliderContext();
+        sliderToThresholding.setValue(0.5);        
+        labelThresholding.setText("Thresholding: 127");        
+    }    
+   
 
     @FXML
     private void convertToDefault(ActionEvent event) {
@@ -598,7 +657,8 @@ public class MainController implements Initializable {
     private void restartUI() {
         restartGrayscale();
         restartBrightness();
-        restartContrast();        
+        restartContrast();
+        restartThresholding();
     }
 
     private void restartGrayscale() {
@@ -612,7 +672,11 @@ public class MainController implements Initializable {
     private void restartContrast() {
         sliderToContrast.setValue(0);        
         labelContrast.setText("Contrast: 0%");     
-    }  
+    }
+    private void restartThresholding() {
+        sliderToThresholding.setValue(0.5);        
+        labelThresholding.setText("Thresholding: 127");     
+    }     
 
     @FXML
     private void generateHistogram(ActionEvent event) {
@@ -637,17 +701,6 @@ public class MainController implements Initializable {
         }
 
     }
-
-
-    
-
- 
- 
-    
-    
-    
-    
-    
 
   
 }
