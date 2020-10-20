@@ -101,7 +101,8 @@
         </items>
       </SplitPane>
       <Button layoutX="255.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
-      <Button layoutX="14.0" layoutY="380.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
+      <Button layoutX="14.0" layoutY="405.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
+      <Button layoutX="14.0" layoutY="380.0" mnemonicParsing="false" onAction="#handleRotate" prefHeight="25.0" prefWidth="168.0" text="Rotate" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

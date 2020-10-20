@@ -21,6 +21,7 @@ public class BlankPic {
     private Image imageModified;
        
     private ImageSize dimensions;
+    private ImageSize originalDimensions;
     
     private Color [][] colorMatrix;
     private Color [][] originalMatrix;
@@ -32,7 +33,6 @@ public class BlankPic {
     
     private int maxColor;
     
-
     public String getFileFormat() {
         return fileFormat;
     }
@@ -59,14 +59,23 @@ public class BlankPic {
     }    
     
 
-   public ImageSize getDimensions() {
-       return dimensions;
-   }
+    public ImageSize getDimensions() {
+        return dimensions;
+    }
    
     public void setDimensions(ImageSize dimensions) {
         this.dimensions = dimensions;
     }
 
+    public ImageSize getOriginalDimensions() {
+        return originalDimensions;
+    }
+   
+    public void setOriginalDimensions(ImageSize originalDimensions) {
+        this.originalDimensions = originalDimensions;
+    }
+    
+    
     public Color[][] getColorMatrix() {
         return colorMatrix;
     }
@@ -99,7 +108,7 @@ public class BlankPic {
         this.maxColor = maxColor;
     }
     
-    public double mapRangePgm(int number){
+    public double mapRangePgm(double number){
         double ent1 = 0;
         double ent2 = maxColor; 
         double ret1 = 0;

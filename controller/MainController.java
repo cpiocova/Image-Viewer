@@ -67,6 +67,9 @@ public class MainController implements Initializable {
     
     private int imageWidth;
     private int imageHeight;
+    private int imageWidthOriginal;
+    private int imageHeightOriginal;
+    
     private Color [][] bufferNetpbm;
     
     private int vw;
@@ -189,10 +192,10 @@ public class MainController implements Initializable {
                 case "bmp":                
                     bmpLoader(imgPath);
                     break;
-                case "ppm":
                 case "pbm":
-                    netpbmLoader(imgPath);
+                    pbmLoader(imgPath);
                     break;
+                case "ppm":
                 case "pgm":
                     pgmLoader(imgPath);
                     break;
@@ -473,6 +476,7 @@ public class MainController implements Initializable {
         int height = Integer.parseInt(heightString.trim());
         
         pic.setDimensions(new ImageSize(width, height));
+        pic.setOriginalDimensions(new ImageSize(width, height));
         setImageSize(width, height);
 
     }
@@ -489,6 +493,8 @@ public class MainController implements Initializable {
         setImageLoaded(pic.getImageOriginal());
         
         pic.setDimensions(new ImageSize((int)image.getWidth(), (int)image.getHeight()));
+        pic.setOriginalDimensions(new ImageSize((int)image.getWidth(), (int)image.getHeight()));
+
         
         int width = pic.getDimensions().getWidth();
         int height = pic.getDimensions().getHeight();
@@ -530,8 +536,11 @@ public class MainController implements Initializable {
                             lineNumber++;
                             break;
                         default:
-                            line = line.replaceAll("\\s+","");   
-                            buildMatrixPgm(line, row);
+                            if("pgm".equals(pic.getFileFormat())) {
+                                buildMatrixPgm(line, row);
+                            }else{
+                                buildMatrixPpm(line, row);
+                            }
                             row++;
                             lineNumber++;
                             break;
@@ -545,7 +554,7 @@ public class MainController implements Initializable {
         }
     }
     
-    private void netpbmLoader(File path) {
+    private void pbmLoader(File path) {
         File pathAbs = path.getAbsoluteFile();
         Scanner scan;
         try {
@@ -567,7 +576,7 @@ public class MainController implements Initializable {
                             break;
                         default:
                             line = line.replaceAll("\\s+","");   
-                            buildMatrixNetbpm(line, row);
+                            buildMatrixPbm(line, row);
                             row++;
                             lineNumber++;
                             break;
@@ -581,43 +590,102 @@ public class MainController implements Initializable {
         }
     }
     
-    private void buildMatrixNetbpm(String line, int row) {       
+    private void buildMatrixPbm(String line, int row) {       
         int i = 0;
         int x = i;
         while(i < line.length()) {
-            double color = Character.getNumericValue(line.charAt(i));
-            if(color == 0) {
-                color = 1;
-            }else {
-                color = 0;
+            if(line.charAt(i) == '#') {
+                break;
+            } else {
+                double color = Character.getNumericValue(line.charAt(i));
+                if(color == 0) {
+                    color = 1;
+                }else {
+                    color = 0;
+                }
+                bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
+                i++;
+                x++;
+                if(x == imageWidth) {
+                    x = 0;
+                    row++;
+                }             
             }
-            bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
-            i++;
-            x++;
-            if(x == imageWidth) {
-                x = 0;
-                row++;
-            }
+
         }
     }
     
         private void buildMatrixPgm(String line, int row) {       
         int i = 0;
-        int x = i;
+        int x = 0;
+        String numberString = "";
         while(i < line.length()) {
-            int number = Character.getNumericValue(line.charAt(i));
-            double color = pic.mapRangePgm(number);
-            System.out.println("------------" + pic.getMaxColor() + "------------");            
-            System.out.println(color);
-            System.out.println(number);
-
-            bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
-            i++;
-            x++;
-            if(x == imageWidth) {
-                x = 0;
-                row++;
+            if(line.charAt(i) == '#') {
+                break;
+            } else {
+                if(line.charAt(i) == ' ' && !"".equals(numberString) && !" ".equals(numberString)){
+                    double number = Double.parseDouble(numberString);
+                    double color = pic.mapRangePgm(number);
+                    bufferNetpbm[x][row] = new Color(color,color,color,1.0);
+                    x++;
+                    i++;
+                    numberString = "";
+                } else {
+                    numberString = numberString + line.charAt(i);
+                    i++;
+                    if(i == line.length()) {
+                        double number = Double.parseDouble(numberString);
+                        double color = pic.mapRangePgm(number);
+                        bufferNetpbm[x][row] = new Color(color,color,color,1.0);   
+                    }
+                }                
             }
+
+        }
+    }
+        
+    private void buildMatrixPpm(String line, int row) {
+        int i = 0;
+        int x = 0;
+        int lineX = row % imageWidth;
+        int lineY = row / imageWidth;
+        double color1 = 0; double color2 = 0; double color3 = 0;
+        String numberString = "";
+        while(i < line.length()) {
+            if(line.charAt(i) == '#') {
+                break;
+            } else {
+                if(line.charAt(i) == ' ' && !"".equals(numberString) && !" ".equals(numberString)){
+                    double number = Double.parseDouble(numberString);                
+                    switch (x) {
+                        case 0:
+                            color1 = pic.mapRangePgm(number);
+                            x++;
+                            break;
+                        case 1:
+                            color2 = pic.mapRangePgm(number);
+                            x++;
+                            break;
+                        case 2:
+                            color3 = pic.mapRangePgm(number);
+                            bufferNetpbm[lineX][lineY] = new Color(color1,color2,color3,1.0);
+                            break;
+                        default:
+                            break;
+                    }
+                    i++;
+                    numberString = "";
+                } else {
+                    numberString = numberString + line.charAt(i);
+                    i++;
+                    if(i == line.length()) {
+                        double number = Double.parseDouble(numberString);
+                        color3 = pic.mapRangePgm(number);
+                        bufferNetpbm[lineX][lineY] = new Color(color1,color2,color3,1.0);   
+                    }
+                }                
+            }
+
         }
     }
     
@@ -751,13 +819,17 @@ public class MainController implements Initializable {
     @FXML
     private void convertToDefault(ActionEvent event) {
         if(image != null) {
-            Color [][] current = pic.getColorMatrix();
+            int height = pic.getOriginalDimensions().getHeight();
+            int width = pic.getOriginalDimensions().getWidth();
+            Color [][] current = new Color[width][height];
             Color [][] original = pic.getOriginalMatrix();
-            for (int y = 0; y < imageHeight; y++) {
-                for (int x = 0; x < imageWidth; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
                     current[x][y] = original[x][y];
                 }
             }
+            setImageSize(width, height);
+            pic.setDimensions(new ImageSize(width, height));
             pic.setColorMatrix(current);
             pic.setImageModified(pic.getImageOriginal());
             imageView.setImage(pic.getImageOriginal());
@@ -813,6 +885,36 @@ public class MainController implements Initializable {
            }           
         }
 
+    }
+
+    @FXML
+    private void handleRotate(ActionEvent event) {
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            int width = imageHeight;
+            int height = imageWidth;
+            writableImage = new WritableImage(imageHeight, imageWidth);
+            pixelWriter = writableImage.getPixelWriter();
+            Color [][] current = pic.getColorMatrix();
+            Color [][] rotate = new Color[imageHeight][imageWidth];
+            for (int y = 0; y < width; y++) {
+               for (int x = 0; x < height; x++) {                
+                   rotate[y][x] = current[x][imageHeight - 1 - y];
+                   pixelWriter.setColor(y,x,rotate[y][x]);
+               }
+            }// falta actualizar dimensiones
+            setImageSize(width, height);
+            pic.setDimensions(new ImageSize(width, height));
+            pic.setColorMatrix(rotate);
+            pic.setImageModified(writableImage);
+            imageView.setImage(writableImage);
+            configurationImageView();
+                
+        }
+    
     }
 
   
