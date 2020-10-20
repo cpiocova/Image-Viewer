@@ -194,6 +194,8 @@ public class MainController implements Initializable {
                     break;
                 case "pbm":
                     pbmLoader(imgPath);
+//                    pic.pbmLoader(imgPath);
+//                    renderImageNetbpm();
                     break;
                 case "ppm":
                 case "pgm":
@@ -583,7 +585,7 @@ public class MainController implements Initializable {
                     }
                 }
             }
-            renderImageNetbpm();
+            renderImagePbm();
             
         } catch (FileNotFoundException ex) {
             System.out.println("Fail Load");
@@ -701,9 +703,11 @@ public class MainController implements Initializable {
         pic.setOriginalMatrix(original);    
     }
     
-    private void renderImageNetbpm() {
-        writableImage = new WritableImage(imageWidth, imageHeight);
-        writableNetpbm = new WritableImage(imageWidth, imageHeight);
+    private void renderImagePbm() {
+        int width = pic.getDimensions().getWidth();
+        int height = pic.getDimensions().getHeight();
+        writableImage = new WritableImage(width, height);
+        writableNetpbm = new WritableImage(width, height);
         
         pixelWriter = writableImage.getPixelWriter();
         pixelWriterNetpbm = writableNetpbm.getPixelWriter();
@@ -711,8 +715,8 @@ public class MainController implements Initializable {
         setColorPixelsNetbpm();
         
         Color [][] current = pic.getColorMatrix();
-        for (int y = 0; y < imageHeight; y++) {
-           for (int x = 0; x < imageWidth; x++) {
+        for (int y = 0; y < height; y++) {
+           for (int x = 0; x < width; x++) {
                Color pbm;
                if(current[x][y].getRed() == 0){
                    pbm = new Color(0,0,0,1.0);
@@ -725,8 +729,8 @@ public class MainController implements Initializable {
         }
                 
         pixelReader = writableImage.getPixelReader();
-        for (int y = 0; y < imageHeight; y++) {
-            for (int x = 0; x < imageWidth; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 addColorsUnique(pixelReader.getArgb(x, y));
             }
         }
@@ -821,6 +825,7 @@ public class MainController implements Initializable {
         if(image != null) {
             int height = pic.getOriginalDimensions().getHeight();
             int width = pic.getOriginalDimensions().getWidth();
+            writableImage = new WritableImage(width, height);
             Color [][] current = new Color[width][height];
             Color [][] original = pic.getOriginalMatrix();
             for (int y = 0; y < height; y++) {
