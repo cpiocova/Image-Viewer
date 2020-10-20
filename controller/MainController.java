@@ -70,6 +70,10 @@ public class MainController implements Initializable {
     private int imageWidthOriginal;
     private int imageHeightOriginal;
     
+    private int imageX;
+    private int imageY;
+
+    
     private Color [][] bufferNetpbm;
     
     private int vw;
@@ -195,7 +199,7 @@ public class MainController implements Initializable {
                 case "pbm":
                     pbmLoader(imgPath);
 //                    pic.pbmLoader(imgPath);
-//                    renderImageNetbpm();
+//                    renderImagePbm();
                     break;
                 case "ppm":
                 case "pgm":
@@ -512,9 +516,9 @@ public class MainController implements Initializable {
     }
     
     private void pgmLoader(File path) {
+        imageX = 0; imageY = 0;
         File pathAbs = path.getAbsoluteFile();
-        Scanner scan; 
-        
+        Scanner scan;
         try {
             scan = new Scanner(pathAbs);           
             int lineNumber = 1;
@@ -557,6 +561,7 @@ public class MainController implements Initializable {
     }
     
     private void pbmLoader(File path) {
+        imageX = 0; imageY = 0;
         File pathAbs = path.getAbsoluteFile();
         Scanner scan;
         try {
@@ -578,7 +583,7 @@ public class MainController implements Initializable {
                             break;
                         default:
                             line = line.replaceAll("\\s+","");   
-                            buildMatrixPbm(line, row);
+                            buildMatrixPbm(line);
                             row++;
                             lineNumber++;
                             break;
@@ -592,9 +597,8 @@ public class MainController implements Initializable {
         }
     }
     
-    private void buildMatrixPbm(String line, int row) {       
+    private void buildMatrixPbm(String line) {
         int i = 0;
-        int x = i;
         while(i < line.length()) {
             if(line.charAt(i) == '#') {
                 break;
@@ -605,12 +609,12 @@ public class MainController implements Initializable {
                 }else {
                     color = 0;
                 }
-                bufferNetpbm[x][row] = new Color(color, color, color, 1.0);
+                bufferNetpbm[imageX][imageY] = new Color(color, color, color, 1.0);
                 i++;
-                x++;
-                if(x == imageWidth) {
-                    x = 0;
-                    row++;
+                imageX++;
+                if(imageX == imageWidth) {
+                    imageX = 0;
+                    imageY++;
                 }             
             }
 
@@ -649,8 +653,8 @@ public class MainController implements Initializable {
     private void buildMatrixPpm(String line, int row) {
         int i = 0;
         int x = 0;
-        int lineX = row % imageWidth;
-        int lineY = row / imageWidth;
+//        int lineX = row % imageWidth;
+//        int lineY = row / imageWidth;
         double color1 = 0; double color2 = 0; double color3 = 0;
         String numberString = "";
         while(i < line.length()) {
@@ -670,7 +674,15 @@ public class MainController implements Initializable {
                             break;
                         case 2:
                             color3 = pic.mapRangePgm(number);
-                            bufferNetpbm[lineX][lineY] = new Color(color1,color2,color3,1.0);
+                            if(imageY < imageHeight && imageX < imageWidth) {
+                                bufferNetpbm[imageX][imageY] = new Color(color1,color2,color3,1.0);
+                                x = 0;
+                            }
+                            imageX++;
+                            if(imageX == imageWidth) {
+                                imageX = 0;
+                                imageY++;
+                            }
                             break;
                         default:
                             break;
@@ -683,7 +695,15 @@ public class MainController implements Initializable {
                     if(i == line.length()) {
                         double number = Double.parseDouble(numberString);
                         color3 = pic.mapRangePgm(number);
-                        bufferNetpbm[lineX][lineY] = new Color(color1,color2,color3,1.0);   
+                        if(imageY < imageHeight && imageX < imageWidth) {
+                            bufferNetpbm[imageX][imageY] = new Color(color1,color2,color3,1.0);
+                            x = 0;
+                        }
+                         imageX++;
+                            if(imageX == imageWidth) {
+                                imageX = 0;
+                                imageY++;
+                            }
                     }
                 }                
             }

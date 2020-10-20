@@ -193,8 +193,8 @@ public class BlankPic {
                 }
             }
 //            renderImageNetbpm();
+            scan.close();
             setColorPixelsPbm();
-            
         } catch (FileNotFoundException ex) {
             System.out.println("Fail Load");
         }
@@ -217,6 +217,7 @@ public class BlankPic {
                 imageYHeight++;
             }
         }
+        numbers.close();
     }
     
      
