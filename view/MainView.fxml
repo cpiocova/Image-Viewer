@@ -73,6 +73,16 @@
                   </AnchorPane>
                </content>
             </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Rotation 90°">
+               <content>
+                  <AnchorPane prefHeight="84.0" prefWidth="125.0">
+                     <children>
+                        <Button layoutX="40.0" layoutY="30.0" mnemonicParsing="false" onAction="#handleRotate" text="&lt;" />
+                        <Button layoutX="103.0" layoutY="30.0" mnemonicParsing="false" onAction="#handleRotate" text="&gt;" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
         </panes>
       </Accordion>
       <AnchorPane layoutX="245.0" layoutY="95.0" prefHeight="419.0" prefWidth="383.0">
@@ -101,8 +111,7 @@
         </items>
       </SplitPane>
       <Button layoutX="255.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
-      <Button layoutX="14.0" layoutY="405.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
-      <Button layoutX="14.0" layoutY="380.0" mnemonicParsing="false" onAction="#handleRotate" prefHeight="25.0" prefWidth="168.0" text="Rotate" />
+      <Button layoutX="14.0" layoutY="401.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

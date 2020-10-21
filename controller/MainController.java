@@ -921,16 +921,16 @@ public class MainController implements Initializable {
             restartThresholding();
             int width = imageHeight;
             int height = imageWidth;
+            Color [][] rotate = new Color[imageHeight][imageWidth];
             writableImage = new WritableImage(imageHeight, imageWidth);
             pixelWriter = writableImage.getPixelWriter();
-            Color [][] current = pic.getColorMatrix();
-            Color [][] rotate = new Color[imageHeight][imageWidth];
-            for (int y = 0; y < width; y++) {
-               for (int x = 0; x < height; x++) {                
-                   rotate[y][x] = current[x][imageHeight - 1 - y];
-                   pixelWriter.setColor(y,x,rotate[y][x]);
-               }
-            }// falta actualizar dimensiones
+            String direction = ((Button)event.getSource()).getText();
+            if(">".equals(direction)) {
+                rotate = rotatePositive(width, height, rotate);
+            }else {
+               rotate = rotateNegative(width, height, rotate);
+            }
+
             setImageSize(width, height);
             pic.setDimensions(new ImageSize(width, height));
             pic.setColorMatrix(rotate);
@@ -940,6 +940,29 @@ public class MainController implements Initializable {
                 
         }
     
+    }
+
+ 
+    private Color[][] rotateNegative(int width, int height, Color[][] rotate) {
+        Color [][] current = pic.getColorMatrix();
+        for (int y = 0; y < width; y++) {
+          for (int x = 0; x < height; x++) {                
+              rotate[y][x] = current[imageWidth - 1 - x][y];
+              pixelWriter.setColor(y,x,rotate[y][x]);
+          }
+       }
+        return rotate;
+    }
+
+    private Color[][] rotatePositive(int width, int height, Color[][] rotate) {
+        Color [][] current = pic.getColorMatrix();
+        for (int y = 0; y < width; y++) {
+          for (int x = 0; x < height; x++) {                
+              rotate[y][x] = current[x][imageHeight - 1 - y];
+              pixelWriter.setColor(y,x,rotate[y][x]);
+          }
+       }
+        return rotate;
     }
 
   
