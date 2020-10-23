@@ -40,6 +40,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TouchEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import object.Convolution;
 
 
 
@@ -125,6 +126,14 @@ public class MainController implements Initializable {
     private TitledPane labelThresholding;
     @FXML
     private Slider sliderToThresholding;
+    @FXML
+    private Label labelAverageX;
+    @FXML
+    private Label labelAverageY;
+    @FXML
+    private Slider sliderToAverageX;
+    @FXML
+    private Slider sliderToAverageY;
    
 
 
@@ -837,7 +846,11 @@ public class MainController implements Initializable {
         sliderContext();
         sliderToThresholding.setValue(0.5);        
         labelThresholding.setText("Thresholding: 127");        
-    }    
+    }
+    @FXML
+    private void averageContext(ActionEvent event) {
+        sliderContext();
+    }
    
 
     @FXML
@@ -964,6 +977,41 @@ public class MainController implements Initializable {
        }
         return rotate;
     }
+
+
+
+    @FXML
+    private void handleAverage(MouseEvent event) {
+        int axisX = (int) sliderToAverageX.getValue();
+        int axisY = (int) sliderToAverageY.getValue();
+        labelAverageX.setText("" + axisX);
+        labelAverageY.setText("" + axisY);    
+        if(image != null && (axisX + axisY > 2)) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            Color [][] current = pic.getColorMatrix();                        
+            Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight);
+            mc.searchNS(0,0);
+            
+            pixelWriter = writableImage.getPixelWriter();
+//            for (int y = 0; y < imageHeight; y++) {
+//                for (int x = 0; x < imageWidth; x++) {
+//                   
+//                        
+//                    pixelWriter.setColor(x,y,thresholding);
+//                }
+//            }
+
+            imageView.setImage(writableImage);
+            configurationImageView();
+       
+
+        }   
+    }
+
+ 
 
   
 }
