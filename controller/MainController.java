@@ -986,23 +986,21 @@ public class MainController implements Initializable {
         int axisY = (int) sliderToAverageY.getValue();
         labelAverageX.setText("" + axisX);
         labelAverageY.setText("" + axisY);    
-        if(image != null && (axisX + axisY > 2)) {
+        if(image != null && (axisX + axisY >= 2)) {
             restartBrightness();
             restartContrast();
             restartGrayscale();            
             restartThresholding();
             Color [][] current = pic.getColorMatrix();                        
-            Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight);
-            mc.searchNS(0,0);
-            
             pixelWriter = writableImage.getPixelWriter();
-//            for (int y = 0; y < imageHeight; y++) {
-//                for (int x = 0; x < imageWidth; x++) {
-//                   
-//                        
-//                    pixelWriter.setColor(x,y,thresholding);
-//                }
-//            }
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "average", pic);
+                    mc.searchNS(x,y);
+                    Color averageColor = mc.setMatrixConvolution(current);  
+                    pixelWriter.setColor(x,y,averageColor);
+                }
+            }
 
             imageView.setImage(writableImage);
             configurationImageView();
