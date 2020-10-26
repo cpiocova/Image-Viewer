@@ -24,6 +24,7 @@ public class Convolution {
     private int countElements;
     private ArrayList coordinates;
     private String filterName;
+    private Color[][] colorMatrix;
 
    public Convolution(int width, int height, int imageWidth, int imageHeight, String filterName, BlankPic pic) {
        this.width = width;
@@ -36,35 +37,39 @@ public class Convolution {
        this.imageHeight = imageHeight;
        this.filterName = filterName;
        this.coordinates = new ArrayList();
+       this.colorMatrix = pic.getColorMatrix();
    }
    
-   public Color setMatrixConvolution(Color [][] colorMatrix) {
+   public Color setMatrixConvolution(Color [][] colorM) {
        Color colorRet = new Color(1,1,1,1);
        switch(filterName) {
            case "average":
                fillAverage();
                colorRet = processItems(colorMatrix);
-               countElements = 0;
        }
     return colorRet;
    }
    
    private Color processItems(Color[][] colorMatrix) {
         double red = 0;
-       double green = 0;
-       double blue = 0;
+        double green = 0;
+        double blue = 0;
+     
+
 
   
         for(int i = 0; i < coordinates.size(); i++) {
             Point info = (Point) coordinates.get(i);
             int pX = info.getPosX();
             int pY = info.getPosY();
-            int iX = info.getIndexRow();
-            int iY = info.getIndexColumn();
-
-            red = red + (colorMatrix[pX][pY].getRed() / countElements);
-            green = green + (colorMatrix[pX][pY].getGreen() / countElements);
-            blue = blue + (colorMatrix[pX][pY].getBlue() /countElements);      
+            int iY = info.getIndexRow();
+            int iX = info.getIndexColumn();
+                       
+            double coefficient = matrixConvolution[iX][iY];
+            
+            red = red + (colorMatrix[pX][pY].getRed() * coefficient);
+            green = green + (colorMatrix[pX][pY].getGreen() * coefficient);
+            blue = blue + (colorMatrix[pX][pY].getBlue() * coefficient);                      
         }
        
         if(red > 1) red = 1;
@@ -79,7 +84,7 @@ public class Convolution {
    private void fillAverage() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-         matrixConvolution[x][y] = (1 / countElements);
+         matrixConvolution[x][y] = (1.0 / (double) countElements);
         }
     }
    }
@@ -95,7 +100,7 @@ public class Convolution {
             
             for(int i = 0; i < height - pivotX; i++){
                 int south = coordX + i + 1;
-                if(south < imageHeight - 1) {
+                if(south < imageWidth - 1) {
                     searchEO(south, coordY, pivotX + i);
                 }
             }             
@@ -116,7 +121,7 @@ public class Convolution {
        }
        for(int i = 0; i < width - pivotY; i++){
            int east = coordY + i + 1;
-           if(east < imageWidth - 1) {
+           if(east < imageHeight - 1) {
                 coordinates.add(new Point(coordX, east, indexRow, pivotY + i));
                countElements++;
            }
