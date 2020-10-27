@@ -134,6 +134,14 @@ public class MainController implements Initializable {
     private Slider sliderToAverageX;
     @FXML
     private Slider sliderToAverageY;
+    @FXML
+    private Slider sliderToMedianX;
+    @FXML
+    private Slider sliderToMedianY;
+    @FXML
+    private Label labelMedianX;
+    @FXML
+    private Label labelMedianY;
    
 
 
@@ -228,6 +236,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();            
             restartThresholding();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -258,6 +268,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();
             restartThresholding();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -346,6 +358,8 @@ public class MainController implements Initializable {
             restartBrightness();
             restartContrast();
             restartThresholding();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -383,6 +397,8 @@ public class MainController implements Initializable {
             restartGrayscale();
             restartContrast();
             restartThresholding();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -408,6 +424,8 @@ public class MainController implements Initializable {
             restartGrayscale();
             restartBrightness();
             restartThresholding();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
@@ -442,6 +460,8 @@ public class MainController implements Initializable {
             restartGrayscale();
             restartBrightness();
             restartContrast();
+            restartAverage();
+            restartMedian();            
             Color [][] current = pic.getColorMatrix();                        
             double thresholdingValue = (double) sliderToThresholding.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -848,8 +868,17 @@ public class MainController implements Initializable {
         labelThresholding.setText("Thresholding: 127");        
     }
     @FXML
-    private void averageContext(ActionEvent event) {
+    private void filterAverageContext(ActionEvent event) {
         sliderContext();
+        sliderToAverageX.setValue(1);
+        sliderToAverageY.setValue(1);
+    }
+    
+    @FXML
+    private void filterMedianContext(ActionEvent event) {
+        sliderContext();
+        sliderToMedianX.setValue(1);
+        sliderToMedianY.setValue(1);        
     }
    
 
@@ -882,6 +911,8 @@ public class MainController implements Initializable {
         restartBrightness();
         restartContrast();
         restartThresholding();
+        restartAverage();
+        restartMedian();
     }
 
     private void restartGrayscale() {
@@ -899,7 +930,16 @@ public class MainController implements Initializable {
     private void restartThresholding() {
         sliderToThresholding.setValue(0.5);        
         labelThresholding.setText("Thresholding: 127");     
+    }   
+    private void restartAverage() {
+        sliderToAverageX.setValue(1);
+        sliderToAverageY.setValue(1);        
+    }
+    private void restartMedian() {
+        sliderToMedianX.setValue(1);
+        sliderToMedianY.setValue(1);        
     }     
+    
 
     @FXML
     private void generateHistogram(ActionEvent event) {
@@ -991,25 +1031,46 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();            
             restartThresholding();
-            Color [][] current = pic.getColorMatrix();                        
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "average", pic);
                     mc.searchNS(x,y);
-                    Color averageColor = mc.setMatrixConvolution(current);  
+                    Color averageColor = mc.setMatrixConvolution();  
                     pixelWriter.setColor(x,y,averageColor);
                 }
             }
-
             imageView.setImage(writableImage);
             configurationImageView();
-       
-
         }   
     }
 
- 
+    @FXML
+    private void handleMedian(MouseEvent event) {
+        int axisX = (int) sliderToMedianX.getValue();
+        int axisY = (int) sliderToMedianY.getValue();
+        labelMedianX.setText("" + axisX);
+        labelMedianY.setText("" + axisY);    
+        if(image != null && (axisX + axisY >= 2)) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "median", pic);
+                    mc.searchNS(x,y);
+                    Color medianColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,medianColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+        }  
+        
+    }
+
 
   
 }

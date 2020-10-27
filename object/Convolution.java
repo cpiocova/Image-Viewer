@@ -7,6 +7,9 @@ package object;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
 /**
@@ -25,6 +28,8 @@ public class Convolution {
     private ArrayList coordinates;
     private String filterName;
     private Color[][] colorMatrix;
+    private Image imageModified;
+
 
    public Convolution(int width, int height, int imageWidth, int imageHeight, String filterName, BlankPic pic) {
        this.width = width;
@@ -38,26 +43,50 @@ public class Convolution {
        this.filterName = filterName;
        this.coordinates = new ArrayList();
        this.colorMatrix = pic.getColorMatrix();
+       this.imageModified = pic.getImageModified();
    }
    
-   public Color setMatrixConvolution(Color [][] colorM) {
+   public Color setMatrixConvolution() {
        Color colorRet = new Color(1,1,1,1);
        switch(filterName) {
            case "average":
                fillAverage();
-               colorRet = processItems(colorMatrix);
+               colorRet = processLineal();
+               break;
+           case "median":
+               colorRet = processNoLineal();
+               break;
        }
     return colorRet;
    }
    
-   private Color processItems(Color[][] colorMatrix) {
+   private Color processNoLineal() {
+       
+    ArrayList messyColors = new ArrayList();
+    PixelReader pixelReader = imageModified.getPixelReader();
+    for(int i = 0; i < coordinates.size(); i++) {
+        Point info = (Point) coordinates.get(i);
+        int pX = info.getPosX();
+        int pY = info.getPosY();
+        messyColors.add(pixelReader.getArgb(pX, pY));
+    }
+    
+    Collections.sort(messyColors);
+
+    int medianColor = (int) messyColors.get(countElements/2);
+    double r = (medianColor & 0xFF0000) >> 16;
+    double g = (medianColor & 0xFF00) >> 8;
+    double b = (medianColor & 0xFF);
+
+//    System.out.println(r/255 + " " + g/255 + " " + b/255);
+    return new Color(r/255,g/255,b/255, 1.0);
+   }
+   
+   private Color processLineal() {
         double red = 0;
         double green = 0;
         double blue = 0;
-     
-
-
-  
+      
         for(int i = 0; i < coordinates.size(); i++) {
             Point info = (Point) coordinates.get(i);
             int pX = info.getPosX();
@@ -88,6 +117,9 @@ public class Convolution {
         }
     }
    }
+   
+
+   
     
    public void searchNS(int coordX, int coordY) {
         if(height > 1) {
