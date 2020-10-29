@@ -60,6 +60,19 @@ public class Convolution {
                fillGaussian();
                normalizeGaussianMatrix();
                colorRet = processLineal();
+               break;          
+           case "laplacian":
+               fillLaplacian();
+               colorRet = processLineal();
+               break;
+           case "gausslap":
+               fillGaussian();
+               normalizeGaussianMatrix();
+               colorRet = processLineal();
+               break;
+           case "sobel":
+               fillSobel();
+               colorRet = processLineal();
                break;
        }
     return colorRet;
@@ -83,7 +96,6 @@ public class Convolution {
     double g = (medianColor & 0xFF00) >> 8;
     double b = (medianColor & 0xFF);
 
-//    System.out.println(r/255 + " " + g/255 + " " + b/255);
     return new Color(r/255,g/255,b/255, 1.0);
    }
    
@@ -110,6 +122,10 @@ public class Convolution {
         if(red > 1) red = 1;
         if(green > 1) green = 1;
         if(blue > 1) blue = 1;
+        
+        if(red < 0) red = 0;
+        if(green < 0) green = 0;
+        if(blue < 0) blue = 0;
 
 
         return new Color(red, green, blue, 1.0);
@@ -124,6 +140,59 @@ public class Convolution {
     }
    }
    
+   private void fillSobel() {
+        int [] comunVectorRow = Pascal.generateVector(width);  
+        int [] comunVectorColumn = Pascal.generateVector(height);
+
+        if(height == 1 ){ // Seria un Sobel Derivando en X, actuara el pivotY
+            for (int y = 0; y < width; y++) {
+                if(y == pivotY - 1) {
+                    matrixConvolution[0][y] = 0;
+                } else if(y > pivotX - 1){
+                    matrixConvolution[0][y] = comunVectorRow[y];
+                } else {
+                    matrixConvolution[0][y] = -comunVectorRow[y];
+                }
+            }
+        }else if(width == 1) { // Seria un sobel Derivando en Y,  actuara el pivotX
+            for (int x = 0; x < height; x++) {
+                if(x == pivotX - 1) {
+                    matrixConvolution[x][0] = 0;
+                } else if(x > pivotX - 1){
+                    matrixConvolution[x][0] = -comunVectorColumn[x];
+                } else {
+                    matrixConvolution[x][0] = comunVectorColumn[x];
+                }
+            }
+        } else {
+           fillSobelY();
+        }
+   }
+   
+    private void fillSobelY() {
+        int [] comunVectorRow = new int[width]; // width === axisY
+        comunVectorRow = Pascal.generateVector(width); // Derivada en Y
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                if(x == pivotX - 1) {
+                    matrixConvolution[x][y] = 0;
+                }else if(x > pivotX - 1){
+                    matrixConvolution[x][y] = (double) -comunVectorRow[y] / (double) (x+1);
+                }else { // x < pivotX - 1
+                    matrixConvolution[x][y] = (double) comunVectorRow[y] / (double) (height - x);
+                }   
+            }
+        }
+    }
+   
+   private void TestMatrixConvol() {
+    for (int x = 0; x < height; x++) {
+       for (int y = 0; y < width; y++) {
+           System.out.println(matrixConvolution[x][y] + " ");
+       }
+   }    
+   }
+   
     private void fillGaussian() {
         int [] pascalX = new int[height]; // height === axisX
         int [] pascalY = new int[width]; // width === axisY
@@ -136,7 +205,16 @@ public class Convolution {
                 matrixConvolution[x][y] = (pascalX[x] * pascalY[y]);
             }
         }
-   }
+    }
+    
+    private void fillLaplacian() {
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                matrixConvolution[x][y] = -1;
+            }
+        }
+        matrixConvolution[pivotX - 1][pivotY - 1] = countElements;
+    }
     
     
    

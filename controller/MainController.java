@@ -81,9 +81,7 @@ public class MainController implements Initializable {
     private int vw;
     private int vh;
 
-    
-
-    
+      
     @FXML
     private ImageView imageView;
     
@@ -151,6 +149,30 @@ public class MainController implements Initializable {
     private Label labelGaussianX;
     @FXML
     private Label labelGaussianY;
+    @FXML
+    private Slider sliderToLaplacianY;
+    @FXML
+    private Label labelLaplacianX;
+    @FXML
+    private Label labelLaplacianY;
+    @FXML
+    private Slider sliderToLaplacianX;
+    @FXML
+    private Slider sliderToGaussLapY;
+    @FXML
+    private Label labelGaussLapX;
+    @FXML
+    private Label labelGaussLapY;
+    @FXML
+    private Slider sliderToGaussLapX;
+    @FXML
+    private Slider sliderToSobelY;
+    @FXML
+    private Label labelSobelX;
+    @FXML
+    private Label labelSobelY;
+    @FXML
+    private Slider sliderToSobelX;
    
 
 
@@ -246,7 +268,8 @@ public class MainController implements Initializable {
             restartGrayscale();            
             restartThresholding();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -278,7 +301,8 @@ public class MainController implements Initializable {
             restartGrayscale();
             restartThresholding();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -368,7 +392,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartThresholding();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -407,7 +432,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartThresholding();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -434,7 +460,8 @@ public class MainController implements Initializable {
             restartBrightness();
             restartThresholding();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();            
             Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
@@ -470,7 +497,8 @@ public class MainController implements Initializable {
             restartBrightness();
             restartContrast();
             restartAverage();
-            restartMedian();            
+            restartMedian();
+            restartGaussian();
             Color [][] current = pic.getColorMatrix();                        
             double thresholdingValue = (double) sliderToThresholding.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -889,6 +917,36 @@ public class MainController implements Initializable {
         sliderToMedianX.setValue(1);
         sliderToMedianY.setValue(1);        
     }
+    
+    @FXML
+    private void filterGaussianContext(ActionEvent event) {
+        sliderContext();
+        sliderToGaussianX.setValue(1);
+        sliderToGaussianY.setValue(1);            
+    }
+
+    @FXML
+    private void filterLaplacianContext(ActionEvent event) {
+        sliderContext();
+        sliderToLaplacianX.setValue(1);
+        sliderToLaplacianY.setValue(1);        
+    }
+    
+    @FXML
+    private void filterGaussLapContext(ActionEvent event) {
+        sliderContext();
+        sliderToGaussLapX.setValue(1);
+        sliderToGaussLapY.setValue(1);            
+    }
+
+    @FXML
+    private void filterSobelContext(ActionEvent event) {
+        sliderContext();
+        sliderToSobelX.setValue(1);
+        sliderToSobelY.setValue(1);             
+    }
+    
+    
    
 
     @FXML
@@ -922,6 +980,8 @@ public class MainController implements Initializable {
         restartThresholding();
         restartAverage();
         restartMedian();
+        restartGaussian();
+        restartLaplacian();
     }
 
     private void restartGrayscale() {
@@ -947,8 +1007,16 @@ public class MainController implements Initializable {
     private void restartMedian() {
         sliderToMedianX.setValue(1);
         sliderToMedianY.setValue(1);        
+    }
+    private void restartGaussian() {
+        sliderToGaussianX.setValue(1);
+        sliderToGaussianY.setValue(1);        
+    }
+    private void restartLaplacian() {
+        sliderToLaplacianX.setValue(1);
+        sliderToLaplacianY.setValue(1);        
     }     
-    
+ 
 
     @FXML
     private void generateHistogram(ActionEvent event) {
@@ -981,6 +1049,10 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();            
             restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            
             int width = imageHeight;
             int height = imageWidth;
             Color [][] rotate = new Color[imageHeight][imageWidth];
@@ -1040,6 +1112,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();            
             restartThresholding();
+            restartMedian();
+            restartGaussian();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1065,6 +1139,8 @@ public class MainController implements Initializable {
             restartContrast();
             restartGrayscale();            
             restartThresholding();
+            restartAverage();
+            restartGaussian();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1092,21 +1168,125 @@ public class MainController implements Initializable {
                restartContrast();
                restartGrayscale();            
                restartThresholding();
+               restartAverage();
+               restartMedian();
                pixelWriter = writableImage.getPixelWriter();              
                for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
                        Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "gaussian", pic);
                        mc.searchNS(x,y);
-                       Color medianColor = mc.setMatrixConvolution();  
-                       pixelWriter.setColor(x,y,medianColor);
+                       Color gaussianColor = mc.setMatrixConvolution();  
+                       pixelWriter.setColor(x,y,gaussianColor);
+                   }
+               }
+               imageView.setImage(writableImage);
+               configurationImageView();
+           }            
+        } 
+    }
+
+    @FXML
+    private void handleLaplacian(MouseEvent event) {
+        int axisX = (int) sliderToLaplacianX.getValue();
+        int axisY = (int) sliderToLaplacianY.getValue();
+        if(axisX % 2 == 1 && axisY % 2 == 1){
+           labelGaussianX.setText("" + axisX);
+           labelGaussianY.setText("" + axisY);    
+           if(image != null && (axisX + axisY >= 2)) {
+               restartBrightness();
+               restartContrast();
+               restartGrayscale();            
+               restartThresholding();
+               restartAverage();
+               restartMedian();
+               restartGaussian();
+               pixelWriter = writableImage.getPixelWriter();              
+               for (int y = 0; y < imageHeight; y++) {
+                   for (int x = 0; x < imageWidth; x++) {
+                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "laplacian", pic);
+                       mc.searchNS(x,y);
+                       Color laplacianColor = mc.setMatrixConvolution();  
+                       pixelWriter.setColor(x,y,laplacianColor);
+                   }
+               }
+               imageView.setImage(writableImage);
+               configurationImageView();
+           }            
+        }         
+    }
+
+    @FXML
+    private void handleGaussLap(MouseEvent event) {
+        int axisX = (int) sliderToGaussLapX.getValue();
+        int axisY = (int) sliderToGaussLapY.getValue();
+        if(axisX % 2 == 1 && axisY % 2 == 1){
+           labelGaussLapX.setText("" + axisX);
+           labelGaussLapY.setText("" + axisY);    
+           if(image != null && (axisX + axisY >= 2)) {
+               restartBrightness();
+               restartContrast();
+               restartGrayscale();            
+               restartThresholding();
+               restartAverage();
+               restartMedian();
+               restartGaussian();
+               restartLaplacian();
+               pixelWriter = writableImage.getPixelWriter();              
+               for (int y = 0; y < imageHeight; y++) {
+                   for (int x = 0; x < imageWidth; x++) {
+                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "gaussian", pic);
+                       mc.searchNS(x,y);
+                       Color gaussianColor = mc.setMatrixConvolution();  
+                       pixelWriter.setColor(x,y,gaussianColor);
+                   }
+               }
+//                for (int y = 0; y < imageHeight; y++) {
+//                   for (int x = 0; x < imageWidth; x++) {
+//                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "laplacian", pic);
+//                       mc.searchNS(x,y);
+//                       Color laplacianColor = mc.setMatrixConvolution();  
+//                       pixelWriter.setColor(x,y,laplacianColor);
+//                    }    
+//                }
+               imageView.setImage(writableImage);
+               configurationImageView();
+           }            
+        }         
+    }
+
+
+
+    @FXML
+    private void handleSobel(MouseEvent event) {
+        int axisX = (int) sliderToSobelX.getValue();
+        int axisY = (int) sliderToSobelY.getValue();
+        if(axisX % 2 == 1 && axisY % 2 == 1){
+           labelSobelX.setText("" + axisX);
+           labelSobelY.setText("" + axisY);    
+           if(image != null && (axisX + axisY >= 3)) {
+               restartBrightness();
+               restartContrast();
+               restartGrayscale();            
+               restartThresholding();
+               restartAverage();
+               restartMedian();
+               restartGaussian();
+               restartLaplacian();
+               pixelWriter = writableImage.getPixelWriter();              
+               for (int y = 0; y < imageHeight; y++) {
+                   for (int x = 0; x < imageWidth; x++) {
+                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobel", pic);
+                       mc.searchNS(x,y);
+                       Color sobelColor = mc.setMatrixConvolution();  
+                       pixelWriter.setColor(x,y,sobelColor);
                    }
                }
                imageView.setImage(writableImage);
                configurationImageView();
            }            
         }
-         
     }
+
 
 
   

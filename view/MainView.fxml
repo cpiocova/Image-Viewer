@@ -13,7 +13,7 @@
     <children>
         <Button fx:id="btnLoadImage" layoutX="15.0" layoutY="27.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="168.0" text="Load File" />
       <Label fx:id="labelLoadMessage" layoutX="193.0" layoutY="27.0" prefHeight="25.0" prefWidth="125.0" />
-      <Accordion layoutX="14.0" layoutY="120.0" prefHeight="425.0" prefWidth="168.0">
+      <Accordion layoutX="14.0" layoutY="120.0" prefHeight="503.0" prefWidth="168.0">
         <panes>
             <TitledPane animated="false" prefHeight="134.0" prefWidth="172.0" text="Negative">
               <content>
@@ -118,12 +118,57 @@
                   <AnchorPane prefHeight="167.0" prefWidth="142.0">
                      <children>
                         <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterAverageContext" text="Apply" />
+                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterGaussianContext" text="Apply" />
                         <Label layoutX="16.0" layoutY="86.0" text="Y" />
                         <Slider fx:id="sliderToGaussianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                         <Label fx:id="labelGaussianX" layoutX="115.0" layoutY="38.0" text="1" />
                         <Label fx:id="labelGaussianY" layoutX="115.0" layoutY="84.0" text="1" />
                         <Slider fx:id="sliderToGaussianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Laplacian Filter">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <Label layoutX="16.0" layoutY="38.0" text="X" />
+                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterLaplacianContext" text="Apply" />
+                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                        <Slider fx:id="sliderToLaplacianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelLaplacianX" layoutX="115.0" layoutY="38.0" text="1" />
+                        <Label fx:id="labelLaplacianY" layoutX="115.0" layoutY="84.0" text="1" />
+                        <Slider fx:id="sliderToLaplacianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Gaussian Laplacian">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <Label layoutX="16.0" layoutY="38.0" text="X" />
+                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterGaussLapContext" text="Apply" />
+                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                        <Slider fx:id="sliderToGaussLapY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelGaussLapX" layoutX="115.0" layoutY="38.0" text="1" />
+                        <Label fx:id="labelGaussLapY" layoutX="115.0" layoutY="84.0" text="1" />
+                        <Slider fx:id="sliderToGaussLapX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Sobel Filter">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <Label layoutX="16.0" layoutY="38.0" text="X" />
+                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterSobelContext" text="Apply" />
+                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                        <Slider fx:id="sliderToSobelY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelSobelX" layoutX="115.0" layoutY="38.0" text="1" />
+                        <Label fx:id="labelSobelY" layoutX="115.0" layoutY="84.0" text="1" />
+                        <Slider fx:id="sliderToSobelX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -136,7 +181,7 @@
          </children>
       </AnchorPane>
       <Button fx:id="btnDefault" layoutX="14.0" layoutY="95.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="168.0" text="Reset Image" />
-      <SplitPane dividerPositions="0.32450331125827814, 0.6754966887417219" layoutX="15.0" layoutY="629.0" orientation="VERTICAL" prefHeight="153.0" prefWidth="230.0">
+      <SplitPane dividerPositions="0.32450331125827814, 0.5" layoutX="245.0" layoutY="629.0" orientation="VERTICAL" prefHeight="153.0" prefWidth="230.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
@@ -155,8 +200,8 @@
             </AnchorPane>
         </items>
       </SplitPane>
-      <Button layoutX="255.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
-      <Button layoutX="14.0" layoutY="545.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
+      <Button layoutX="515.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
+      <Button layoutX="14.0" layoutY="617.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
