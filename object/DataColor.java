@@ -7,7 +7,7 @@ package object;
 
 /**
  *
- * @author thecnomacVZLA
+ * @author Jose Pio
  */
 public class DataColor {
     

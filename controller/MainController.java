@@ -41,6 +41,7 @@ import javafx.scene.input.TouchEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import object.Convolution;
+import object.Pascal;
 
 
 
@@ -142,6 +143,14 @@ public class MainController implements Initializable {
     private Label labelMedianX;
     @FXML
     private Label labelMedianY;
+    @FXML
+    private Slider sliderToGaussianX;
+    @FXML
+    private Slider sliderToGaussianY;
+    @FXML
+    private Label labelGaussianX;
+    @FXML
+    private Label labelGaussianY;
    
 
 
@@ -1069,6 +1078,34 @@ public class MainController implements Initializable {
             configurationImageView();
         }  
         
+    }
+
+    @FXML
+    private void handleGaussian(MouseEvent event) {
+        int axisX = (int) sliderToGaussianX.getValue();
+        int axisY = (int) sliderToGaussianY.getValue();
+        if(axisX % 2 == 1 && axisY % 2 == 1){
+           labelGaussianX.setText("" + axisX);
+           labelGaussianY.setText("" + axisY);    
+           if(image != null && (axisX + axisY >= 2)) {
+               restartBrightness();
+               restartContrast();
+               restartGrayscale();            
+               restartThresholding();
+               pixelWriter = writableImage.getPixelWriter();              
+               for (int y = 0; y < imageHeight; y++) {
+                   for (int x = 0; x < imageWidth; x++) {
+                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "gaussian", pic);
+                       mc.searchNS(x,y);
+                       Color medianColor = mc.setMatrixConvolution();  
+                       pixelWriter.setColor(x,y,medianColor);
+                   }
+               }
+               imageView.setImage(writableImage);
+               configurationImageView();
+           }            
+        }
+         
     }
 
 

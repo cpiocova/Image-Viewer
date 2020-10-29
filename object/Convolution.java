@@ -34,7 +34,7 @@ public class Convolution {
    public Convolution(int width, int height, int imageWidth, int imageHeight, String filterName, BlankPic pic) {
        this.width = width;
        this.height = height;
-       this.matrixConvolution = new double[width][height];
+       this.matrixConvolution = new double[height][width];
        this.pivotY = (int) Math.round((double)this.width / 2);
        this.pivotX = (int) Math.round((double)this.height / 2);
        this.countElements = 0;
@@ -55,6 +55,11 @@ public class Convolution {
                break;
            case "median":
                colorRet = processNoLineal();
+               break;
+           case "gaussian":
+               fillGaussian();
+               normalizeGaussianMatrix();
+               colorRet = processLineal();
                break;
        }
     return colorRet;
@@ -86,13 +91,14 @@ public class Convolution {
         double red = 0;
         double green = 0;
         double blue = 0;
+        
       
         for(int i = 0; i < coordinates.size(); i++) {
             Point info = (Point) coordinates.get(i);
             int pX = info.getPosX();
             int pY = info.getPosY();
-            int iY = info.getIndexRow();
-            int iX = info.getIndexColumn();
+            int iX = info.getIndexRow();
+            int iY = info.getIndexColumn();
                        
             double coefficient = matrixConvolution[iX][iY];
             
@@ -108,18 +114,58 @@ public class Convolution {
 
         return new Color(red, green, blue, 1.0);
    }
-   
+  
     
    private void fillAverage() {
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-         matrixConvolution[x][y] = (1.0 / (double) countElements);
+    for (int x = 0; x < height; x++) {
+        for (int y = 0; y < width; y++) {
+            matrixConvolution[x][y] = (1.0 / (double) countElements);
         }
     }
    }
    
-
+    private void fillGaussian() {
+        int [] pascalX = new int[height]; // height === axisX
+        int [] pascalY = new int[width]; // width === axisY
+                                                      
+        pascalX = Pascal.generateVector(height); 
+        pascalY =  Pascal.generateVector(width);
+         
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                matrixConvolution[x][y] = (pascalX[x] * pascalY[y]);
+            }
+        }
+   }
+    
+    
    
+   private double setArraySum() {
+       double arraySum = 0;
+       for(int i = 0; i < coordinates.size(); i++) {
+        Point info = (Point) coordinates.get(i);
+        int iX = info.getIndexRow();
+        int iY = info.getIndexColumn();   
+        arraySum = arraySum + matrixConvolution[iX][iY];           
+       }
+       return arraySum;
+   }
+    
+    private void normalizeGaussianMatrix() {
+        double elevation;
+        if(countElements == width * height) {
+            elevation = Math.pow(2, width + height - 2);
+        } else {
+            elevation = setArraySum();
+        }
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                matrixConvolution[x][y] = matrixConvolution[x][y] / elevation;
+            }
+        }
+                
+    }
+    
     
    public void searchNS(int coordX, int coordY) {
         if(height > 1) {
