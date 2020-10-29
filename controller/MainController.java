@@ -175,24 +175,76 @@ public class MainController implements Initializable {
     @FXML
     private Slider sliderToSobelX;
    
+    
+    final ChangeListener<Number> sliderGaussLapX = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToGaussLapX.valueProperty().set(roundedValue);
+        labelGaussLapX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderGaussLapY = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToGaussLapY.valueProperty().set(roundedValue);
+        labelGaussLapY.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderGaussianX = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToGaussianX.valueProperty().set(roundedValue);
+        labelGaussianX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderGaussianY = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToGaussianY.valueProperty().set(roundedValue);
+        labelGaussianY.setText(Integer.toString(roundedValue));
+    };
 
-
+    final ChangeListener<Number> sliderLaplacianX = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToLaplacianX.valueProperty().set(roundedValue);
+        labelLaplacianX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderLaplacianY = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToLaplacianY.valueProperty().set(roundedValue);
+        labelLaplacianY.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderSobelX = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToSobelX.valueProperty().set(roundedValue);
+        labelSobelX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderSobelY = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToSobelY.valueProperty().set(roundedValue);
+        labelSobelY.setText(Integer.toString(roundedValue));
+    };
 
        
      @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         mainInstanceController = this;
-        sliderToGaussLapX.valueProperty().addListener(numberChangeListener);
+        
+        sliderToGaussLapX.valueProperty().addListener(sliderGaussLapX);
+        sliderToGaussLapY.valueProperty().addListener(sliderGaussLapY);
+        
+        sliderToGaussianX.valueProperty().addListener(sliderGaussianX);
+        sliderToGaussianY.valueProperty().addListener(sliderGaussianY);
+
+        sliderToLaplacianX.valueProperty().addListener(sliderLaplacianX);
+        sliderToLaplacianY.valueProperty().addListener(sliderLaplacianY);
+        
+        sliderToSobelX.valueProperty().addListener(sliderSobelX);
+        sliderToSobelY.valueProperty().addListener(sliderSobelY);
+
 
     }
     
-    
-    final ChangeListener<Number> numberChangeListener = (obs, old, val) -> {
-        final double roundedValue = Math.floor(val.doubleValue() / 2.0) * 2.0 + 1;
-        sliderToGaussLapX.valueProperty().set(roundedValue);
-        labelGaussLapX.setText(Double.toString(roundedValue));
-    };
     
     
     private void setImageLoaded(Image image) {
@@ -1211,30 +1263,28 @@ public class MainController implements Initializable {
     private void handleLaplacian(MouseEvent event) {
         int axisX = (int) sliderToLaplacianX.getValue();
         int axisY = (int) sliderToLaplacianY.getValue();
-        if(axisX % 2 == 1 && axisY % 2 == 1){
-           labelLaplacianX.setText("" + axisX);
-           labelLaplacianY.setText("" + axisY);    
-           if(image != null && (axisX + axisY >= 2)) {
-               restartBrightness();
-               restartContrast();
-               restartGrayscale();            
-               restartThresholding();
-               restartAverage();
-               restartMedian();
-               restartGaussian();
-               pixelWriter = writableImage.getPixelWriter();              
-               for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {
-                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "laplacian", pic);
-                       mc.searchNS(x,y);
-                       Color laplacianColor = mc.setMatrixConvolution();  
-                       pixelWriter.setColor(x,y,laplacianColor);
-                   }
-               }
-               imageView.setImage(writableImage);
-               configurationImageView();
-           }            
-        }         
+        labelLaplacianX.setText("" + axisX);
+        labelLaplacianY.setText("" + axisY);    
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            pixelWriter = writableImage.getPixelWriter();              
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "laplacian", pic);
+                    mc.searchNS(x,y);
+                    Color laplacianColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,laplacianColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+        }        
     }
 
     @FXML
@@ -1282,30 +1332,28 @@ public class MainController implements Initializable {
     private void handleSobel(MouseEvent event) {
         int axisX = (int) sliderToSobelX.getValue();
         int axisY = (int) sliderToSobelY.getValue();
-        if(axisX % 2 == 1 && axisY % 2 == 1){
-           labelSobelX.setText("" + axisX);
-           labelSobelY.setText("" + axisY);    
-           if(image != null && (axisX + axisY >= 3)) {
-               restartBrightness();
-               restartContrast();
-               restartGrayscale();            
-               restartThresholding();
-               restartAverage();
-               restartMedian();
-               restartGaussian();
-               restartLaplacian();
-               pixelWriter = writableImage.getPixelWriter();              
-               for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {
-                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobel", pic);
-                       mc.searchNS(x,y);
-                       Color sobelColor = mc.setMatrixConvolution();  
-                       pixelWriter.setColor(x,y,sobelColor);
-                   }
-               }
-               imageView.setImage(writableImage);
-               configurationImageView();
-           }            
+        labelSobelX.setText("" + axisX);
+        labelSobelY.setText("" + axisY);    
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            pixelWriter = writableImage.getPixelWriter();              
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobel", pic);
+                    mc.searchNS(x,y);
+                    Color sobelColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,sobelColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
         }
     }
 

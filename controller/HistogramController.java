@@ -131,8 +131,9 @@ public class HistogramController implements Initializable {
         double ent2 = maxRepeat;
         double ret1 = 20;
         double ret2 = 180;
-        if(maxRepeat == minRepeat) return 180; 
-        return (int) (((ret2 - ret1)/(ent2 - ent1)) * (x - ent2) + ret2);
+        double mod = maxRepeat - minRepeat; 
+        if(mod == 0) mod = 1; 
+        return (int) (((ret2 - ret1)/mod) * (x - ent2) + ret2);
     }
 
     private int[] calculateMaxMinRepeats() {
