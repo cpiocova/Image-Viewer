@@ -150,10 +150,10 @@
                         <Label layoutX="16.0" layoutY="38.0" text="X" />
                         <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterGaussLapContext" text="Apply" />
                         <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToGaussLapY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Slider fx:id="sliderToGaussLapY" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="20.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                         <Label fx:id="labelGaussLapX" layoutX="115.0" layoutY="38.0" text="1" />
                         <Label fx:id="labelGaussLapY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToGaussLapX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Slider fx:id="sliderToGaussLapX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" nodeOrientation="LEFT_TO_RIGHT" onMouseDragged="#handleGaussLap" onMouseReleased="#handleGaussLap" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
                      </children>
                   </AnchorPane>
                </content>

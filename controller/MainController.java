@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -181,9 +182,18 @@ public class MainController implements Initializable {
      @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        mainInstanceController = this;        
+        mainInstanceController = this;
+        sliderToGaussLapX.valueProperty().addListener(numberChangeListener);
 
     }
+    
+    
+    final ChangeListener<Number> numberChangeListener = (obs, old, val) -> {
+        final double roundedValue = Math.floor(val.doubleValue() / 2.0) * 2.0 + 1;
+        sliderToGaussLapX.valueProperty().set(roundedValue);
+        labelGaussLapX.setText(Double.toString(roundedValue));
+    };
+    
     
     private void setImageLoaded(Image image) {
         this.image = image;
@@ -982,6 +992,8 @@ public class MainController implements Initializable {
         restartMedian();
         restartGaussian();
         restartLaplacian();
+        restartGaussLap();
+        restartSobel();
     }
 
     private void restartGrayscale() {
@@ -1015,6 +1027,16 @@ public class MainController implements Initializable {
     private void restartLaplacian() {
         sliderToLaplacianX.setValue(1);
         sliderToLaplacianY.setValue(1);        
+    }     
+ 
+    private void restartGaussLap() {
+        sliderToGaussLapX.setValue(1);
+        sliderToGaussLapY.setValue(1);        
+    }     
+    
+    private void restartSobel() {
+        sliderToSobelX.setValue(1);
+        sliderToSobelY.setValue(1);        
     }     
  
 
@@ -1190,8 +1212,8 @@ public class MainController implements Initializable {
         int axisX = (int) sliderToLaplacianX.getValue();
         int axisY = (int) sliderToLaplacianY.getValue();
         if(axisX % 2 == 1 && axisY % 2 == 1){
-           labelGaussianX.setText("" + axisX);
-           labelGaussianY.setText("" + axisY);    
+           labelLaplacianX.setText("" + axisX);
+           labelLaplacianY.setText("" + axisY);    
            if(image != null && (axisX + axisY >= 2)) {
                restartBrightness();
                restartContrast();
@@ -1219,7 +1241,7 @@ public class MainController implements Initializable {
     private void handleGaussLap(MouseEvent event) {
         int axisX = (int) sliderToGaussLapX.getValue();
         int axisY = (int) sliderToGaussLapY.getValue();
-        if(axisX % 2 == 1 && axisY % 2 == 1){
+//        if(axisX % 2 == 1 && axisY % 2 == 1){
            labelGaussLapX.setText("" + axisX);
            labelGaussLapY.setText("" + axisY);    
            if(image != null && (axisX + axisY >= 2)) {
@@ -1251,7 +1273,7 @@ public class MainController implements Initializable {
                imageView.setImage(writableImage);
                configurationImageView();
            }            
-        }         
+//        }         
     }
 
 

@@ -104,7 +104,6 @@ public class Convolution {
         double green = 0;
         double blue = 0;
         
-      
         for(int i = 0; i < coordinates.size(); i++) {
             Point info = (Point) coordinates.get(i);
             int pX = info.getPosX();
@@ -165,25 +164,38 @@ public class Convolution {
                 }
             }
         } else {
-           fillSobelY();
+           fillSobelY(comunVectorRow);
         }
    }
    
-    private void fillSobelY() {
-        int [] comunVectorRow = new int[width]; // width === axisY
-        comunVectorRow = Pascal.generateVector(width); // Derivada en Y
+    private void fillSobelY(int [] comunVectorRow) {
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
                 if(x == pivotX - 1) {
                     matrixConvolution[x][y] = 0;
                 }else if(x > pivotX - 1){
-                    matrixConvolution[x][y] = (double) -comunVectorRow[y] / (double) (x+1);
+                    matrixConvolution[x][y] = (double) -comunVectorRow[y] / (double) x;
                 }else { // x < pivotX - 1
-                    matrixConvolution[x][y] = (double) comunVectorRow[y] / (double) (height - x);
+                    matrixConvolution[x][y] = (double) comunVectorRow[y] / (double) (height - x - 1);
                 }   
             }
         }
     }
+
+    private void fillSobelX(int [] comunVectorColumn) {
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                if(y == pivotX - 1) {
+                    matrixConvolution[x][y] = 0;
+                }else if(y > pivotX - 1){
+                    matrixConvolution[x][y] = (double) comunVectorColumn[x] / (double) (width - y);
+                }else { // y < pivotX - 1
+                    matrixConvolution[x][y] = (double) -comunVectorColumn[x] / (double) (y+1);
+                }   
+            }
+        }
+    }    
+    
    
    private void TestMatrixConvol() {
     for (int x = 0; x < height; x++) {
@@ -213,7 +225,7 @@ public class Convolution {
                 matrixConvolution[x][y] = -1;
             }
         }
-        matrixConvolution[pivotX - 1][pivotY - 1] = countElements;
+        matrixConvolution[pivotX - 1][pivotY - 1] = countElements - 1;
     }
     
     
