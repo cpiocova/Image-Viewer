@@ -34,8 +34,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TouchEvent;
@@ -61,11 +64,15 @@ public class MainController implements Initializable {
     private Image image;
     private WritableImage writableImage;
     private WritableImage writableNetpbm;
+    private WritableImage zoomWritable;
 
     
     private PixelReader pixelReader;
+    private PixelReader zoomReader;
+    
     private PixelWriter pixelWriter;
     private PixelWriter pixelWriterNetpbm;
+    private PixelWriter zoomWriter;
 
     
     private int imageWidth;
@@ -174,6 +181,13 @@ public class MainController implements Initializable {
     private Label labelPrewittY;
     @FXML
     private Slider sliderToPrewittX;
+    @FXML
+    private Slider sliderToZoom;
+    @FXML
+    private Label labelZoom;
+    @FXML
+    private ToggleGroup zoomMethod;
+    
    
     
     final ChangeListener<Number> sliderGaussianX = (obs, old, val) -> {
@@ -222,9 +236,17 @@ public class MainController implements Initializable {
         final int roundedValue = (val.intValue() /2) * 2 + 1;
         sliderToPrewittY.valueProperty().set(roundedValue);
         labelPrewittY.setText(Integer.toString(roundedValue));
-    };    
+    };   
     
-    
+    final ChangeListener<Number> sliderZoom = (obs, old, val) -> {
+        final double roundedValue = Math.round(val.doubleValue() * 10) / 10.0;
+        sliderToZoom.valueProperty().set(roundedValue);
+        labelZoom.setText(Double.toString(roundedValue) + "x");
+    };
+    @FXML
+    private RadioButton zoomNeighbor;
+    @FXML
+    private RadioButton zoomInterpolation;
     
 
 
@@ -246,6 +268,8 @@ public class MainController implements Initializable {
         
         sliderToPrewittX.valueProperty().addListener(sliderPrewittX);
         sliderToPrewittY.valueProperty().addListener(sliderPrewittY);
+        
+        sliderToZoom.valueProperty().addListener(sliderZoom);
 
     }
     
@@ -256,9 +280,9 @@ public class MainController implements Initializable {
     }
     
     private void setViewport() {
-        if(imageWidth > 300 || imageHeight > 300) {
-            vw = 300;
-            vh = 300;
+        if(imageWidth > 500 || imageHeight > 500) {
+            vw = 500;
+            vh = 500;
         } else {
         vw = imageWidth;
         vh = imageHeight;  
@@ -267,8 +291,8 @@ public class MainController implements Initializable {
      
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
-        setViewport();
-        configurationImageView();        
+//        setViewport();
+//        configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
         displayUniqueColor();
@@ -279,8 +303,8 @@ public class MainController implements Initializable {
         imageView.setPreserveRatio(true);
 //        imageView.setFitWidth(vw);
 //        imageView.setFitHeight(vh);   
-        imageView.setFitWidth(300);
-        imageView.setFitHeight(300);   
+//        imageView.setFitWidth(300);
+//        imageView.setFitHeight(300);   
     }
     
     
@@ -939,7 +963,6 @@ public class MainController implements Initializable {
             pic.setImageModified(writableImage);
             pic.setColorMatrix(current);        
         }
-
     }
     
     @FXML
@@ -1011,6 +1034,26 @@ public class MainController implements Initializable {
         sliderToPrewittX.setValue(1);
         sliderToPrewittY.setValue(1);   
     }
+    
+//    @FXML
+//    private void zoomContext(ActionEvent event) {
+//        scaleContext();
+//        sliderToZoom.setValue(1);
+//    }
+//    
+//    private void scaleContext() {
+//        if(image != null) {
+//            Color [][] current = pic.getColorMatrix();
+//            pixelReader = writableImage.getPixelReader();
+//            for (int y = 0; y < imageHeight; y++) {
+//                for (int x = 0; x < imageWidth; x++) {
+//                    current[x][y] = pixelReader.getColor(x, y);
+//                }
+//            }
+//            pic.setImageModified(writableImage);
+//            pic.setColorMatrix(current);        
+//        }
+//    }
 
     
    
@@ -1050,6 +1093,7 @@ public class MainController implements Initializable {
         restartLaplacian();
         restartSobel();
         restartPrewitt();
+        restartZoom();
     }
 
     private void restartGrayscale() {
@@ -1093,6 +1137,10 @@ public class MainController implements Initializable {
     private void restartPrewitt() {
         sliderToPrewittX.setValue(1);
         sliderToPrewittY.setValue(1);        
+    }
+    
+    private void restartZoom() {
+        sliderToZoom.setValue(1);
     }      
  
 
@@ -1369,20 +1417,80 @@ public class MainController implements Initializable {
             restartLaplacian();
             restartSobel();
             restartPrewitt();
+            Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     Convolution mc = new Convolution(2, 2, imageWidth, imageHeight, "roberts", pic);
                     mc.searchRoberts(x,y);
-                    Color sobelColor = mc.setMatrixConvolution();  
-                    pixelWriter.setColor(x,y,sobelColor);
+                    Color robertsColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,robertsColor);
+                    current[x][y] = robertsColor;
                 }
             }
+            pic.setColorMatrix(current);
+            pic.setImageModified(writableImage);
             imageView.setImage(writableImage);
             configurationImageView();
         }          
         
     }
+
+    @FXML
+    private void handleZoom() {
+        int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
+        // 0  Neighbor   -    1  Interpolation
+        double zoomValue = sliderToZoom.getValue();
+        
+        if(zoomButton == 0) {
+            zoomNeighbor(zoomValue);
+        } else {
+            zoomInterpolation(zoomValue);
+        }
+    }
+    
+    private void zoomNeighbor(double zoomValue) {
+        if(image != null) {
+            int width = (int) Math.round(imageWidth * zoomValue);
+            int height = (int) Math.round(imageHeight * zoomValue);
+            Color [][] current = pic.getColorMatrix();
+            zoomWritable = new WritableImage(width, height);
+            zoomWriter = zoomWritable.getPixelWriter();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                        int zX = (int) (x/zoomValue);
+                        int zY = (int) (y/zoomValue);
+                        Color zoomColor = current[zX][zY];
+                        zoomWriter.setColor(x,y,zoomColor);
+                }
+            }
+            imageView.setImage(zoomWritable);
+            configurationImageView();      
+            }
+    }
+    
+    private void zoomInterpolation(double zoomValue) {
+//        System.out.println("Zoom Interpolation " + zoomValue);
+        if(image != null) {
+            int width = (int) Math.round(imageWidth * zoomValue);
+            int height = (int) Math.round(imageHeight * zoomValue);
+            Color [][] current = pic.getColorMatrix();
+            zoomWritable = new WritableImage(width, height);
+            zoomWriter = zoomWritable.getPixelWriter();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                        int zX = (int) (x/zoomValue);
+                        int zY = (int) (y/zoomValue);
+                        Color zoomColor = current[zX][zY];
+                        zoomWriter.setColor(x,y,zoomColor);
+                }
+            }
+            imageView.setImage(zoomWritable);
+            configurationImageView();      
+        }
+    }
+
+
 
   
 }
