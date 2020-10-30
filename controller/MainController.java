@@ -1457,11 +1457,15 @@ public class MainController implements Initializable {
             zoomWritable = new WritableImage(width, height);
             zoomWriter = zoomWritable.getPixelWriter();
             for (int y = 0; y < height; y++) {
+                // poner un boton con el overflow active o desactive para que la imagen se quede en el cuadro o se salga, cambio el if que este abajo por imageWidth
+
                 for (int x = 0; x < width; x++) {
+                    if(x < width - zoomValue && y < height - zoomValue){
                         int zX = (int) (x/zoomValue);
                         int zY = (int) (y/zoomValue);
                         Color zoomColor = current[zX][zY];
                         zoomWriter.setColor(x,y,zoomColor);
+                    }
                 }
             }
             imageView.setImage(zoomWritable);
@@ -1479,18 +1483,86 @@ public class MainController implements Initializable {
             zoomWriter = zoomWritable.getPixelWriter();
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                        int zX = (int) (x/zoomValue);
-                        int zY = (int) (y/zoomValue);
-                        Color zoomColor = current[zX][zY];
+//                    if(x < width - zoomValue) {
+//                       // Interpolar solo vertical  
+//                    }else if(y < height - zoomValue) {
+//                       // Interpolar solo horizontal 
+// poner un boton con el overflow active o desactive para que la imagen se quede en el cuadro o se salga, cambio el if que este abajo por imageWidth
+//                    }
+                    if(x < width - zoomValue - 1  && y < height - zoomValue - 1){
+                        int i = (int) Math.floor((double)x/zoomValue);
+                        int d = i + 1;
+                        int s = (int) Math.floor((double)y/zoomValue);
+                        int r = s + 1;
+                        double a = ((double) x / zoomValue) - i;
+                        double b = ((double) y / zoomValue) - s;
+
+                        Color bilinear1 = bilinearCoefficient(i,s, 1-a, 1-b, current);
+                        Color bilinear2 = bilinearCoefficient(d,s, a, 1-b, current);
+                        Color bilinear3 = bilinearCoefficient(i,r, 1-a, b, current);
+                        Color bilinear4 = bilinearCoefficient(d,r, a, b, current);
+
+                        Color zoomColor = addColors(bilinear1,bilinear2,bilinear3,bilinear4);
                         zoomWriter.setColor(x,y,zoomColor);
+                    }
                 }
             }
             imageView.setImage(zoomWritable);
             configurationImageView();      
         }
     }
-
-
+    
+    private Color bilinearCoefficient(int x, int y, double a, double b, Color[][] current) {
+        double red = current[x][y].getRed();
+        double green = current[x][y].getGreen();
+        double blue = current[x][y].getBlue();
+        
+        red = a*b*red;
+        green = a*b*green;
+        blue = a*b*blue;
+        
+        if(red > 1) red = 1;
+        if(green > 1) green = 1;
+        if(blue > 1) blue = 1;
+        
+        if(red < 0) red = 0;
+        if(green < 0) green = 0;
+        if(blue < 0) blue = 0;
+        
+        return new Color(red, green, blue, 1.0);
+    }
+      
+    private Color addColors(Color a, Color b, Color c, Color d) {
+        double aRed = a.getRed();
+        double aGreen = a.getGreen();
+        double aBlue = a.getBlue();
+        
+        double bRed = b.getRed();
+        double bGreen = b.getGreen();
+        double bBlue = b.getBlue();
+        
+        double cRed = c.getRed();
+        double cGreen = c.getGreen();
+        double cBlue = c.getBlue();
+        
+        double dRed = d.getRed();
+        double dGreen = d.getGreen();
+        double dBlue = d.getBlue();
+        
+        double red = aRed + bRed + cRed + dRed;
+        double green = aGreen + bGreen + cGreen + dGreen;
+        double blue = aBlue + bBlue + cBlue + dBlue;
+        
+        if(red > 1) red = 1;
+        if(green > 1) green = 1;
+        if(blue > 1) blue = 1;
+        
+        if(red < 0) red = 0;
+        if(green < 0) green = 0;
+        if(blue < 0) blue = 0;
+        
+        return new Color(red,green,blue,1.0);
+    }
 
   
 }
