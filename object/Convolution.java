@@ -65,15 +65,18 @@ public class Convolution {
                fillLaplacian();
                colorRet = processLineal();
                break;
-           case "gausslap":
-               fillGaussian();
-               normalizeGaussianMatrix();
-               colorRet = processLineal();
-               break;
            case "sobel":
                fillSobel();
                colorRet = processLineal();
                break;
+           case "prewitt":
+               fillPrewitt();
+               colorRet = processLineal();
+               break;
+           case "roberts":
+               fillRoberts();
+               colorRet = processLineal();
+               break;                
        }
     return colorRet;
    }
@@ -139,6 +142,54 @@ public class Convolution {
     }
    }
    
+    private void fillRoberts() {
+        matrixConvolution[0][0] = 1;
+        matrixConvolution[0][1] = 0;
+        matrixConvolution[1][0] = 0;
+        matrixConvolution[1][1] = -1;
+    }
+   
+    private void fillPrewitt() {
+        if(height == 1){ // Seria un Prewitt Derivando en X, actuara el pivotY
+            for (int y = 0; y < width; y++) {
+                if(y == pivotY - 1) {
+                    matrixConvolution[0][y] = 0;
+                } else if(y > pivotY - 1){
+                    matrixConvolution[0][y] = 1;
+                } else {
+                    matrixConvolution[0][y] = -1;
+                }
+            }
+        }else if(width == 1) { // Seria un Prewitt Derivando en Y,  actuara el pivotX
+            for (int x = 0; x < height; x++) {
+                if(x == pivotX - 1) {
+                    matrixConvolution[x][0] = 0;
+                } else if(x > pivotX - 1){
+                    matrixConvolution[x][0] = -1;
+                } else {
+                    matrixConvolution[x][0] = 1;
+                }
+            }
+        } else {
+           fillPrewittY();
+        }
+    }
+    
+    private void fillPrewittY() {
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                if(x == pivotX - 1) {
+                    matrixConvolution[x][y] = 0;
+                }else if(x > pivotX - 1){
+                    matrixConvolution[x][y] = (double) -1;
+                }else { // x < pivotX - 1
+                    matrixConvolution[x][y] = (double) 1;
+                }   
+            }
+        }
+    }   
+   
+   
    private void fillSobel() {
         int [] comunVectorRow = Pascal.generateVector(width);  
         int [] comunVectorColumn = Pascal.generateVector(height);
@@ -147,7 +198,7 @@ public class Convolution {
             for (int y = 0; y < width; y++) {
                 if(y == pivotY - 1) {
                     matrixConvolution[0][y] = 0;
-                } else if(y > pivotX - 1){
+                } else if(y > pivotY - 1){
                     matrixConvolution[0][y] = comunVectorRow[y];
                 } else {
                     matrixConvolution[0][y] = -comunVectorRow[y];
@@ -295,6 +346,20 @@ public class Convolution {
            }
        }       
 
+   }
+   
+   public void searchRoberts(int coordX, int coordY) {
+        coordinates.add(new Point(coordX, coordY, 0, 0));
+        countElements++;
+
+        int east = coordY + 1;
+        int south = coordX + 1;
+        
+        if(east < imageHeight && south < imageWidth)  {
+            coordinates.add(new Point(south, east, 1, 1));
+            countElements++;
+        }
+       
    }
 
 }

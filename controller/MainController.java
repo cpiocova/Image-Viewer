@@ -159,14 +159,6 @@ public class MainController implements Initializable {
     @FXML
     private Slider sliderToLaplacianX;
     @FXML
-    private Slider sliderToGaussLapY;
-    @FXML
-    private Label labelGaussLapX;
-    @FXML
-    private Label labelGaussLapY;
-    @FXML
-    private Slider sliderToGaussLapX;
-    @FXML
     private Slider sliderToSobelY;
     @FXML
     private Label labelSobelX;
@@ -174,19 +166,15 @@ public class MainController implements Initializable {
     private Label labelSobelY;
     @FXML
     private Slider sliderToSobelX;
+    @FXML
+    private Slider sliderToPrewittY;
+    @FXML
+    private Label labelPrewittX;
+    @FXML
+    private Label labelPrewittY;
+    @FXML
+    private Slider sliderToPrewittX;
    
-    
-    final ChangeListener<Number> sliderGaussLapX = (obs, old, val) -> {
-        final int roundedValue = (val.intValue() /2) * 2 + 1;
-        sliderToGaussLapX.valueProperty().set(roundedValue);
-        labelGaussLapX.setText(Integer.toString(roundedValue));
-    };
-    
-    final ChangeListener<Number> sliderGaussLapY = (obs, old, val) -> {
-        final int roundedValue = (val.intValue() /2) * 2 + 1;
-        sliderToGaussLapY.valueProperty().set(roundedValue);
-        labelGaussLapY.setText(Integer.toString(roundedValue));
-    };
     
     final ChangeListener<Number> sliderGaussianX = (obs, old, val) -> {
         final int roundedValue = (val.intValue() /2) * 2 + 1;
@@ -223,15 +211,29 @@ public class MainController implements Initializable {
         sliderToSobelY.valueProperty().set(roundedValue);
         labelSobelY.setText(Integer.toString(roundedValue));
     };
+    
+    final ChangeListener<Number> sliderPrewittX = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToPrewittX.valueProperty().set(roundedValue);
+        labelPrewittX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderPrewittY = (obs, old, val) -> {
+        final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToPrewittY.valueProperty().set(roundedValue);
+        labelPrewittY.setText(Integer.toString(roundedValue));
+    };    
+    
+    
+    
+
+
 
        
      @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         mainInstanceController = this;
-        
-        sliderToGaussLapX.valueProperty().addListener(sliderGaussLapX);
-        sliderToGaussLapY.valueProperty().addListener(sliderGaussLapY);
         
         sliderToGaussianX.valueProperty().addListener(sliderGaussianX);
         sliderToGaussianY.valueProperty().addListener(sliderGaussianY);
@@ -241,7 +243,9 @@ public class MainController implements Initializable {
         
         sliderToSobelX.valueProperty().addListener(sliderSobelX);
         sliderToSobelY.valueProperty().addListener(sliderSobelY);
-
+        
+        sliderToPrewittX.valueProperty().addListener(sliderPrewittX);
+        sliderToPrewittY.valueProperty().addListener(sliderPrewittY);
 
     }
     
@@ -995,19 +999,19 @@ public class MainController implements Initializable {
     }
     
     @FXML
-    private void filterGaussLapContext(ActionEvent event) {
-        sliderContext();
-        sliderToGaussLapX.setValue(1);
-        sliderToGaussLapY.setValue(1);            
-    }
-
-    @FXML
     private void filterSobelContext(ActionEvent event) {
         sliderContext();
         sliderToSobelX.setValue(1);
         sliderToSobelY.setValue(1);             
     }
     
+    @FXML
+    private void filterPrewittContext(ActionEvent event) {
+        sliderContext();
+        sliderToPrewittX.setValue(1);
+        sliderToPrewittY.setValue(1);   
+    }
+
     
    
 
@@ -1044,8 +1048,8 @@ public class MainController implements Initializable {
         restartMedian();
         restartGaussian();
         restartLaplacian();
-        restartGaussLap();
         restartSobel();
+        restartPrewitt();
     }
 
     private void restartGrayscale() {
@@ -1079,17 +1083,17 @@ public class MainController implements Initializable {
     private void restartLaplacian() {
         sliderToLaplacianX.setValue(1);
         sliderToLaplacianY.setValue(1);        
-    }     
- 
-    private void restartGaussLap() {
-        sliderToGaussLapX.setValue(1);
-        sliderToGaussLapY.setValue(1);        
-    }     
+    }      
     
     private void restartSobel() {
         sliderToSobelX.setValue(1);
         sliderToSobelY.setValue(1);        
-    }     
+    } 
+    
+    private void restartPrewitt() {
+        sliderToPrewittX.setValue(1);
+        sliderToPrewittY.setValue(1);        
+    }      
  
 
     @FXML
@@ -1288,47 +1292,6 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleGaussLap(MouseEvent event) {
-        int axisX = (int) sliderToGaussLapX.getValue();
-        int axisY = (int) sliderToGaussLapY.getValue();
-//        if(axisX % 2 == 1 && axisY % 2 == 1){
-           labelGaussLapX.setText("" + axisX);
-           labelGaussLapY.setText("" + axisY);    
-           if(image != null && (axisX + axisY >= 2)) {
-               restartBrightness();
-               restartContrast();
-               restartGrayscale();            
-               restartThresholding();
-               restartAverage();
-               restartMedian();
-               restartGaussian();
-               restartLaplacian();
-               pixelWriter = writableImage.getPixelWriter();              
-               for (int y = 0; y < imageHeight; y++) {
-                   for (int x = 0; x < imageWidth; x++) {
-                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "gaussian", pic);
-                       mc.searchNS(x,y);
-                       Color gaussianColor = mc.setMatrixConvolution();  
-                       pixelWriter.setColor(x,y,gaussianColor);
-                   }
-               }
-//                for (int y = 0; y < imageHeight; y++) {
-//                   for (int x = 0; x < imageWidth; x++) {
-//                       Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "laplacian", pic);
-//                       mc.searchNS(x,y);
-//                       Color laplacianColor = mc.setMatrixConvolution();  
-//                       pixelWriter.setColor(x,y,laplacianColor);
-//                    }    
-//                }
-               imageView.setImage(writableImage);
-               configurationImageView();
-           }            
-//        }         
-    }
-
-
-
-    @FXML
     private void handleSobel(MouseEvent event) {
         int axisX = (int) sliderToSobelX.getValue();
         int axisY = (int) sliderToSobelY.getValue();
@@ -1343,9 +1306,12 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
-            pixelWriter = writableImage.getPixelWriter();              
-            for (int y = 0; y < imageHeight; y++) {
-                for (int x = 0; x < imageWidth; x++) {
+            pixelWriter = writableImage.getPixelWriter();
+            int aX = (int) Math.round(axisX / 2.0 + 0.5);
+            int aY = (int) Math.round(axisY / 2.0 + 0.5);
+            
+            for (int y = aY; y < imageHeight - aY; y++) {
+                for (int x = aX; x < imageWidth - aX; x++) {
                     Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobel", pic);
                     mc.searchNS(x,y);
                     Color sobelColor = mc.setMatrixConvolution();  
@@ -1357,7 +1323,66 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
+    private void handlePrewitt(MouseEvent event) {
+        int axisX = (int) sliderToPrewittX.getValue();
+        int axisY = (int) sliderToPrewittY.getValue();
+        labelPrewittX.setText("" + axisX);
+        labelPrewittY.setText("" + axisY);    
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            pixelWriter = writableImage.getPixelWriter();
+            int aX = (int) Math.round(axisX / 2.0 + 0.5);
+            int aY = (int) Math.round(axisY / 2.0 + 0.5);
+            for (int y = aY; y < imageHeight - aY; y++) {
+                for (int x = aX; x < imageWidth - aX; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewitt", pic);
+                    mc.searchNS(x,y);
+                    Color prewittColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,prewittColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+        }        
+        
+    }
 
+    @FXML
+    private void handleRoberts(ActionEvent event) {
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            pixelWriter = writableImage.getPixelWriter();
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(2, 2, imageWidth, imageHeight, "roberts", pic);
+                    mc.searchRoberts(x,y);
+                    Color sobelColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,sobelColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+        }          
+        
+    }
 
   
 }
