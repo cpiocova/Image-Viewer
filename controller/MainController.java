@@ -189,6 +189,36 @@ public class MainController implements Initializable {
     @FXML
     private ToggleGroup zoomMethod;
     
+        
+    @FXML
+    private RadioButton zoomNeighbor;
+    @FXML
+    private RadioButton zoomInterpolation;
+    @FXML
+    private ToggleGroup sobelDerivate;
+    @FXML
+    private ToggleGroup prewittDerivate;
+    @FXML
+    private CheckBox overflowZoom;
+    private Slider sliderToRobertsY;
+    private Label labelRobertsX;
+    private Label labelRobertsY;
+    private Slider sliderToRobertsX;
+    @FXML
+    private ToggleGroup robertsDerivate;
+    @FXML
+    private Slider sliderToRoberts;
+    @FXML
+    private Label labelRoberts;
+    @FXML
+    private Slider sliderToLoGY;
+    @FXML
+    private Label labelLoGX;
+    @FXML
+    private Label labelLoGY;
+    @FXML
+    private Slider sliderToLoGX;
+    
    
     
     final ChangeListener<Number> sliderGaussianX = (obs, old, val) -> {
@@ -244,16 +274,27 @@ public class MainController implements Initializable {
         sliderToZoom.valueProperty().set(roundedValue);
         labelZoom.setText(Double.toString(roundedValue) + "x");
     };
-    @FXML
-    private RadioButton zoomNeighbor;
-    @FXML
-    private RadioButton zoomInterpolation;
-    @FXML
-    private ToggleGroup sobelDerivate;
-    @FXML
-    private ToggleGroup prewittDerivate;
-    @FXML
-    private CheckBox overflowZoom;
+    
+    final ChangeListener<Number> sliderRoberts = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToRoberts.valueProperty().set(roundedValue);
+        labelRoberts.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderLoGX = (obs, old, val) -> {
+       final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToLoGX.valueProperty().set(roundedValue);
+        labelLoGX.setText(Integer.toString(roundedValue));
+    };
+    final ChangeListener<Number> sliderLoGY = (obs, old, val) -> {
+       final int roundedValue = (val.intValue() /2) * 2 + 1;
+        sliderToLoGY.valueProperty().set(roundedValue);
+        labelLoGY.setText(Integer.toString(roundedValue));
+    };
+
+    
+    
+
     
 
 
@@ -276,7 +317,12 @@ public class MainController implements Initializable {
         sliderToPrewittX.valueProperty().addListener(sliderPrewittX);
         sliderToPrewittY.valueProperty().addListener(sliderPrewittY);
         
+        sliderToLoGX.valueProperty().addListener(sliderLoGX);
+        sliderToLoGY.valueProperty().addListener(sliderLoGY);
+        
         sliderToZoom.valueProperty().addListener(sliderZoom);
+        
+        sliderToRoberts.valueProperty().addListener(sliderRoberts);
 
     }
     
@@ -340,13 +386,16 @@ public class MainController implements Initializable {
             switch(pic.getFileFormat()) {
                 case "bmp":                
                     bmpLoader(imgPath);
+                    restartUI();
                     break;
                 case "pbm":
                     pbmLoader(imgPath);
+                    restartUI();
                     break;
                 case "ppm":
                 case "pgm":
                     pgmLoader(imgPath);
+                    restartUI();
                     break;
                   default:
                     labelLoadMessage.setText("Incompatible Format.");
@@ -366,8 +415,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
@@ -403,8 +454,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
@@ -498,8 +551,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
@@ -542,8 +597,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
@@ -574,9 +631,11 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
-            restartZoom();      
+            restartRoberts();
+            restartZoom();     
             Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
@@ -615,8 +674,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             Color [][] current = pic.getColorMatrix();                        
             double thresholdingValue = (double) sliderToThresholding.getValue();
@@ -997,83 +1058,73 @@ public class MainController implements Initializable {
     @FXML
     private void grayscaleContext(ActionEvent event) {
         sliderContext();
-        sliderToGrayscale.setValue(0);
-        labelGrayscale.setText("Grayscale: 0%");
+        restartGrayscale();
     }
 
     @FXML
     private void brightnessContext(ActionEvent event) {
         sliderContext();
-        sliderToBrightness.setValue(0);
-        labelBrightness.setText("Brightness: 0%");        
+        restartBrightness();      
     }
 
     @FXML
     private void contrastContext(ActionEvent event) {
         sliderContext();
-        sliderToContrast.setValue(0);        
-        labelContrast.setText("Contrast: 0%");        
+        restartContrast();    
     }
 
 
     @FXML
     private void thresholdingContext(ActionEvent event) {
         sliderContext();
-        sliderToThresholding.setValue(0.5);        
-        labelThresholding.setText("Thresholding: 127");        
+        restartThresholding();     
     }
     @FXML
     private void filterAverageContext(ActionEvent event) {
         sliderContext();
-        labelAverageX.setText("1");
-        labelAverageY.setText("1");
-        sliderToAverageX.setValue(1);
-        sliderToAverageY.setValue(1);
+        restartAverage();
     }
     
     @FXML
     private void filterMedianContext(ActionEvent event) {
         sliderContext();
-        labelMedianX.setText("1");
-        labelMedianY.setText("1");        
-        sliderToMedianX.setValue(1);
-        sliderToMedianY.setValue(1);        
+        restartMedian();     
     }
     
     @FXML
     private void filterGaussianContext(ActionEvent event) {
         sliderContext();
-        labelGaussianX.setText("1");
-        labelGaussianY.setText("1");         
-        sliderToGaussianX.setValue(1);
-        sliderToGaussianY.setValue(1);            
+        restartGaussian();          
     }
 
     @FXML
     private void filterLaplacianContext(ActionEvent event) {
         sliderContext();
-        labelLaplacianX.setText("1");
-        labelLaplacianY.setText("1");          
-        sliderToLaplacianX.setValue(1);
-        sliderToLaplacianY.setValue(1);        
+        restartLaplacian();
     }
     
     @FXML
     private void filterSobelContext(ActionEvent event) {
         sliderContext();
-        labelSobelX.setText("1");
-        labelSobelY.setText("1");   
-        sliderToSobelX.setValue(1);
-        sliderToSobelY.setValue(1);             
+        restartSobel();
     }
     
     @FXML
     private void filterPrewittContext(ActionEvent event) {
         sliderContext();
-        labelPrewittX.setText("1");
-        labelPrewittY.setText("1");           
-        sliderToPrewittX.setValue(1);
-        sliderToPrewittY.setValue(1);   
+        restartPrewitt();
+    }
+    
+    @FXML
+    private void filterRobertsContext(ActionEvent event) {
+        sliderContext();
+        restartRoberts();
+    }
+    
+    @FXML
+    private void filterLoGContext(ActionEvent event) {
+        sliderContext();
+        restartLoG();
     }
     
 //    @FXML
@@ -1134,6 +1185,8 @@ public class MainController implements Initializable {
         restartLaplacian();
         restartSobel();
         restartPrewitt();
+        restartRoberts();
+        restartLoG();
         restartZoom();
     }
 
@@ -1192,8 +1245,20 @@ public class MainController implements Initializable {
         sliderToPrewittY.setValue(1);        
     }
     
+    private void restartRoberts() {
+        labelRoberts.setText("1");
+        sliderToRoberts.setValue(1);
+    }
+    
     private void restartZoom() {
         sliderToZoom.setValue(1);
+    }  
+    
+    private void restartLoG() {
+        labelLoGX.setText("1");
+        labelLoGY.setText("1");    
+        sliderToLoGX.setValue(1);
+        sliderToLoGY.setValue(1);
     }      
  
 
@@ -1232,10 +1297,11 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
-            
             int width = imageHeight;
             int height = imageWidth;
             Color [][] rotate = new Color[imageHeight][imageWidth];
@@ -1298,8 +1364,10 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -1329,8 +1397,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -1362,9 +1432,11 @@ public class MainController implements Initializable {
                 restartAverage();
                 restartMedian();
                 restartLaplacian();
+                restartLoG();
                 restartSobel();
                 restartPrewitt();
-                restartZoom();               
+                restartRoberts();
+                restartZoom();              
                pixelWriter = writableImage.getPixelWriter();              
                for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -1394,8 +1466,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             pixelWriter = writableImage.getPixelWriter();              
             for (int y = 0; y < imageHeight; y++) {
@@ -1409,6 +1483,40 @@ public class MainController implements Initializable {
             imageView.setImage(writableImage);
             configurationImageView();
         }        
+    }
+    
+    @FXML
+    private void handleLoG(MouseEvent event) {
+        int axisX = (int) sliderToLoGX.getValue();
+        int axisY = (int) sliderToLoGY.getValue();
+        labelLoGX.setText("" + axisX);
+        labelLoGY.setText("" + axisY);    
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartRoberts();
+            restartZoom();
+            pixelWriter = writableImage.getPixelWriter();              
+            for (int y = 0; y < imageHeight; y++) {
+                for (int x = 0; x < imageWidth; x++) {
+                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "log", pic);
+                    mc.searchNS(x,y);
+                    Color logColor = mc.setMatrixConvolution();  
+                    pixelWriter.setColor(x,y,logColor);
+                }
+            }
+            imageView.setImage(writableImage);
+            configurationImageView();
+        }         
+        
     }
 
     @FXML
@@ -1426,8 +1534,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLoG();
             restartLaplacian();
             restartPrewitt();
+            restartRoberts();
             restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
@@ -1469,7 +1579,9 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
+            restartRoberts();
             restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
@@ -1496,7 +1608,10 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleRoberts(ActionEvent event) {
+    private void handleRoberts() {
+        int robertsIndex = robertsDerivate.getToggles().indexOf(robertsDerivate.getSelectedToggle());
+        int axis = (int) sliderToRoberts.getValue();
+        labelRoberts.setText("" + axis);
         if(image != null) {
             restartBrightness();
             restartContrast();
@@ -1506,22 +1621,27 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
             restartPrewitt();
             restartZoom();
-            Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
-            for (int y = 0; y < imageHeight; y++) {
-                for (int x = 0; x < imageWidth; x++) {
-                    Convolution mc = new Convolution(2, 2, imageWidth, imageHeight, "roberts", pic);
-                    mc.searchRoberts(x,y);
-                    Color robertsColor = mc.setMatrixConvolution();  
-                    pixelWriter.setColor(x,y,robertsColor);
-                    current[x][y] = robertsColor;
+            int aXY = (int) Math.round(axis / 2.0 + 0.5);
+            for (int y = aXY; y < imageHeight - aXY; y++) {
+                for (int x = aXY; x < imageWidth - aXY; x++) {
+                    if(robertsIndex == 0) { //Derivate in X
+                        Convolution mc = new Convolution(axis, axis, imageWidth, imageHeight, "robertsX", pic);
+                        mc.searchNS(x,y);
+                        Color robertsColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,robertsColor);                        
+                    } else {
+                        Convolution mc = new Convolution(axis, axis, imageWidth, imageHeight, "robertsY", pic);
+                        mc.searchNS(x,y);
+                        Color robertsColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,robertsColor);
+                    }
                 }
             }
-            pic.setColorMatrix(current);
-            pic.setImageModified(writableImage);
             imageView.setImage(writableImage);
             configurationImageView();
         }          
@@ -1539,7 +1659,9 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartLoG();
             restartSobel();
+            restartRoberts();
             restartPrewitt();
             int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
             // 0  Neighbor   -    1  Interpolation
@@ -1676,6 +1798,11 @@ public class MainController implements Initializable {
         
         return new Color(red,green,blue,1.0);
     }
+
+    @FXML
+    private void setAribitraryKernel(ActionEvent event) {
+    }
+
 
 
   

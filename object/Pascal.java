@@ -29,7 +29,27 @@ public class Pascal {
             if (i == linePascal-1) {
                 for (int j = 0; j <= i; j++) {
                     arr[j] = pascalValue(i, j);
-//                    System.out.print(pascalValue(i, j) + " ");
+                }
+            }
+        }
+        return arr;
+    }
+    
+    
+        public static int[] generateVectorLoG(int linePascal) {
+        int arr[] = new int[linePascal];
+        if(linePascal == 1) {
+            arr[0] = 1;
+            return arr;
+        }
+        if(linePascal == 2) {
+            arr[0] = 1;
+            arr[1] = 1;
+        }
+        for (int i = 0; i < linePascal; i++) {
+            if (i == linePascal-1) {
+                for (int j = 0; j <= i; j++) {
+                    arr[j] = pascalValue(i, j) - 1;
                 }
             }
         }

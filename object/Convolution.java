@@ -34,7 +34,7 @@ public class Convolution {
    public Convolution(int width, int height, int imageWidth, int imageHeight, String filterName, BlankPic pic) {
        this.width = width;
        this.height = height;
-       this.matrixConvolution = new double[height][width];
+       this.matrixConvolution = new double[this.height][this.width];
        this.pivotY = (int) Math.round((double)this.width / 2);
        this.pivotX = (int) Math.round((double)this.height / 2);
        this.countElements = 0;
@@ -65,6 +65,10 @@ public class Convolution {
                fillLaplacian();
                colorRet = processLineal();
                break;
+           case "log":
+               fillLoG();
+               colorRet = processLineal();
+               break;
            case "sobelX":
                fillSobel();
                fillSobelX();
@@ -85,10 +89,15 @@ public class Convolution {
                fillPrewittY();
                colorRet = processLineal();
                break;
-           case "roberts":
-               fillRoberts();
+           case "robertsX":
+               fillRoberts("x");
                colorRet = processLineal();
-               break;                
+               break;
+           case "robertsY":
+               fillRoberts("y");
+               colorRet = processLineal();
+               break;
+             
        }
     return colorRet;
    }
@@ -128,9 +137,13 @@ public class Convolution {
                        
             double coefficient = matrixConvolution[iX][iY];
             
-            red = red + (colorMatrix[pX][pY].getRed() * coefficient);
-            green = green + (colorMatrix[pX][pY].getGreen() * coefficient);
-            blue = blue + (colorMatrix[pX][pY].getBlue() * coefficient);                      
+            double cRed = colorMatrix[pX][pY].getRed();
+            double cGreen = colorMatrix[pX][pY].getGreen();
+            double cBlue = colorMatrix[pX][pY].getBlue();
+            
+            red = red + (cRed * coefficient);
+            green = green + (cGreen * coefficient);
+            blue = blue + (cBlue * coefficient);                      
         }
        
         if(red > 1) red = 1;
@@ -154,11 +167,25 @@ public class Convolution {
     }
    }
    
-    private void fillRoberts() {
-        matrixConvolution[0][0] = 1;
-        matrixConvolution[0][1] = 0;
-        matrixConvolution[1][0] = 0;
-        matrixConvolution[1][1] = -1;
+   private int sideDerivate(String der) {
+       if(der == "x") {
+           return 1;
+       } else {
+           return -1;
+       }
+   }
+       
+    private void fillRoberts(String der) {
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                if(x == y){
+                    matrixConvolution[x][y] = 0;
+                } else {
+                    matrixConvolution[x][y] = sideDerivate(der);
+                    matrixConvolution[y][x] = -matrixConvolution[x][y];
+                }
+            }
+        } 
     }
    
     private void fillPrewitt() {
@@ -291,12 +318,9 @@ public class Convolution {
    }
    
     private void fillGaussian() {
-        int [] pascalX = new int[height]; // height === axisX
-        int [] pascalY = new int[width]; // width === axisY
-                                                      
-        pascalX = Pascal.generateVector(height); 
-        pascalY =  Pascal.generateVector(width);
-         
+        int [] pascalX = Pascal.generateVector(height);// height === axisX
+        int [] pascalY = Pascal.generateVector(width); // width === axisY
+           
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
                 matrixConvolution[x][y] = (pascalX[x] * pascalY[y]);
@@ -311,6 +335,18 @@ public class Convolution {
             }
         }
         matrixConvolution[pivotX - 1][pivotY - 1] = countElements - 1;
+    }
+    
+    private void fillLoG() {
+        fillGaussian();
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                matrixConvolution[x][y] = -1 * matrixConvolution[x][y];
+            }
+        }        
+        double pivotValue = setArraySum();
+        double sumadeTodo = pivotValue - matrixConvolution[pivotX - 1][pivotY - 1];
+        matrixConvolution[pivotX - 1][pivotY - 1] = -1 * sumadeTodo; 
     }
     
     
