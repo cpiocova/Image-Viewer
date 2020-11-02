@@ -34,6 +34,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
@@ -247,6 +248,12 @@ public class MainController implements Initializable {
     private RadioButton zoomNeighbor;
     @FXML
     private RadioButton zoomInterpolation;
+    @FXML
+    private ToggleGroup sobelDerivate;
+    @FXML
+    private ToggleGroup prewittDerivate;
+    @FXML
+    private CheckBox overflowZoom;
     
 
 
@@ -291,8 +298,8 @@ public class MainController implements Initializable {
      
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
-//        setViewport();
-//        configurationImageView();        
+        setViewport();
+        configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
         displayPixelsFormatLabel();
         displayUniqueColor();
@@ -336,8 +343,6 @@ public class MainController implements Initializable {
                     break;
                 case "pbm":
                     pbmLoader(imgPath);
-//                    pic.pbmLoader(imgPath);
-//                    renderImagePbm();
                     break;
                 case "ppm":
                 case "pgm":
@@ -360,6 +365,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -393,6 +402,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -484,6 +497,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -524,6 +541,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -551,7 +572,11 @@ public class MainController implements Initializable {
             restartThresholding();
             restartAverage();
             restartMedian();
-            restartGaussian();            
+            restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();      
             Color [][] current = pic.getColorMatrix();                        
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
@@ -589,6 +614,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();                        
             double thresholdingValue = (double) sliderToThresholding.getValue();
             pixelWriter = writableImage.getPixelWriter();
@@ -996,6 +1025,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterAverageContext(ActionEvent event) {
         sliderContext();
+        labelAverageX.setText("1");
+        labelAverageY.setText("1");
         sliderToAverageX.setValue(1);
         sliderToAverageY.setValue(1);
     }
@@ -1003,6 +1034,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterMedianContext(ActionEvent event) {
         sliderContext();
+        labelMedianX.setText("1");
+        labelMedianY.setText("1");        
         sliderToMedianX.setValue(1);
         sliderToMedianY.setValue(1);        
     }
@@ -1010,6 +1043,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterGaussianContext(ActionEvent event) {
         sliderContext();
+        labelGaussianX.setText("1");
+        labelGaussianY.setText("1");         
         sliderToGaussianX.setValue(1);
         sliderToGaussianY.setValue(1);            
     }
@@ -1017,6 +1052,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterLaplacianContext(ActionEvent event) {
         sliderContext();
+        labelLaplacianX.setText("1");
+        labelLaplacianY.setText("1");          
         sliderToLaplacianX.setValue(1);
         sliderToLaplacianY.setValue(1);        
     }
@@ -1024,6 +1061,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterSobelContext(ActionEvent event) {
         sliderContext();
+        labelSobelX.setText("1");
+        labelSobelY.setText("1");   
         sliderToSobelX.setValue(1);
         sliderToSobelY.setValue(1);             
     }
@@ -1031,6 +1070,8 @@ public class MainController implements Initializable {
     @FXML
     private void filterPrewittContext(ActionEvent event) {
         sliderContext();
+        labelPrewittX.setText("1");
+        labelPrewittY.setText("1");           
         sliderToPrewittX.setValue(1);
         sliderToPrewittY.setValue(1);   
     }
@@ -1113,28 +1154,40 @@ public class MainController implements Initializable {
         labelThresholding.setText("Thresholding: 127");     
     }   
     private void restartAverage() {
+        labelAverageX.setText("1");
+        labelAverageY.setText("1");
         sliderToAverageX.setValue(1);
         sliderToAverageY.setValue(1);        
     }
     private void restartMedian() {
+        labelMedianX.setText("1");
+        labelMedianY.setText("1");
         sliderToMedianX.setValue(1);
         sliderToMedianY.setValue(1);        
     }
     private void restartGaussian() {
+        labelGaussianX.setText("1");
+        labelGaussianY.setText("1");
         sliderToGaussianX.setValue(1);
         sliderToGaussianY.setValue(1);        
     }
     private void restartLaplacian() {
+        labelLaplacianX.setText("1");
+        labelLaplacianY.setText("1");        
         sliderToLaplacianX.setValue(1);
         sliderToLaplacianY.setValue(1);        
     }      
     
     private void restartSobel() {
+        labelSobelX.setText("1");
+        labelSobelY.setText("1");            
         sliderToSobelX.setValue(1);
         sliderToSobelY.setValue(1);        
     } 
     
     private void restartPrewitt() {
+        labelPrewittX.setText("1");
+        labelPrewittY.setText("1");           
         sliderToPrewittX.setValue(1);
         sliderToPrewittY.setValue(1);        
     }
@@ -1178,6 +1231,10 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             
             int width = imageHeight;
             int height = imageWidth;
@@ -1240,6 +1297,10 @@ public class MainController implements Initializable {
             restartThresholding();
             restartMedian();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1267,6 +1328,10 @@ public class MainController implements Initializable {
             restartThresholding();
             restartAverage();
             restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1289,13 +1354,17 @@ public class MainController implements Initializable {
         if(axisX % 2 == 1 && axisY % 2 == 1){
            labelGaussianX.setText("" + axisX);
            labelGaussianY.setText("" + axisY);    
-           if(image != null && (axisX + axisY >= 2)) {
-               restartBrightness();
-               restartContrast();
-               restartGrayscale();            
-               restartThresholding();
-               restartAverage();
-               restartMedian();
+           if(image != null) {
+                restartBrightness();
+                restartContrast();
+                restartGrayscale();            
+                restartThresholding();
+                restartAverage();
+                restartMedian();
+                restartLaplacian();
+                restartSobel();
+                restartPrewitt();
+                restartZoom();               
                pixelWriter = writableImage.getPixelWriter();              
                for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -1317,7 +1386,7 @@ public class MainController implements Initializable {
         int axisY = (int) sliderToLaplacianY.getValue();
         labelLaplacianX.setText("" + axisX);
         labelLaplacianY.setText("" + axisY);    
-        if(image != null) {
+        if(image != null && (axisY + axisX > 2)) {
             restartBrightness();
             restartContrast();
             restartGrayscale();            
@@ -1325,6 +1394,9 @@ public class MainController implements Initializable {
             restartAverage();
             restartMedian();
             restartGaussian();
+            restartSobel();
+            restartPrewitt();
+            restartZoom();
             pixelWriter = writableImage.getPixelWriter();              
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1340,12 +1412,13 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleSobel(MouseEvent event) {
+    private void handleSobel() {
+        int sobelIndex = sobelDerivate.getToggles().indexOf(sobelDerivate.getSelectedToggle());
         int axisX = (int) sliderToSobelX.getValue();
         int axisY = (int) sliderToSobelY.getValue();
         labelSobelX.setText("" + axisX);
         labelSobelY.setText("" + axisY);    
-        if(image != null) {
+        if(image != null && axisY + axisX > 2) {
             restartBrightness();
             restartContrast();
             restartGrayscale();            
@@ -1354,16 +1427,25 @@ public class MainController implements Initializable {
             restartMedian();
             restartGaussian();
             restartLaplacian();
+            restartPrewitt();
+            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
             int aY = (int) Math.round(axisY / 2.0 + 0.5);
-            
             for (int y = aY; y < imageHeight - aY; y++) {
                 for (int x = aX; x < imageWidth - aX; x++) {
-                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobel", pic);
-                    mc.searchNS(x,y);
-                    Color sobelColor = mc.setMatrixConvolution();  
-                    pixelWriter.setColor(x,y,sobelColor);
+                    if(sobelIndex == 0){ // Derivate in X
+                        Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobelX", pic);
+                        mc.searchNS(x,y);
+                        Color sobelColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,sobelColor);                    
+                    } else { //Derivate in Y
+                        Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobelY", pic);
+                        mc.searchNS(x,y);
+                        Color sobelColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,sobelColor);                      
+                    }
+
                 }
             }
             imageView.setImage(writableImage);
@@ -1372,7 +1454,8 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handlePrewitt(MouseEvent event) {
+    private void handlePrewitt() {
+        int prewittIndex = prewittDerivate.getToggles().indexOf(prewittDerivate.getSelectedToggle());
         int axisX = (int) sliderToPrewittX.getValue();
         int axisY = (int) sliderToPrewittY.getValue();
         labelPrewittX.setText("" + axisX);
@@ -1387,15 +1470,23 @@ public class MainController implements Initializable {
             restartGaussian();
             restartLaplacian();
             restartSobel();
+            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
             int aY = (int) Math.round(axisY / 2.0 + 0.5);
             for (int y = aY; y < imageHeight - aY; y++) {
                 for (int x = aX; x < imageWidth - aX; x++) {
-                    Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewitt", pic);
-                    mc.searchNS(x,y);
-                    Color prewittColor = mc.setMatrixConvolution();  
-                    pixelWriter.setColor(x,y,prewittColor);
+                    if(prewittIndex == 0) { //Derivate in X
+                        Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewittX", pic);
+                        mc.searchNS(x,y);
+                        Color prewittColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,prewittColor);                        
+                    } else {
+                        Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewittY", pic);
+                        mc.searchNS(x,y);
+                        Color prewittColor = mc.setMatrixConvolution();  
+                        pixelWriter.setColor(x,y,prewittColor);
+                    }
                 }
             }
             imageView.setImage(writableImage);
@@ -1417,6 +1508,7 @@ public class MainController implements Initializable {
             restartLaplacian();
             restartSobel();
             restartPrewitt();
+            restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -1438,78 +1530,99 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleZoom() {
-        int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
-        // 0  Neighbor   -    1  Interpolation
-        double zoomValue = sliderToZoom.getValue();
-        
-        if(zoomButton == 0) {
-            zoomNeighbor(zoomValue);
-        } else {
-            zoomInterpolation(zoomValue);
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartSobel();
+            restartPrewitt();
+            int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
+            // 0  Neighbor   -    1  Interpolation
+            double zoomValue = sliderToZoom.getValue();
+
+            if(zoomButton == 0) {
+                zoomNeighbor(zoomValue);
+            } else {
+                zoomInterpolation(zoomValue);
+            }  
         }
     }
     
+    private int[] getZoomDimension(double zoomValue) {
+        int [] newDimen = new int[2];
+        boolean overflow = overflowZoom.isSelected();
+        if(overflow || zoomValue < 1) {
+            newDimen[0] = (int) Math.round(imageWidth * zoomValue);
+            newDimen[1] = (int) Math.round(imageHeight * zoomValue);
+        } else{
+            newDimen[0] = imageWidth;
+            newDimen[1] = imageHeight;  
+        }
+        return newDimen;
+    } 
+    
     private void zoomNeighbor(double zoomValue) {
-        if(image != null) {
-            int width = (int) Math.round(imageWidth * zoomValue);
-            int height = (int) Math.round(imageHeight * zoomValue);
-            Color [][] current = pic.getColorMatrix();
-            zoomWritable = new WritableImage(width, height);
-            zoomWriter = zoomWritable.getPixelWriter();
-            for (int y = 0; y < height; y++) {
-                // poner un boton con el overflow active o desactive para que la imagen se quede en el cuadro o se salga, cambio el if que este abajo por imageWidth
-
-                for (int x = 0; x < width; x++) {
-                    if(x < width - zoomValue && y < height - zoomValue){
-                        int zX = (int) (x/zoomValue);
-                        int zY = (int) (y/zoomValue);
-                        Color zoomColor = current[zX][zY];
-                        zoomWriter.setColor(x,y,zoomColor);
-                    }
+        int [] zoomDimensions = getZoomDimension(zoomValue);
+        int width = zoomDimensions[0];
+        int height = zoomDimensions[1];
+        Color [][] current = pic.getColorMatrix();
+        zoomWritable = new WritableImage(width, height);
+        zoomWriter = zoomWritable.getPixelWriter();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if(x < width - zoomValue - 1 && y < height - zoomValue - 1){
+                    int zX = (int) (x/zoomValue);
+                    int zY = (int) (y/zoomValue);
+                    Color zoomColor = current[zX][zY];
+                    zoomWriter.setColor(x,y,zoomColor);
                 }
             }
-            imageView.setImage(zoomWritable);
-            configurationImageView();      
-            }
+        }
+        imageView.setImage(zoomWritable);
+        configurationImageView();      
+            
     }
-    
+        
     private void zoomInterpolation(double zoomValue) {
 //        System.out.println("Zoom Interpolation " + zoomValue);
-        if(image != null) {
-            int width = (int) Math.round(imageWidth * zoomValue);
-            int height = (int) Math.round(imageHeight * zoomValue);
-            Color [][] current = pic.getColorMatrix();
-            zoomWritable = new WritableImage(width, height);
-            zoomWriter = zoomWritable.getPixelWriter();
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
+        int [] zoomDimensions = getZoomDimension(zoomValue);
+        int width = zoomDimensions[0];
+        int height = zoomDimensions[1];
+        Color [][] current = pic.getColorMatrix();
+        zoomWritable = new WritableImage(width, height);
+        zoomWriter = zoomWritable.getPixelWriter();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
 //                    if(x < width - zoomValue) {
 //                       // Interpolar solo vertical  
 //                    }else if(y < height - zoomValue) {
 //                       // Interpolar solo horizontal 
-// poner un boton con el overflow active o desactive para que la imagen se quede en el cuadro o se salga, cambio el if que este abajo por imageWidth
 //                    }
-                    if(x < width - zoomValue - 1  && y < height - zoomValue - 1){
-                        int i = (int) Math.floor((double)x/zoomValue);
-                        int d = i + 1;
-                        int s = (int) Math.floor((double)y/zoomValue);
-                        int r = s + 1;
-                        double a = ((double) x / zoomValue) - i;
-                        double b = ((double) y / zoomValue) - s;
+                if(x < width - zoomValue - 1  && y < height - zoomValue - 1){
+                    int i = (int) Math.floor((double)x/zoomValue);
+                    int d = i + 1;
+                    int s = (int) Math.floor((double)y/zoomValue);
+                    int r = s + 1;
+                    double a = ((double) x / zoomValue) - i;
+                    double b = ((double) y / zoomValue) - s;
 
-                        Color bilinear1 = bilinearCoefficient(i,s, 1-a, 1-b, current);
-                        Color bilinear2 = bilinearCoefficient(d,s, a, 1-b, current);
-                        Color bilinear3 = bilinearCoefficient(i,r, 1-a, b, current);
-                        Color bilinear4 = bilinearCoefficient(d,r, a, b, current);
+                    Color bilinear1 = bilinearCoefficient(i,s, 1-a, 1-b, current);
+                    Color bilinear2 = bilinearCoefficient(d,s, a, 1-b, current);
+                    Color bilinear3 = bilinearCoefficient(i,r, 1-a, b, current);
+                    Color bilinear4 = bilinearCoefficient(d,r, a, b, current);
 
-                        Color zoomColor = addColors(bilinear1,bilinear2,bilinear3,bilinear4);
-                        zoomWriter.setColor(x,y,zoomColor);
-                    }
+                    Color zoomColor = addColors(bilinear1,bilinear2,bilinear3,bilinear4);
+                    zoomWriter.setColor(x,y,zoomColor);
                 }
             }
-            imageView.setImage(zoomWritable);
-            configurationImageView();      
         }
+        imageView.setImage(zoomWritable);
+        configurationImageView();  
     }
     
     private Color bilinearCoefficient(int x, int y, double a, double b, Color[][] current) {
@@ -1563,6 +1676,7 @@ public class MainController implements Initializable {
         
         return new Color(red,green,blue,1.0);
     }
+
 
   
 }

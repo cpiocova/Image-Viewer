@@ -65,12 +65,24 @@ public class Convolution {
                fillLaplacian();
                colorRet = processLineal();
                break;
-           case "sobel":
+           case "sobelX":
                fillSobel();
+               fillSobelX();
                colorRet = processLineal();
                break;
-           case "prewitt":
+           case "sobelY":
+               fillSobel();
+               fillSobelY();
+               colorRet = processLineal();
+               break;
+           case "prewittX":
                fillPrewitt();
+               fillPrewittX();
+               colorRet = processLineal();
+               break;               
+           case "prewittY":
+               fillPrewitt();
+               fillPrewittY();
                colorRet = processLineal();
                break;
            case "roberts":
@@ -150,7 +162,7 @@ public class Convolution {
     }
    
     private void fillPrewitt() {
-        if(height == 1){ // Seria un Prewitt Derivando en X, actuara el pivotY
+        if(height == 1  && width != 1){ // Seria un Prewitt Derivando en X, actuara el pivotY
             for (int y = 0; y < width; y++) {
                 if(y == pivotY - 1) {
                     matrixConvolution[0][y] = 0;
@@ -160,7 +172,9 @@ public class Convolution {
                     matrixConvolution[0][y] = -1;
                 }
             }
-        }else if(width == 1) { // Seria un Prewitt Derivando en Y,  actuara el pivotX
+        }
+        
+        if(width == 1 && height != 1) { // Seria un Prewitt Derivando en Y,  actuara el pivotX
             for (int x = 0; x < height; x++) {
                 if(x == pivotX - 1) {
                     matrixConvolution[x][0] = 0;
@@ -170,21 +184,36 @@ public class Convolution {
                     matrixConvolution[x][0] = 1;
                 }
             }
-        } else {
-           fillPrewittY();
         }
     }
     
     private void fillPrewittY() {
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < width; y++) {
-                if(x == pivotX - 1) {
-                    matrixConvolution[x][y] = 0;
-                }else if(x > pivotX - 1){
-                    matrixConvolution[x][y] = (double) -1;
-                }else { // x < pivotX - 1
-                    matrixConvolution[x][y] = (double) 1;
-                }   
+        if(width > 1 && height > 1) {
+            for (int x = 0; x < height; x++) {
+                for (int y = 0; y < width; y++) {
+                    if(x == pivotX - 1) {
+                        matrixConvolution[x][y] = 0;
+                    }else if(x > pivotX - 1){
+                        matrixConvolution[x][y] = (double) -1;
+                    }else { // x < pivotX - 1
+                        matrixConvolution[x][y] = (double) 1;
+                    }   
+                }
+            }            
+        }
+    }   
+    private void fillPrewittX() {
+        if(width > 1 && height > 1) {
+            for (int x = 0; x < height; x++) {
+                for (int y = 0; y < width; y++) {
+                    if(y == pivotY - 1) {
+                        matrixConvolution[x][y] = 0;
+                    }else if(y > pivotY - 1){
+                        matrixConvolution[x][y] = (double) -1;
+                    }else { // x < pivotY - 1
+                        matrixConvolution[x][y] = (double) 1;
+                    }   
+                }
             }
         }
     }   
@@ -194,7 +223,7 @@ public class Convolution {
         int [] comunVectorRow = Pascal.generateVector(width);  
         int [] comunVectorColumn = Pascal.generateVector(height);
 
-        if(height == 1 ){ // Seria un Sobel Derivando en X, actuara el pivotY
+        if(height == 1  && width != 1){ // Seria un Sobel Derivando en X, actuara el pivotY
             for (int y = 0; y < width; y++) {
                 if(y == pivotY - 1) {
                     matrixConvolution[0][y] = 0;
@@ -204,7 +233,8 @@ public class Convolution {
                     matrixConvolution[0][y] = -comunVectorRow[y];
                 }
             }
-        }else if(width == 1) { // Seria un sobel Derivando en Y,  actuara el pivotX
+        }
+        if(width == 1 && height != 1) { // Seria un sobel Derivando en Y,  actuara el pivotX
             for (int x = 0; x < height; x++) {
                 if(x == pivotX - 1) {
                     matrixConvolution[x][0] = 0;
@@ -214,35 +244,39 @@ public class Convolution {
                     matrixConvolution[x][0] = comunVectorColumn[x];
                 }
             }
-        } else {
-           fillSobelY(comunVectorRow);
         }
    }
    
-    private void fillSobelY(int [] comunVectorRow) {
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < width; y++) {
-                if(x == pivotX - 1) {
-                    matrixConvolution[x][y] = 0;
-                }else if(x > pivotX - 1){
-                    matrixConvolution[x][y] = (double) -comunVectorRow[y] / (double) x;
-                }else { // x < pivotX - 1
-                    matrixConvolution[x][y] = (double) comunVectorRow[y] / (double) (height - x - 1);
-                }   
+    private void fillSobelY() {
+        if(width > 1 && height > 1) {
+            int [] comunVectorRow = Pascal.generateVector(width);  
+            for (int x = 0; x < height; x++) {
+                for (int y = 0; y < width; y++) {
+                    if(x == pivotX - 1) {
+                        matrixConvolution[x][y] = 0;
+                    }else if(x > pivotX - 1){
+                        matrixConvolution[x][y] = (double) -comunVectorRow[y] / (double) x;
+                    }else { // x < pivotX - 1
+                        matrixConvolution[x][y] = (double) comunVectorRow[y] / (double) (height - x - 1);
+                    }   
+                }
             }
         }
     }
 
-    private void fillSobelX(int [] comunVectorColumn) {
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < width; y++) {
-                if(y == pivotX - 1) {
-                    matrixConvolution[x][y] = 0;
-                }else if(y > pivotX - 1){
-                    matrixConvolution[x][y] = (double) comunVectorColumn[x] / (double) (width - y);
-                }else { // y < pivotX - 1
-                    matrixConvolution[x][y] = (double) -comunVectorColumn[x] / (double) (y+1);
-                }   
+    private void fillSobelX() {
+        if(width > 1 && height > 1) {
+        int [] comunVectorColumn = Pascal.generateVector(height);
+            for (int x = 0; x < height; x++) {
+                for (int y = 0; y < width; y++) {
+                    if(y == pivotY - 1) {
+                        matrixConvolution[x][y] = 0;
+                    }else if(y > pivotY - 1){
+                        matrixConvolution[x][y] = (double) comunVectorColumn[x] / (double) (width - y);
+                    }else { // y < pivotY - 1
+                        matrixConvolution[x][y] = (double) -comunVectorColumn[x] / (double) (y+1);
+                    }   
+                }
             }
         }
     }    

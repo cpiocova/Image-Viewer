@@ -11,9 +11,9 @@
 
 <AnchorPane id="AnchorPane" prefHeight="827.0" prefWidth="657.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
     <children>
-        <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="27.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="168.0" text="Load File" />
+        <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="27.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="170.0" text="Load File" />
       <Label fx:id="labelLoadMessage" layoutX="193.0" layoutY="27.0" prefHeight="25.0" prefWidth="125.0" />
-      <Accordion layoutX="15.0" layoutY="102.0" prefHeight="559.0" prefWidth="170.0">
+      <Accordion layoutX="15.0" layoutY="102.0" prefHeight="621.0" prefWidth="170.0">
         <panes>
             <TitledPane animated="false" prefHeight="134.0" prefWidth="172.0" text="Negative">
               <content>
@@ -147,13 +147,19 @@
                <content>
                   <AnchorPane prefHeight="167.0" prefWidth="142.0">
                      <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterSobelContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToSobelY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelSobelX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelSobelY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToSobelX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label layoutX="26.0" layoutY="118.0" text="X" />
+                        <Button layoutX="57.0" layoutY="205.0" mnemonicParsing="false" onAction="#filterSobelContext" text="Apply" />
+                        <Label layoutX="26.0" layoutY="166.0" text="Y" />
+                        <Slider fx:id="sliderToSobelY" blockIncrement="2.0" layoutX="47.0" layoutY="167.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelSobelX" layoutX="125.0" layoutY="118.0" text="1" />
+                        <Label fx:id="labelSobelY" layoutX="125.0" layoutY="164.0" text="1" />
+                        <Slider fx:id="sliderToSobelX" blockIncrement="2.0" layoutX="47.0" layoutY="117.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <RadioButton layoutX="26.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleSobel" selected="true" text="Derivate in X">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="sobelDerivate" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton layoutX="26.0" layoutY="63.0" mnemonicParsing="false" onAction="#handleSobel" text="Derivate in Y" toggleGroup="$sobelDerivate" />
                      </children>
                   </AnchorPane>
                </content>
@@ -162,13 +168,19 @@
                <content>
                   <AnchorPane prefHeight="167.0" prefWidth="142.0">
                      <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterPrewittContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToPrewittY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelPrewittX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelPrewittY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToPrewittX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label layoutX="26.0" layoutY="108.0" text="X" />
+                        <Button layoutX="57.0" layoutY="195.0" mnemonicParsing="false" onAction="#filterPrewittContext" text="Apply" />
+                        <Label layoutX="26.0" layoutY="156.0" text="Y" />
+                        <Slider fx:id="sliderToPrewittY" blockIncrement="2.0" layoutX="47.0" layoutY="157.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelPrewittX" layoutX="125.0" layoutY="108.0" text="1" />
+                        <Label fx:id="labelPrewittY" layoutX="125.0" layoutY="154.0" text="1" />
+                        <Slider fx:id="sliderToPrewittX" blockIncrement="2.0" layoutX="47.0" layoutY="107.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <RadioButton layoutX="30.0" layoutY="27.0" mnemonicParsing="false" onAction="#handlePrewitt" selected="true" text="Derivate in X">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="prewittDerivate" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton layoutX="30.0" layoutY="57.0" mnemonicParsing="false" onAction="#handlePrewitt" text="Derivate in Y" toggleGroup="$prewittDerivate" />
                      </children>
                   </AnchorPane>
                </content>
@@ -188,12 +200,13 @@
                      <children>
                         <Slider fx:id="sliderToZoom" blockIncrement="0.5" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="5.0" min="0.5" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="113.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                         <Label fx:id="labelZoom" layoutX="66.0" layoutY="89.0" text="1.0x" />
-                        <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" selected="true" text="Nearest Neighbor">
+                        <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
                            <toggleGroup>
                               <ToggleGroup fx:id="zoomMethod" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="zoomInterpolation" layoutX="17.0" layoutY="60.0" mnemonicParsing="false" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
+                        <RadioButton fx:id="zoomInterpolation" layoutX="17.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleZoom" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
+                        <CheckBox fx:id="overflowZoom" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Overflow" />
                      </children>
                   </AnchorPane>
                </content>
@@ -202,10 +215,10 @@
       </Accordion>
       <AnchorPane layoutX="245.0" layoutY="95.0" prefHeight="419.0" prefWidth="383.0">
          <children>
-            <ImageView fx:id="imageView" layoutX="42.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="300.0" layoutX="42.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </AnchorPane>
-      <Button fx:id="btnDefault" layoutX="14.0" layoutY="77.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="168.0" text="Reset Image" />
+      <Button fx:id="btnDefault" layoutX="14.0" layoutY="77.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
       <SplitPane dividerPositions="0.32450331125827814, 0.5" layoutX="245.0" layoutY="629.0" orientation="VERTICAL" prefHeight="153.0" prefWidth="230.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -226,7 +239,7 @@
         </items>
       </SplitPane>
       <Button layoutX="515.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
-      <Button layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="168.0" text="View histogram" />
+      <Button layoutX="14.0" layoutY="52.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
