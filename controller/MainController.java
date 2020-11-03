@@ -1122,10 +1122,10 @@ public class MainController implements Initializable {
                     current[x][y] = pixelReader.getColor(x, y);
                 }
             }
-            pic.setImageModified(writableImage);
             pic.setColorMatrix(current);
             pic.setScaleMatrix(current);
             handleZoom();
+            pic.setImageModified(writableImage);
         }
     }
     
@@ -1636,6 +1636,7 @@ public class MainController implements Initializable {
             for(int y = 0; y < imageHeight; y++) {
                 for(int x = 0; x< imageWidth; x ++) {
                     scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                    pixelWriter.setColor(x,y,scaleMatrix[x][y]); 
                 }
             }
             for (int y = aY; y < imageHeight - aY; y++) {
@@ -1691,6 +1692,7 @@ public class MainController implements Initializable {
             for(int y = 0; y < imageHeight; y++) {
                 for(int x = 0; x< imageWidth; x ++) {
                     scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                    pixelWriter.setColor(x,y,scaleMatrix[x][y]); 
                 }
             }
             for (int y = aY; y < imageHeight - aY; y++) {
@@ -1740,6 +1742,7 @@ public class MainController implements Initializable {
             for(int y = 0; y < imageHeight; y++) {
                 for(int x = 0; x< imageWidth; x ++) {
                     scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                    pixelWriter.setColor(x,y,scaleMatrix[x][y]);  
                 }
             }
             int aXY = (int) Math.round(axis / 2.0 + 0.5);
