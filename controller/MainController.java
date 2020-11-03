@@ -539,11 +539,13 @@ public class MainController implements Initializable {
     private void  setColorPixelsBmp() {
         Color [][] current = new Color[imageWidth][imageHeight];
         Color [][] original = new Color[imageWidth][imageHeight];
-        
+        pixelWriter = writableImage.getPixelWriter();
+
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 original[x][y] = current[x][y] = pixelReader.getColor(x, y);
                 addColorsUnique(pixelReader.getArgb(x, y));
+                pixelWriter.setColor(x,y,current[x][y]);
             }
         }
         pic.setUniqueColors(uniqueColorsList);        
