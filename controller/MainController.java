@@ -86,6 +86,8 @@ public class MainController implements Initializable {
     
     private Color [][] bufferNetpbm;
     
+    private boolean grayScaleFlag;
+    
     private int vw;
     private int vh;
 
@@ -370,7 +372,8 @@ public class MainController implements Initializable {
         
         sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
-
+        
+        this.grayScaleFlag = false;
     }
     
     
@@ -653,6 +656,7 @@ public class MainController implements Initializable {
             handleZoom();
             configurationImageView();
             int text = (int) (gv * 100);
+            if(text >= 99) this.grayScaleFlag = true;
             labelGrayscale.setText("Grayscale: " + text + "%");           
         }    
     }
@@ -1959,12 +1963,13 @@ public class MainController implements Initializable {
         int aX = (int) Math.round(height / 2.0 + 0.5);
         pixelWriter = writableImage.getPixelWriter();
         Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
-        Color[][] current = pic.getColorMatrix();
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
-                scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                    scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                    pixelWriter.setColor(x,y,scaleMatrix[x][y]); 
             }
-        }
+        }        
+        
         for (int y = aY; y < imageHeight - aY; y++) {
             for (int x = aX; x < imageWidth - aX; x++) {
                 Convolution mc = new Convolution(width, height, imageWidth, imageHeight, "arbitrary", pic);
@@ -1981,6 +1986,10 @@ public class MainController implements Initializable {
         configurationImageView();
     }
 
+    public int log2(int x){
+        return (int) (Math.log(x) / Math.log(2) + 1e-10);
+    }
+    
     @FXML 
     private void handleSaveImage(ActionEvent event) {
         if(image != null) {
@@ -1989,9 +1998,7 @@ public class MainController implements Initializable {
 
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
-                    new FileChooser.ExtensionFilter("PBM", "*.pbm"),
-                    new FileChooser.ExtensionFilter("PGM", "*.pgm"),
-                    new FileChooser.ExtensionFilter("PPM", "*.ppm")
+                    new FileChooser.ExtensionFilter("Netbpm", "*.pbm", "*.pgm", "*.ppm")
             );
 
               File file = fileChooser.showSaveDialog(null);
@@ -2004,25 +2011,44 @@ public class MainController implements Initializable {
                       bmpSaver(writableImage, file);
                   break;
                   default:
-                      System.out.println("Falta");
+                      netBpmSaver();
                 }  
               }
         }
     
     }
     
-    private void bmpSaver(Image content, File file){
+    private void bmpSaver(Image content, File file){      
         
         BufferedImage bfImage = SwingFXUtils.fromFXImage(content, null);
-        BufferedImage bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+        BufferedImage bfImage2 = null;
+        
+        int size = uniqueColorsList.size();
+        int rank = log2(size);
+        
+        if(rank >= 0 && rank <= 1) {
+            bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+        } else if(rank > 1 && rank <= 8 && grayScaleFlag == true) {
+            bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        } else if(rank > 8 && rank <= 24) {
+           bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_INT_RGB); 
+        }
+        
         bfImage2.getGraphics().drawImage(bfImage, 0, 0, null);
-    try {
-        ImageIO.write(bfImage2, "png", file);
-    } catch (IOException ex) {
-        ex.printStackTrace();
+        try {
+            ImageIO.write(bfImage2, "png", file);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+    
+
+
+    private void netBpmSaver() {
+        System.out.println("PPMMMMM");
     }
 
-}
 
 
 
