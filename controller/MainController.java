@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package controller;
+import java.awt.image.BufferedImage;
 import object.BlankPic;
 import object.ImageSize;
 
@@ -31,6 +32,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,6 +44,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 import object.Convolution;
 
 
@@ -295,6 +298,44 @@ public class MainController implements Initializable {
         sliderToLoGY.valueProperty().set(roundedValue);
         labelLoGY.setText(Integer.toString(roundedValue));
     };
+    
+    final ChangeListener<Number> sliderAverageX = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToAverageX.valueProperty().set(roundedValue);
+        labelAverageX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderAverageY = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToAverageY.valueProperty().set(roundedValue);
+        labelAverageY.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderMedianX = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToMedianX.valueProperty().set(roundedValue);
+        labelMedianX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderMedianY = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToMedianY.valueProperty().set(roundedValue);
+        labelMedianY.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderArbitraryX = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToArbitraryX.valueProperty().set(roundedValue);
+        labelArbitraryX.setText(Integer.toString(roundedValue));
+    };
+    
+    final ChangeListener<Number> sliderArbitraryY = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToArbitraryY.valueProperty().set(roundedValue);
+        labelArbitraryY.setText(Integer.toString(roundedValue));
+    };
+    @FXML
+    private Button btnSaveImage;
 
 
     @Override
@@ -320,6 +361,15 @@ public class MainController implements Initializable {
         sliderToZoom.valueProperty().addListener(sliderZoom);
         
         sliderToRoberts.valueProperty().addListener(sliderRoberts);
+        
+        sliderToAverageX.valueProperty().addListener(sliderAverageX);
+        sliderToAverageY.valueProperty().addListener(sliderAverageY);
+        
+        sliderToMedianX.valueProperty().addListener(sliderMedianX);
+        sliderToMedianY.valueProperty().addListener(sliderMedianY);
+        
+        sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
+        sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
 
     }
     
@@ -1754,7 +1804,7 @@ public class MainController implements Initializable {
         zoomWriter = zoomWritable.getPixelWriter();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if(x < width - zoomValue - 1 && y < height - zoomValue - 1){
+                if(x < width - zoomValue && y < height - zoomValue){
                     int zX = (int) (x/zoomValue);
                     int zY = (int) (y/zoomValue);
                     Color zoomColor = current[zX][zY];
@@ -1777,12 +1827,23 @@ public class MainController implements Initializable {
         zoomWriter = zoomWritable.getPixelWriter();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-//                    if(x < width - zoomValue) {
-//                       // Interpolar solo vertical  
-//                    }else if(y < height - zoomValue) {
-//                       // Interpolar solo horizontal 
-//                    }
-                if(x < width - zoomValue - 1  && y < height - zoomValue - 1){
+//                if(x == width - zoomValue -1) {
+////                  Verticula Interpolate
+//                    int s = (int) Math.floor((double)y/zoomValue);
+//                    int r = s + 1;
+//                    double b = ((double) y / zoomValue) - s;
+//                    Color linear = linearCoefficient(s,r,x,b,current);
+//                    zoomWriter.setColor(x,y,linear);                    
+//                }
+//                if(y == height - zoomValue - 1) {
+////                       Horizontal Interpolate
+//                    int i = (int) Math.floor((double)x/zoomValue);
+//                    int d = i + 1;
+//                    double a = ((double) x / zoomValue) - i;
+//                    Color linear = linearCoefficient(i,d,y,a,current);
+//                    zoomWriter.setColor(x,y,linear);
+//                }
+                if(x < width - zoomValue - 1  && y < height - zoomValue - 1 ){
                     int i = (int) Math.floor((double)x/zoomValue);
                     int d = i + 1;
                     int s = (int) Math.floor((double)y/zoomValue);
@@ -1804,22 +1865,34 @@ public class MainController implements Initializable {
         configurationImageView();  
     }
     
+    
+    private Color linearCoefficient(int x1, int x2, int y, double a, Color[][] current) {
+        double red1 = current[x1][y].getRed();
+        double green1 = current[x1][y].getGreen();
+        double blue1 = current[x1][y].getBlue();
+        
+        double red2 = current[x2][y].getRed();
+        double green2 = current[x2][y].getGreen();
+        double blue2 = current[x2][y].getBlue();
+        
+        
+        double red = truncatePixel(a*red1 + (1-a)*red2);
+        double green = truncatePixel(a*green1 + (1-a)*green2);
+        double blue = truncatePixel(a*blue1 + (1-a)*blue2);
+        
+        return new Color(red,green,blue,1.0);
+        
+        
+    }
+    
     private Color bilinearCoefficient(int x, int y, double a, double b, Color[][] current) {
         double red = current[x][y].getRed();
         double green = current[x][y].getGreen();
         double blue = current[x][y].getBlue();
         
-        red = a*b*red;
-        green = a*b*green;
-        blue = a*b*blue;
-        
-        if(red > 1) red = 1;
-        if(green > 1) green = 1;
-        if(blue > 1) blue = 1;
-        
-        if(red < 0) red = 0;
-        if(green < 0) green = 0;
-        if(blue < 0) blue = 0;
+        red = truncatePixel(a*b*red);
+        green = truncatePixel(a*b*green);
+        blue = truncatePixel(a*b*blue);
         
         return new Color(red, green, blue, 1.0);
     }
@@ -1841,17 +1914,10 @@ public class MainController implements Initializable {
         double dGreen = d.getGreen();
         double dBlue = d.getBlue();
         
-        double red = aRed + bRed + cRed + dRed;
-        double green = aGreen + bGreen + cGreen + dGreen;
-        double blue = aBlue + bBlue + cBlue + dBlue;
+        double red = truncatePixel(aRed + bRed + cRed + dRed);
+        double green = truncatePixel(aGreen + bGreen + cGreen + dGreen);
+        double blue = truncatePixel(aBlue + bBlue + cBlue + dBlue);
         
-        if(red > 1) red = 1;
-        if(green > 1) green = 1;
-        if(blue > 1) blue = 1;
-        
-        if(red < 0) red = 0;
-        if(green < 0) green = 0;
-        if(blue < 0) blue = 0;
         
         return new Color(red,green,blue,1.0);
     }
@@ -1914,5 +1980,45 @@ public class MainController implements Initializable {
         handleZoom();
         configurationImageView();
     }
-  
+
+    @FXML 
+    private void handleSaveImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load image in BMP or Netpbm format");
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
+                new FileChooser.ExtensionFilter("PBM", "*.pbm"),
+                new FileChooser.ExtensionFilter("PGM", "*.pgm"),
+                new FileChooser.ExtensionFilter("PPM", "*.ppm")
+        );
+
+          File file = fileChooser.showSaveDialog(null);
+
+          if(file != null){
+            String format = file.getName().substring(file.getName().lastIndexOf(".") + 1, 
+                    file.getName().length());
+            switch(format) {
+              case "bmp":
+                  SaveFile(writableImage, file);
+              break;
+              default:
+                  System.out.println("Falta");
+            }  
+          }
+    
+    }
+    
+    private void SaveFile(Image content, File file){
+    try {
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(content, null);
+        ImageIO.write(bufferedImage, "png", file);
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+
+}
+
+ 
+    
 }
