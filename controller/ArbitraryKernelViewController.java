@@ -56,6 +56,8 @@ public class ArbitraryKernelViewController implements Initializable {
         mainController = mainInstanceController; 
         this.width = width;
         this.height = height;
+        int pivotY = (int) Math.round((double)this.width / 2);
+        int pivotX = (int) Math.round((double)this.height / 2);
         textFields = new TextField[this.height][this.width]; 
         GridPane gridPane = new GridPane();
         gridPane.setVgap(20); 
@@ -67,7 +69,10 @@ public class ArbitraryKernelViewController implements Initializable {
             for (int x = 0; x < this.height; x++) {
                 TextField infoCoord = new TextField();
                 infoCoord.setId("coord"+x+""+y);
-                infoCoord.setPromptText("Enter coord: " + x + "" + y);
+                infoCoord.setPromptText("Enter coord: " + x + "" + y);                
+                if(x == pivotX - 1 && y == pivotY - 1) {
+                    infoCoord.setStyle("-fx-background-color: rgba(3,172,240,0.2);");
+                }
                textFields[x][y] = infoCoord;
                gridPane.add(textFields[x][y], y, x);
             }
