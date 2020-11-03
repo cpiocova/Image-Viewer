@@ -389,13 +389,24 @@ public class MainController implements Initializable {
         }
     }
     
-        @FXML
     private void recalculateInfo() {
         if(image != null) {
+            calculateUniqueColor();
             displayUniqueColor();
             displayDimensionsLabel();
             displayPixelsFormatLabel();
         }
+    }
+    
+    private void calculateUniqueColor() {
+        uniqueColorsList.clear();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                addColorsUnique(pixelReader.getArgb(x, y));
+            }
+        }
+
+        
     }
      
     private void configurationInit() {
@@ -489,11 +500,13 @@ public class MainController implements Initializable {
                    current[x][y] = negative;
                }
             }
-            pic.setColorMatrix(current);
-            pic.setImageModified(writableImage);
-           imageView.setImage(writableImage);
-           handleZoom();
-           configurationImageView();
+//            pic.setColorMatrix(current);
+//            pic.setImageModified(writableImage);
+//           imageView.setImage(writableImage);
+            sliderContext();
+            handleZoom();
+            configurationImageView();
+
         }
     }
     
@@ -534,9 +547,10 @@ public class MainController implements Initializable {
                     current[x][y] = blackwhite;
                }
             }
-            pic.setColorMatrix(current);
-            pic.setImageModified(writableImage);                
-            imageView.setImage(writableImage);
+//            pic.setColorMatrix(current);
+//            pic.setImageModified(writableImage);                
+//            imageView.setImage(writableImage);
+            sliderContext();
             handleZoom();
             configurationImageView();
         }
@@ -551,7 +565,7 @@ public class MainController implements Initializable {
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
                 original[x][y] = current[x][y] = pixelReader.getColor(x, y);
-                addColorsUnique(pixelReader.getArgb(x, y));
+//                addColorsUnique(pixelReader.getArgb(x, y));
                 pixelWriter.setColor(x,y,current[x][y]);
             }
         }
@@ -1067,11 +1081,11 @@ public class MainController implements Initializable {
         }
                 
         pixelReader = writableImage.getPixelReader();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                addColorsUnique(pixelReader.getArgb(x, y));
-            }
-        }
+//        for (int y = 0; y < height; y++) {
+//            for (int x = 0; x < width; x++) {
+//                addColorsUnique(pixelReader.getArgb(x, y));
+//            }
+//        }
         
         pic.setImageOriginal(writableNetpbm);
         pic.setImageModified(writableNetpbm);
@@ -1099,11 +1113,11 @@ public class MainController implements Initializable {
         }
                 
         pixelReader = writableImage.getPixelReader();
-        for (int y = 0; y < imageHeight; y++) {
-            for (int x = 0; x < imageWidth; x++) {
-                addColorsUnique(pixelReader.getArgb(x, y));
-            }
-        }
+//        for (int y = 0; y < imageHeight; y++) {
+//            for (int x = 0; x < imageWidth; x++) {
+//                addColorsUnique(pixelReader.getArgb(x, y));
+//            }
+//        }
         
         pic.setImageOriginal(writableNetpbm);
         pic.setImageModified(writableNetpbm);
@@ -1120,12 +1134,14 @@ public class MainController implements Initializable {
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     current[x][y] = pixelReader.getColor(x, y);
+                    
                 }
             }
             pic.setColorMatrix(current);
             pic.setScaleMatrix(current);
             handleZoom();
             pic.setImageModified(writableImage);
+            recalculateInfo();
         }
     }
     
@@ -1223,13 +1239,16 @@ public class MainController implements Initializable {
             int height = pic.getOriginalDimensions().getHeight();
             int width = pic.getOriginalDimensions().getWidth();
             writableImage = new WritableImage(width, height);
+            pixelWriter = writableImage.getPixelWriter();
             Color [][] current = new Color[width][height];
             Color [][] original = pic.getOriginalMatrix();
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     current[x][y] = original[x][y];
+                    pixelWriter.setColor(x, y, original[x][y]);
                 }
             }
+            pixelReader = writableImage.getPixelReader();
             setImageSize(width, height);
             pic.setDimensions(new ImageSize(width, height));
             pic.setColorMatrix(current);
@@ -1237,7 +1256,8 @@ public class MainController implements Initializable {
             pic.setImageModified(pic.getImageOriginal());
             imageView.setImage(pic.getImageOriginal());
             configurationImageView();
-            restartUI();    
+            restartUI();
+            recalculateInfo();
         }
 
     }
@@ -1394,6 +1414,7 @@ public class MainController implements Initializable {
             pic.setScaleMatrix(rotate);
             pic.setImageModified(writableImage);
             handleZoom();
+            sliderContext();
 //            imageView.setImage(writableImage);
             configurationImageView();
                 
