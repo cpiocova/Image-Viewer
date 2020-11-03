@@ -277,7 +277,7 @@ public class MainController implements Initializable {
     };   
     
     final ChangeListener<Number> sliderZoom = (obs, old, val) -> {
-        final double roundedValue = Math.round(val.doubleValue() * 10) / 10.0;
+        final double roundedValue = Math.round(0.1 + val.doubleValue() * 10) / 10.0;
         sliderToZoom.valueProperty().set(roundedValue);
         labelZoom.setText(Double.toString(roundedValue) + "x");
     };
@@ -574,7 +574,7 @@ public class MainController implements Initializable {
     
         
     private void displayDimensionsLabel() {
-        infoDimensionsImage.setText("Dimensions in pixels: " + imageHeight + "x" + imageWidth + ".");
+        infoDimensionsImage.setText("Dimensions in pixels: " + imageHeight + " x " + imageWidth + ".");
     }
     
     private void  displayPixelsFormatLabel() {
@@ -1804,9 +1804,11 @@ public class MainController implements Initializable {
 //    } 
     
     private void zoomNeighbor(double zoomValue) {
-        if(zoomValue > 0.1) {
+//        if(zoomValue > 0.1) {
             int width = (int) Math.round(imageWidth * zoomValue);
             int height = (int) Math.round(imageHeight * zoomValue);
+            width = width > 0 ? width : 1;
+            height = height > 0 ? height : 1;
             Color [][] current = pic.getScaleMatrix();
             zoomWritable = new WritableImage(width, height);
             zoomWriter = zoomWritable.getPixelWriter();
@@ -1822,14 +1824,16 @@ public class MainController implements Initializable {
             }
             imageView.setImage(zoomWritable);
             configurationImageView();
-        }
+//        }
             
     }
         
     private void zoomInterpolation(double zoomValue) {
-        if(zoomValue > 0.1) {
+//        if(zoomValue > 0.1) {
             int width = (int) Math.round(imageWidth * zoomValue);
             int height = (int) Math.round(imageHeight * zoomValue);
+            width = width > 0 ? width : 1;
+            height = height > 0 ? height : 1;
             Color [][] current = pic.getScaleMatrix();
             zoomWritable = new WritableImage(width, height);
             zoomWriter = zoomWritable.getPixelWriter();
@@ -1856,7 +1860,7 @@ public class MainController implements Initializable {
             imageView.setImage(zoomWritable);
             configurationImageView();  
 
-        }
+//        }
 
     }
        
