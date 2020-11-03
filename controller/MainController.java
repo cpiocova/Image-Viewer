@@ -351,10 +351,9 @@ public class MainController implements Initializable {
     
     private void configurationImageView() {
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(vw);
-        imageView.setFitHeight(vh);   
-//        imageView.setFitWidth(300);
-//        imageView.setFitHeight(300);   
+        imageView.setFitWidth(0);
+        imageView.setFitHeight(0);   
+
     }
     
     
@@ -382,15 +381,18 @@ public class MainController implements Initializable {
             uniqueColorsList = new ArrayList();
             switch(pic.getFileFormat()) {
                 case "bmp":                
+                    restartZoom();
                     bmpLoader(imgPath);
                     restartUI();
                     break;
                 case "pbm":
+                    restartZoom();
                     pbmLoader(imgPath);
                     restartUI();
                     break;
                 case "ppm":
                 case "pgm":
+                    restartZoom();
                     pgmLoader(imgPath);
                     restartUI();
                     break;
@@ -416,7 +418,6 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -434,6 +435,7 @@ public class MainController implements Initializable {
             pic.setColorMatrix(current);
             pic.setImageModified(writableImage);
            imageView.setImage(writableImage);
+           handleZoom();
            configurationImageView();
         }
     }
@@ -455,7 +457,6 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             Color [][] current = pic.getColorMatrix();
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
@@ -479,6 +480,7 @@ public class MainController implements Initializable {
             pic.setColorMatrix(current);
             pic.setImageModified(writableImage);                
             imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }
     }
@@ -496,6 +498,7 @@ public class MainController implements Initializable {
         }
         pic.setUniqueColors(uniqueColorsList);        
         pic.setColorMatrix(current);
+        pic.setScaleMatrix(current);
         pic.setOriginalMatrix(original);
     }
     
@@ -552,10 +555,10 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             Color [][] current = pic.getColorMatrix();
             double gv = (double) sliderToGrayscale.getValue();
             pixelWriter = writableImage.getPixelWriter();
+            Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
             double gred, ggreen, gblue;
                 for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -569,9 +572,12 @@ public class MainController implements Initializable {
                                gblue * (1 - gv) + average * gv,
                                1.0);
                         pixelWriter.setColor(x,y,grayScale);
+                        scaleMatrix[x][y] = grayScale;
                    }
                 }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
             int text = (int) (gv * 100);
             labelGrayscale.setText("Grayscale: " + text + "%");           
@@ -598,10 +604,10 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             Color [][] current = pic.getColorMatrix();            
             double brightnessValue = (double) sliderToBrightness.getValue();
             pixelWriter = writableImage.getPixelWriter();
+            Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     double r = truncatePixel(current[x][y].getRed() + brightnessValue);
@@ -609,9 +615,12 @@ public class MainController implements Initializable {
                     double b = truncatePixel(current[x][y].getBlue() + brightnessValue);
                     Color brightness = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,brightness);
+                    scaleMatrix[x][y] = brightness;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
             int text = (int) (brightnessValue * 100);
             labelBrightness.setText("Brightness: " + text + "%");           
@@ -632,11 +641,11 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();     
             Color [][] current = pic.getColorMatrix();
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
             pixelWriter = writableImage.getPixelWriter();
+            Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     double r = truncatePixel(
@@ -650,9 +659,12 @@ public class MainController implements Initializable {
                     );
                     Color contrast = new Color(r,g,b,1.0);
                     pixelWriter.setColor(x,y,contrast);
+                    scaleMatrix[x][y] = contrast;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
             int text = (int) (contrastValue * 100);
             labelContrast.setText("Contrast: " + text + "%");           
@@ -675,9 +687,9 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
-            Color [][] current = pic.getColorMatrix();                        
+            Color [][] current = pic.getColorMatrix();
             double thresholdingValue = (double) sliderToThresholding.getValue();
+            Color [][] scaleMatrix = new Color[imageWidth][imageHeight];
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -694,9 +706,12 @@ public class MainController implements Initializable {
                     }
   
                     pixelWriter.setColor(x,y,thresholding);
+                    scaleMatrix[x][y] = thresholding;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
             int text = (int) (thresholdingValue * 255);
             labelThresholding.setText("Thresholding: " + text);           
@@ -963,6 +978,7 @@ public class MainController implements Initializable {
             }
         }
         pic.setColorMatrix(current);
+        pic.setScaleMatrix(current);
         pic.setOriginalMatrix(original);    
     }
     
@@ -1048,7 +1064,9 @@ public class MainController implements Initializable {
                 }
             }
             pic.setImageModified(writableImage);
-            pic.setColorMatrix(current);        
+            pic.setColorMatrix(current);
+            pic.setScaleMatrix(current);
+            handleZoom();
         }
     }
     
@@ -1138,30 +1156,7 @@ public class MainController implements Initializable {
     public void filterArbitraryContext() {
         sliderContext();
         restartArbitrary();
-    }
-    
-//    @FXML
-//    private void zoomContext(ActionEvent event) {
-//        scaleContext();
-//        sliderToZoom.setValue(1);
-//    }
-//    
-//    private void scaleContext() {
-//        if(image != null) {
-//            Color [][] current = pic.getColorMatrix();
-//            pixelReader = writableImage.getPixelReader();
-//            for (int y = 0; y < imageHeight; y++) {
-//                for (int x = 0; x < imageWidth; x++) {
-//                    current[x][y] = pixelReader.getColor(x, y);
-//                }
-//            }
-//            pic.setImageModified(writableImage);
-//            pic.setColorMatrix(current);        
-//        }
-//    }
-
-    
-   
+    }   
 
     @FXML
     private void convertToDefault(ActionEvent event) {
@@ -1179,6 +1174,7 @@ public class MainController implements Initializable {
             setImageSize(width, height);
             pic.setDimensions(new ImageSize(width, height));
             pic.setColorMatrix(current);
+            pic.setScaleMatrix(current);
             pic.setImageModified(pic.getImageOriginal());
             imageView.setImage(pic.getImageOriginal());
             configurationImageView();
@@ -1200,7 +1196,7 @@ public class MainController implements Initializable {
         restartPrewitt();
         restartRoberts();
         restartLoG();
-        restartZoom();
+        handleZoom();
     }
 
     private void restartGrayscale() {
@@ -1321,7 +1317,6 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             int width = imageHeight;
             int height = imageWidth;
             Color [][] rotate = new Color[imageHeight][imageWidth];
@@ -1337,8 +1332,10 @@ public class MainController implements Initializable {
             setImageSize(width, height);
             pic.setDimensions(new ImageSize(width, height));
             pic.setColorMatrix(rotate);
+            pic.setScaleMatrix(rotate);
             pic.setImageModified(writableImage);
-            imageView.setImage(writableImage);
+            handleZoom();
+//            imageView.setImage(writableImage);
             configurationImageView();
                 
         }
@@ -1375,7 +1372,7 @@ public class MainController implements Initializable {
         int axisX = (int) sliderToAverageX.getValue();
         int axisY = (int) sliderToAverageY.getValue();
         labelAverageX.setText("" + axisX);
-        labelAverageY.setText("" + axisY);    
+        labelAverageY.setText("" + axisY);
         if(image != null && (axisX + axisY >= 2)) {
             restartBrightness();
             restartContrast();
@@ -1388,7 +1385,7 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1396,9 +1393,12 @@ public class MainController implements Initializable {
                     mc.searchNS(x,y);
                     Color averageColor = mc.setMatrixConvolution();  
                     pixelWriter.setColor(x,y,averageColor);
+                    scaleMatrix[x][y] = averageColor;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }   
     }
@@ -1421,7 +1421,7 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
             pixelWriter = writableImage.getPixelWriter();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1429,9 +1429,12 @@ public class MainController implements Initializable {
                     mc.searchNS(x,y);
                     Color medianColor = mc.setMatrixConvolution();  
                     pixelWriter.setColor(x,y,medianColor);
+                    scaleMatrix[x][y] = medianColor;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }  
         
@@ -1456,7 +1459,7 @@ public class MainController implements Initializable {
                 restartSobel();
                 restartPrewitt();
                 restartRoberts();
-                restartZoom();              
+                Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
                pixelWriter = writableImage.getPixelWriter();              
                for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -1464,12 +1467,15 @@ public class MainController implements Initializable {
                        mc.searchNS(x,y);
                        Color gaussianColor = mc.setMatrixConvolution();  
                        pixelWriter.setColor(x,y,gaussianColor);
+                       scaleMatrix[x][y] = gaussianColor;
                    }
                }
-               imageView.setImage(writableImage);
+                pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+                handleZoom();
                configurationImageView();
            }            
-        } 
+        }
     }
 
     @FXML
@@ -1490,7 +1496,7 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
+           Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
             pixelWriter = writableImage.getPixelWriter();              
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1498,9 +1504,12 @@ public class MainController implements Initializable {
                     mc.searchNS(x,y);
                     Color laplacianColor = mc.setMatrixConvolution();  
                     pixelWriter.setColor(x,y,laplacianColor);
+                    scaleMatrix[x][y] = laplacianColor;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }        
     }
@@ -1523,7 +1532,7 @@ public class MainController implements Initializable {
             restartSobel();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
             pixelWriter = writableImage.getPixelWriter();              
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
@@ -1531,9 +1540,12 @@ public class MainController implements Initializable {
                     mc.searchNS(x,y);
                     Color logColor = mc.setMatrixConvolution();  
                     pixelWriter.setColor(x,y,logColor);
+                    scaleMatrix[x][y] = logColor;
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }         
         
@@ -1558,28 +1570,39 @@ public class MainController implements Initializable {
             restartLaplacian();
             restartPrewitt();
             restartRoberts();
-            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
             int aY = (int) Math.round(axisY / 2.0 + 0.5);
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+            for(int y = 0; y < imageHeight; y++) {
+                for(int x = 0; x< imageWidth; x ++) {
+                    scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                }
+            }
             for (int y = aY; y < imageHeight - aY; y++) {
                 for (int x = aX; x < imageWidth - aX; x++) {
                     if(sobelIndex == 0){ // Derivate in X
                         Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobelX", pic);
                         mc.searchNS(x,y);
                         Color sobelColor = mc.setMatrixConvolution();  
-                        pixelWriter.setColor(x,y,sobelColor);                    
+                        pixelWriter.setColor(x,y,sobelColor); 
+                        scaleMatrix[x][y] = sobelColor;
                     } else { //Derivate in Y
                         Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "sobelY", pic);
                         mc.searchNS(x,y);
                         Color sobelColor = mc.setMatrixConvolution();  
-                        pixelWriter.setColor(x,y,sobelColor);                      
+                        pixelWriter.setColor(x,y,sobelColor); 
+                        scaleMatrix[x][y] = sobelColor;
+
                     }
 
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
+
         }
     }
 
@@ -1602,26 +1625,35 @@ public class MainController implements Initializable {
             restartLoG();
             restartSobel();
             restartRoberts();
-            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
             int aX = (int) Math.round(axisX / 2.0 + 0.5);
             int aY = (int) Math.round(axisY / 2.0 + 0.5);
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+            for(int y = 0; y < imageHeight; y++) {
+                for(int x = 0; x< imageWidth; x ++) {
+                    scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                }
+            }
             for (int y = aY; y < imageHeight - aY; y++) {
                 for (int x = aX; x < imageWidth - aX; x++) {
                     if(prewittIndex == 0) { //Derivate in X
                         Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewittX", pic);
                         mc.searchNS(x,y);
                         Color prewittColor = mc.setMatrixConvolution();  
-                        pixelWriter.setColor(x,y,prewittColor);                        
+                        pixelWriter.setColor(x,y,prewittColor);   
+                        scaleMatrix[x][y] = prewittColor;
                     } else {
                         Convolution mc = new Convolution(axisY, axisX, imageWidth, imageHeight, "prewittY", pic);
                         mc.searchNS(x,y);
                         Color prewittColor = mc.setMatrixConvolution();  
                         pixelWriter.setColor(x,y,prewittColor);
+                        scaleMatrix[x][y] = prewittColor;
                     }
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }        
         
@@ -1644,8 +1676,13 @@ public class MainController implements Initializable {
             restartLoG();
             restartSobel();
             restartPrewitt();
-            restartZoom();
             pixelWriter = writableImage.getPixelWriter();
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+            for(int y = 0; y < imageHeight; y++) {
+                for(int x = 0; x< imageWidth; x ++) {
+                    scaleMatrix[x][y] = new Color(0,0,0,1.0);
+                }
+            }
             int aXY = (int) Math.round(axis / 2.0 + 0.5);
             for (int y = aXY; y < imageHeight - aXY; y++) {
                 for (int x = aXY; x < imageWidth - aXY; x++) {
@@ -1653,16 +1690,20 @@ public class MainController implements Initializable {
                         Convolution mc = new Convolution(axis, axis, imageWidth, imageHeight, "robertsX", pic);
                         mc.searchNS(x,y);
                         Color robertsColor = mc.setMatrixConvolution();  
-                        pixelWriter.setColor(x,y,robertsColor);                        
+                        pixelWriter.setColor(x,y,robertsColor);    
+                        scaleMatrix[x][y] = robertsColor;
                     } else {
                         Convolution mc = new Convolution(axis, axis, imageWidth, imageHeight, "robertsY", pic);
                         mc.searchNS(x,y);
                         Color robertsColor = mc.setMatrixConvolution();  
                         pixelWriter.setColor(x,y,robertsColor);
+                        scaleMatrix[x][y] = robertsColor;
                     }
                 }
             }
-            imageView.setImage(writableImage);
+            pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+            handleZoom();
             configurationImageView();
         }          
         
@@ -1679,18 +1720,6 @@ public class MainController implements Initializable {
     @FXML
     private void handleZoom() {
         if(image != null) {
-            restartBrightness();
-            restartContrast();
-            restartGrayscale();            
-            restartThresholding();
-            restartAverage();
-            restartMedian();
-            restartGaussian();
-            restartLaplacian();
-            restartLoG();
-            restartSobel();
-            restartRoberts();
-            restartPrewitt();
             int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
             // 0  Neighbor   -    1  Interpolation
             double zoomValue = sliderToZoom.getValue();
@@ -1720,7 +1749,7 @@ public class MainController implements Initializable {
         int [] zoomDimensions = getZoomDimension(zoomValue);
         int width = zoomDimensions[0];
         int height = zoomDimensions[1];
-        Color [][] current = pic.getColorMatrix();
+        Color [][] current = pic.getScaleMatrix();
         zoomWritable = new WritableImage(width, height);
         zoomWriter = zoomWritable.getPixelWriter();
         for (int y = 0; y < height; y++) {
@@ -1743,7 +1772,7 @@ public class MainController implements Initializable {
         int [] zoomDimensions = getZoomDimension(zoomValue);
         int width = zoomDimensions[0];
         int height = zoomDimensions[1];
-        Color [][] current = pic.getColorMatrix();
+        Color [][] current = pic.getScaleMatrix();
         zoomWritable = new WritableImage(width, height);
         zoomWriter = zoomWritable.getPixelWriter();
         for (int y = 0; y < height; y++) {
@@ -1862,16 +1891,27 @@ public class MainController implements Initializable {
     public void receiveParamsArbitraryKernel(double[][] matrixConvol, int width, int height) {
         int aY = (int) Math.round(width / 2.0 + 0.5);
         int aX = (int) Math.round(height / 2.0 + 0.5);
-        pixelWriter = writableImage.getPixelWriter();              
+        pixelWriter = writableImage.getPixelWriter();
+        Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+        Color[][] current = pic.getColorMatrix();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                scaleMatrix[x][y] = new Color(0,0,0,1.0);
+            }
+        }
         for (int y = aY; y < imageHeight - aY; y++) {
             for (int x = aX; x < imageWidth - aX; x++) {
                 Convolution mc = new Convolution(width, height, imageWidth, imageHeight, "arbitrary", pic);
                 mc.searchNS(x,y);
                 Color arbitraryColor = mc.setMatrixArbitrary(matrixConvol);  
                 pixelWriter.setColor(x,y,arbitraryColor);
+                scaleMatrix[x][y] = arbitraryColor;
+                
             }
         }
-        imageView.setImage(writableImage);
+        pic.setScaleMatrix(scaleMatrix);
+//            imageView.setImage(writableImage);
+        handleZoom();
         configurationImageView();
     }
   
