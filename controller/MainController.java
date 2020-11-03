@@ -38,15 +38,11 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TouchEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import object.Convolution;
-import object.Pascal;
 
 
 
@@ -218,6 +214,14 @@ public class MainController implements Initializable {
     private Label labelLoGY;
     @FXML
     private Slider sliderToLoGX;
+    @FXML
+    private Slider sliderToArbitraryX;
+    @FXML
+    private Slider sliderToArbitraryY;
+    @FXML
+    private Label labelArbitraryX;
+    @FXML
+    private Label labelArbitraryY;
     
    
     
@@ -292,15 +296,8 @@ public class MainController implements Initializable {
         labelLoGY.setText(Integer.toString(roundedValue));
     };
 
-    
-    
 
-    
-
-
-
-       
-     @Override
+    @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         mainInstanceController = this;
@@ -337,8 +334,8 @@ public class MainController implements Initializable {
             vw = 500;
             vh = 500;
         } else {
-        vw = imageWidth;
-        vh = imageHeight;  
+        vw = 0;
+        vh = 0;  
         }
     }
      
@@ -354,8 +351,8 @@ public class MainController implements Initializable {
     
     private void configurationImageView() {
         imageView.setPreserveRatio(true);
-//        imageView.setFitWidth(vw);
-//        imageView.setFitHeight(vh);   
+        imageView.setFitWidth(vw);
+        imageView.setFitHeight(vh);   
 //        imageView.setFitWidth(300);
 //        imageView.setFitHeight(300);   
     }
@@ -636,7 +633,7 @@ public class MainController implements Initializable {
             restartPrewitt();
             restartRoberts();
             restartZoom();     
-            Color [][] current = pic.getColorMatrix();                        
+            Color [][] current = pic.getColorMatrix();
             double contrastValue = (double) sliderToContrast.getValue();
             double factor = (1.0156 *(1 + contrastValue)) / (1 * (1.0156 - contrastValue));
             pixelWriter = writableImage.getPixelWriter();
@@ -665,7 +662,7 @@ public class MainController implements Initializable {
     
     
         @FXML
-    private void handleThresholding(MouseEvent event) {
+    private void handleThresholding() {
         if(image != null) {
             restartGrayscale();
             restartBrightness();
@@ -1057,27 +1054,38 @@ public class MainController implements Initializable {
     
     @FXML
     private void grayscaleContext(ActionEvent event) {
-        sliderContext();
-        restartGrayscale();
+        double grayscaleValue = (double) sliderToGrayscale.getValue();
+        if(grayscaleValue != 0) {
+            sliderContext();
+            restartGrayscale();
+        }
     }
 
     @FXML
     private void brightnessContext(ActionEvent event) {
-        sliderContext();
-        restartBrightness();      
+        double brightnessValue = (double) sliderToBrightness.getValue();
+        if(brightnessValue != 0) {
+            sliderContext();
+            restartBrightness();                  
+        }
     }
 
     @FXML
     private void contrastContext(ActionEvent event) {
-        sliderContext();
-        restartContrast();    
+        double contrastValue = (double) sliderToContrast.getValue();
+        if(contrastValue != 0) {
+            sliderContext();
+            restartContrast();
+        }
     }
 
 
     @FXML
     private void thresholdingContext(ActionEvent event) {
+        handleThresholding();
         sliderContext();
-        restartThresholding();     
+        restartThresholding();                 
+
     }
     @FXML
     private void filterAverageContext(ActionEvent event) {
@@ -1125,6 +1133,11 @@ public class MainController implements Initializable {
     private void filterLoGContext(ActionEvent event) {
         sliderContext();
         restartLoG();
+    }
+    
+    public void filterArbitraryContext() {
+        sliderContext();
+        restartArbitrary();
     }
     
 //    @FXML
@@ -1259,7 +1272,14 @@ public class MainController implements Initializable {
         labelLoGY.setText("1");    
         sliderToLoGX.setValue(1);
         sliderToLoGY.setValue(1);
-    }      
+    }
+    
+    private void restartArbitrary() {
+        labelArbitraryX.setText("1");
+        labelArbitraryY.setText("1");    
+        sliderToArbitraryX.setValue(1);
+        sliderToArbitraryY.setValue(1);     
+    }
  
 
     @FXML
@@ -1647,6 +1667,14 @@ public class MainController implements Initializable {
         }          
         
     }
+    
+    @FXML
+    private void handleArbitrary(MouseEvent event) {
+        int axisX = (int) sliderToArbitraryX.getValue();
+        int axisY = (int) sliderToArbitraryY.getValue();
+        labelArbitraryX.setText("" + axisX);
+        labelArbitraryY.setText("" + axisY);
+    }
 
     @FXML
     private void handleZoom() {
@@ -1801,9 +1829,50 @@ public class MainController implements Initializable {
 
     @FXML
     private void setAribitraryKernel(ActionEvent event) {
+        if(image != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/ArbitraryKernelView.fxml")));
+                Parent root =  loader.load();
+                
+               ArbitraryKernelViewController arbitrarykernelInstanceController = (ArbitraryKernelViewController)loader.getController();
+                
+                int axisX = (int) sliderToArbitraryX.getValue();
+                int axisY = (int) sliderToArbitraryY.getValue();
+                
+                if(axisX + axisY >= 3) {
+                              
+                    arbitrarykernelInstanceController.setArbitraryMatrix(mainInstanceController, axisX, axisY);
+
+
+                    Scene scene = new Scene(root);
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.setScene(scene);
+                    stage.showAndWait();     
+                }
+               
+
+
+           } catch (IOException ex) {
+               Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+           }           
+        }
     }
-
-
-
+    
+    public void receiveParamsArbitraryKernel(double[][] matrixConvol, int width, int height) {
+        int aY = (int) Math.round(width / 2.0 + 0.5);
+        int aX = (int) Math.round(height / 2.0 + 0.5);
+        pixelWriter = writableImage.getPixelWriter();              
+        for (int y = aY; y < imageHeight - aY; y++) {
+            for (int x = aX; x < imageWidth - aX; x++) {
+                Convolution mc = new Convolution(width, height, imageWidth, imageHeight, "arbitrary", pic);
+                mc.searchNS(x,y);
+                Color arbitraryColor = mc.setMatrixArbitrary(matrixConvol);  
+                pixelWriter.setColor(x,y,arbitraryColor);
+            }
+        }
+        imageView.setImage(writableImage);
+        configurationImageView();
+    }
   
 }

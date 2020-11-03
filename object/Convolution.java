@@ -96,10 +96,21 @@ public class Convolution {
            case "robertsY":
                fillRoberts("y");
                colorRet = processLineal();
-               break;
-             
+               break;            
        }
     return colorRet;
+   }
+   
+   
+   public Color setMatrixArbitrary(double[][] matrixArbitrary) {
+    for (int x = 0; x < height; x++) {
+        for (int y = 0; y < width; y++) {
+            matrixConvolution[x][y] = matrixArbitrary[x][y];
+        }
+    }
+    Color colorRet = processLineal();
+    return colorRet;
+       
    }
    
    private Color processNoLineal() {
@@ -348,9 +359,7 @@ public class Convolution {
         double sumadeTodo = pivotValue - matrixConvolution[pivotX - 1][pivotY - 1];
         matrixConvolution[pivotX - 1][pivotY - 1] = -1 * sumadeTodo; 
     }
-    
-    
-   
+       
    private double setArraySum() {
        double arraySum = 0;
        for(int i = 0; i < coordinates.size(); i++) {

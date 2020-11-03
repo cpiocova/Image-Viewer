@@ -222,7 +222,7 @@
                <content>
                   <AnchorPane prefHeight="167.0" prefWidth="142.0">
                      <children>
-                        <Slider fx:id="sliderToZoom" blockIncrement="0.5" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="5.0" min="0.5" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="113.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Slider fx:id="sliderToZoom" blockIncrement="0.5" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="10.0" min="0.1" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="125.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                         <Label fx:id="labelZoom" layoutX="66.0" layoutY="89.0" text="1.0x" />
                         <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
                            <toggleGroup>
@@ -235,11 +235,34 @@
                   </AnchorPane>
                </content>
             </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Arbitrary Kernel">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <Label layoutX="16.0" layoutY="38.0" text="X" />
+                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#setAribitraryKernel" prefHeight="25.0" prefWidth="52.0" text="Set" />
+                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                        <Slider fx:id="sliderToArbitraryX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Slider fx:id="sliderToArbitraryY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                        <Label fx:id="labelArbitraryX" layoutX="115.0" layoutY="38.0" text="1" />
+                        <Label fx:id="labelArbitraryY" layoutX="115.0" layoutY="84.0" text="1" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
         </panes>
       </Accordion>
       <AnchorPane layoutX="245.0" layoutY="95.0" prefHeight="419.0" prefWidth="383.0">
          <children>
-            <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="300.0" layoutX="42.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true" />
+            <ScrollPane prefHeight="358.0" prefWidth="383.0">
+              <content>
+                <AnchorPane minHeight="800.0" minWidth="1200.0" prefHeight="0.0" prefWidth="0.0">
+                     <children>
+                        <ImageView fx:id="imageView" fitHeight="181.0" fitWidth="197.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
          </children>
       </AnchorPane>
       <Button fx:id="btnDefault" layoutX="14.0" layoutY="107.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
@@ -264,8 +287,6 @@
       </SplitPane>
       <Button layoutX="515.0" layoutY="682.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="113.0" text="Recalculate" />
       <Button layoutX="15.0" layoutY="58.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
-      <ScrollBar layoutX="652.0" layoutY="95.0" orientation="VERTICAL" prefHeight="419.0" prefWidth="14.0" />
-      <Button layoutX="15.0" layoutY="83.0" mnemonicParsing="false" onAction="#setAribitraryKernel" prefHeight="25.0" prefWidth="170.0" text="Set arbitrary kernel" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
