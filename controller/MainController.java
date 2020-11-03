@@ -12,6 +12,7 @@ import object.ImageSize;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -1994,7 +1995,7 @@ public class MainController implements Initializable {
     private void handleSaveImage(ActionEvent event) {
         if(image != null) {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Load image in BMP or Netpbm format");
+            fileChooser.setTitle("Save image in BMP or Netpbm format");
 
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
@@ -2011,7 +2012,7 @@ public class MainController implements Initializable {
                       bmpSaver(writableImage, file);
                   break;
                   default:
-                      netBpmSaver();
+                      netBpmSaver(file);
                 }  
               }
         }
@@ -2028,7 +2029,7 @@ public class MainController implements Initializable {
         
         if(rank >= 0 && rank <= 1) {
             bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-        } else if(rank > 1 && rank <= 8 && grayScaleFlag == true) {
+        } else if((rank > 1 && rank <= 8) || grayScaleFlag == true) {
             bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         } else if(rank > 8 && rank <= 24) {
            bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_INT_RGB); 
@@ -2045,10 +2046,48 @@ public class MainController implements Initializable {
     
 
 
-    private void netBpmSaver() {
-        System.out.println("PPMMMMM");
+    private void netBpmSaver(File file) {
+        int size = uniqueColorsList.size();
+        int rank = log2(size);
+        
+        if(rank >= 0 && rank <= 1) {
+            pbmSaver(file);
+        } else if(rank > 1 && rank <= 8 && grayScaleFlag == true) {
+            pgmSaver();
+        } else if(rank > 8 && rank <= 24) {
+            ppmSaver();
+        }
+        
     }
 
+    private void pbmSaver(File file) {
+        PrintWriter outFile = null;
+        try {
+            outFile = new PrintWriter(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pixelReader = writableImage.getPixelReader();
+        outFile.println("P1");
+        outFile.println("" + imageWidth + " " + imageHeight);
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                int pixel = pixelReader.getArgb(x, y);
+                pixel = pixel == -1 ? 0 : 1;
+                outFile.print(pixel + " ");
+            }
+            outFile.println();
+        } 
+        outFile.close();
+    }
+    
+    
+    private void pgmSaver() {
+        
+    }
+    private void ppmSaver() {
+        
+    }
 
 
 
