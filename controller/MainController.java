@@ -388,15 +388,22 @@ public class MainController implements Initializable {
         vh = 0;  
         }
     }
+    
+        @FXML
+    private void recalculateInfo() {
+        if(image != null) {
+            displayUniqueColor();
+            displayDimensionsLabel();
+            displayPixelsFormatLabel();
+        }
+    }
      
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
         setViewport();
         configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
-        displayPixelsFormatLabel();
-        displayUniqueColor();
-        displayDimensionsLabel();
+        recalculateInfo();
     }
     
     private void configurationImageView() {
@@ -567,7 +574,7 @@ public class MainController implements Initializable {
     
         
     private void displayDimensionsLabel() {
-        infoDimensionsImage.setText("Width: " + imageWidth + "px. Heigh: " + imageHeight + "px.");
+        infoDimensionsImage.setText("Dimensions in pixels: " + imageHeight + "x" + imageWidth + ".");
     }
     
     private void  displayPixelsFormatLabel() {
@@ -577,19 +584,19 @@ public class MainController implements Initializable {
             case INT_ARGB:
             case BYTE_BGRA_PRE:
             case BYTE_BGRA:
-                infoFormatPixelImage.setText("Bits per pixel: 32 bits per pixel.");
+                infoFormatPixelImage.setText("Bits per pixel: 32bpp.");
                 break;
             case BYTE_INDEXED:
-                infoFormatPixelImage.setText("The pixel colors are referenced by byte indices stored in the pixel array.");
+                infoFormatPixelImage.setText("The pixel colors are referenced by byte index stored in the pixel array.");
                 break;
             case BYTE_RGB:
-                infoFormatPixelImage.setText("Bits per pixel: 24 bits per pixel.");                
+                infoFormatPixelImage.setText("Bits per pixel: 24bpp.");                
         }
     }
  
     private void displayUniqueColor() {
         infoUniqueColorsImage.setText(
-                "The image contains " + uniqueColorsList.size() + " unique colors."
+                "The image contains " + uniqueColorsList.size() + " unique color/s."
         );
     }
     
@@ -1784,109 +1791,72 @@ public class MainController implements Initializable {
         }
     }
     
-    private int[] getZoomDimension(double zoomValue) {
-        int [] newDimen = new int[2];
-        boolean overflow = overflowZoom.isSelected();
-        if(overflow || zoomValue < 1) {
-            newDimen[0] = (int) Math.round(imageWidth * zoomValue);
-            newDimen[1] = (int) Math.round(imageHeight * zoomValue);
-        } else{
-            newDimen[0] = imageWidth;
-            newDimen[1] = imageHeight;  
-        }
-        return newDimen;
-    } 
+//    private int[] getZoomDimension(double zoomValue) {
+//
+//        boolean overflow = overflowZoom.isSelected();
+//        if(overflow) {
+// 
+//        } 
+//        return overflow;
+//    } 
     
     private void zoomNeighbor(double zoomValue) {
-        int [] zoomDimensions = getZoomDimension(zoomValue);
-        int width = zoomDimensions[0];
-        int height = zoomDimensions[1];
-        Color [][] current = pic.getScaleMatrix();
-        zoomWritable = new WritableImage(width, height);
-        zoomWriter = zoomWritable.getPixelWriter();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if(x < width - zoomValue && y < height - zoomValue){
-                    int zX = (int) (x/zoomValue);
-                    int zY = (int) (y/zoomValue);
-                    Color zoomColor = current[zX][zY];
-                    zoomWriter.setColor(x,y,zoomColor);
+        if(zoomValue > 0.1) {
+            int width = (int) Math.round(imageWidth * zoomValue);
+            int height = (int) Math.round(imageHeight * zoomValue);
+            Color [][] current = pic.getScaleMatrix();
+            zoomWritable = new WritableImage(width, height);
+            zoomWriter = zoomWritable.getPixelWriter();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if(x < width  && y < height ){
+                        int zX = (int) (x/zoomValue);
+                        int zY = (int) (y/zoomValue);
+                        Color zoomColor = current[zX][zY];
+                        zoomWriter.setColor(x,y,zoomColor);
+                    }
                 }
             }
+            imageView.setImage(zoomWritable);
+            configurationImageView();
         }
-        imageView.setImage(zoomWritable);
-        configurationImageView();      
             
     }
         
     private void zoomInterpolation(double zoomValue) {
-//        System.out.println("Zoom Interpolation " + zoomValue);
-        int [] zoomDimensions = getZoomDimension(zoomValue);
-        int width = zoomDimensions[0];
-        int height = zoomDimensions[1];
-        Color [][] current = pic.getScaleMatrix();
-        zoomWritable = new WritableImage(width, height);
-        zoomWriter = zoomWritable.getPixelWriter();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-//                if(x == width - zoomValue -1) {
-////                  Verticula Interpolate
-//                    int s = (int) Math.floor((double)y/zoomValue);
-//                    int r = s + 1;
-//                    double b = ((double) y / zoomValue) - s;
-//                    Color linear = linearCoefficient(s,r,x,b,current);
-//                    zoomWriter.setColor(x,y,linear);                    
-//                }
-//                if(y == height - zoomValue - 1) {
-////                       Horizontal Interpolate
-//                    int i = (int) Math.floor((double)x/zoomValue);
-//                    int d = i + 1;
-//                    double a = ((double) x / zoomValue) - i;
-//                    Color linear = linearCoefficient(i,d,y,a,current);
-//                    zoomWriter.setColor(x,y,linear);
-//                }
-                if(x < width - zoomValue - 1  && y < height - zoomValue - 1 ){
-                    int i = (int) Math.floor((double)x/zoomValue);
-                    int d = i + 1;
-                    int s = (int) Math.floor((double)y/zoomValue);
-                    int r = s + 1;
-                    double a = ((double) x / zoomValue) - i;
-                    double b = ((double) y / zoomValue) - s;
+        if(zoomValue > 0.1) {
+            int width = (int) Math.round(imageWidth * zoomValue);
+            int height = (int) Math.round(imageHeight * zoomValue);
+            Color [][] current = pic.getScaleMatrix();
+            zoomWritable = new WritableImage(width, height);
+            zoomWriter = zoomWritable.getPixelWriter();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {                   
+                        int i = (int) Math.floor((double)x/zoomValue);
+                        int d = i + 1;
+                        d = d == imageWidth ? imageWidth - 1 : d;
+                        int s = (int) Math.floor((double)y/zoomValue);
+                        int r = s + 1;
+                        r = r == imageHeight ? imageHeight - 1 : r;
+                        double a = ((double) x / zoomValue) - i;
+                        double b = ((double) y / zoomValue) - s;
 
-                    Color bilinear1 = bilinearCoefficient(i,s, 1-a, 1-b, current);
-                    Color bilinear2 = bilinearCoefficient(d,s, a, 1-b, current);
-                    Color bilinear3 = bilinearCoefficient(i,r, 1-a, b, current);
-                    Color bilinear4 = bilinearCoefficient(d,r, a, b, current);
+                        Color bilinear1 = bilinearCoefficient(i,s, 1-a, 1-b, current);
+                        Color bilinear2 = bilinearCoefficient(d,s, a, 1-b, current);
+                        Color bilinear3 = bilinearCoefficient(i,r, 1-a, b, current);
+                        Color bilinear4 = bilinearCoefficient(d,r, a, b, current);
 
-                    Color zoomColor = addColors(bilinear1,bilinear2,bilinear3,bilinear4);
-                    zoomWriter.setColor(x,y,zoomColor);
+                        Color zoomColor = addColors(bilinear1,bilinear2,bilinear3,bilinear4);
+                        zoomWriter.setColor(x,y,zoomColor);
                 }
             }
+            imageView.setImage(zoomWritable);
+            configurationImageView();  
+
         }
-        imageView.setImage(zoomWritable);
-        configurationImageView();  
+
     }
-    
-    
-    private Color linearCoefficient(int x1, int x2, int y, double a, Color[][] current) {
-        double red1 = current[x1][y].getRed();
-        double green1 = current[x1][y].getGreen();
-        double blue1 = current[x1][y].getBlue();
-        
-        double red2 = current[x2][y].getRed();
-        double green2 = current[x2][y].getGreen();
-        double blue2 = current[x2][y].getBlue();
-        
-        
-        double red = truncatePixel(a*red1 + (1-a)*red2);
-        double green = truncatePixel(a*green1 + (1-a)*green2);
-        double blue = truncatePixel(a*blue1 + (1-a)*blue2);
-        
-        return new Color(red,green,blue,1.0);
-        
-        
-    }
-    
+       
     private Color bilinearCoefficient(int x, int y, double a, double b, Color[][] current) {
         double red = current[x][y].getRed();
         double green = current[x][y].getGreen();
@@ -1985,41 +1955,48 @@ public class MainController implements Initializable {
 
     @FXML 
     private void handleSaveImage(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Load image in BMP or Netpbm format");
+        if(image != null) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Load image in BMP or Netpbm format");
 
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
-                new FileChooser.ExtensionFilter("PBM", "*.pbm"),
-                new FileChooser.ExtensionFilter("PGM", "*.pgm"),
-                new FileChooser.ExtensionFilter("PPM", "*.ppm")
-        );
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
+                    new FileChooser.ExtensionFilter("PBM", "*.pbm"),
+                    new FileChooser.ExtensionFilter("PGM", "*.pgm"),
+                    new FileChooser.ExtensionFilter("PPM", "*.ppm")
+            );
 
-          File file = fileChooser.showSaveDialog(null);
+              File file = fileChooser.showSaveDialog(null);
 
-          if(file != null){
-            String format = file.getName().substring(file.getName().lastIndexOf(".") + 1, 
-                    file.getName().length());
-            switch(format) {
-              case "bmp":
-                  SaveFile(writableImage, file);
-              break;
-              default:
-                  System.out.println("Falta");
-            }  
-          }
+              if(file != null){
+                String format = file.getName().substring(file.getName().lastIndexOf(".") + 1, 
+                        file.getName().length());
+                switch(format) {
+                  case "bmp":
+                      bmpSaver(writableImage, file);
+                  break;
+                  default:
+                      System.out.println("Falta");
+                }  
+              }
+        }
     
     }
     
-    private void SaveFile(Image content, File file){
+    private void bmpSaver(Image content, File file){
+        
+        BufferedImage bfImage = SwingFXUtils.fromFXImage(content, null);
+        BufferedImage bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+        bfImage2.getGraphics().drawImage(bfImage, 0, 0, null);
     try {
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(content, null);
-        ImageIO.write(bufferedImage, "png", file);
+        ImageIO.write(bfImage2, "png", file);
     } catch (IOException ex) {
         ex.printStackTrace();
     }
 
 }
+
+
 
  
     
