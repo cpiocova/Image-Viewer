@@ -14,7 +14,7 @@
         <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="33.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="170.0" text="Load File" />
       <Accordion layoutX="14.0" layoutY="58.0" prefHeight="136.0" prefWidth="170.0">
          <panes>
-          <TitledPane expanded="false" prefHeight="111.0" prefWidth="143.0" text="Save File">
+          <TitledPane animated="false" expanded="false" prefHeight="111.0" prefWidth="143.0" text="Save File">
                <content>
                   <AnchorPane prefHeight="85.0" prefWidth="135.0">
                      <children>
@@ -31,7 +31,7 @@
             </TitledPane>
          </panes>
       </Accordion>
-      <Button layoutX="344.0" layoutY="33.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
+      <Button defaultButton="true" layoutX="344.0" layoutY="33.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
       <Label fx:id="labelLoadMessage" layoutX="370.0" layoutY="480.0" prefHeight="25.0" prefWidth="125.0" textFill="#05adf0cc" />
       <Button fx:id="btnDefault" layoutX="350.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
       <Accordion layoutX="14.0" layoutY="193.0" prefHeight="621.0" prefWidth="170.0">
@@ -277,7 +277,7 @@
          <children>
             <ScrollPane prefHeight="358.0" prefWidth="383.0">
               <content>
-                <AnchorPane minHeight="800.0" minWidth="1200.0" prefHeight="0.0" prefWidth="0.0">
+                <AnchorPane fx:id="imageWrapper" minHeight="-Infinity" minWidth="0.0" prefHeight="0.0" prefWidth="0.0">
                      <children>
                         <ImageView fx:id="imageView" fitHeight="181.0" fitWidth="197.0" pickOnBounds="true" preserveRatio="true" />
                      </children>
@@ -322,8 +322,8 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <Button layoutX="253.0" layoutY="505.0" mnemonicParsing="false" onAction="#handleUndo" text="Undo" />
-      <Button layoutX="584.0" layoutY="505.0" mnemonicParsing="false" onAction="#handleRedo" text="Redo" />
+      <Button cancelButton="true" layoutX="253.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleUndo" text="Undo" />
+      <Button cancelButton="true" layoutX="584.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleRedo" text="Redo" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

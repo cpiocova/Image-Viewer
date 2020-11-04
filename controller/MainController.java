@@ -7,6 +7,8 @@ package controller;
 import java.awt.image.BufferedImage;
 import object.BlankPic;
 import object.ImageSize;
+import object.Stack;
+import object.UserActions;
 
 
 import java.io.File;
@@ -43,6 +45,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
@@ -84,6 +87,8 @@ public class MainController implements Initializable {
     private int imageX;
     private int imageY;
 
+    private UserActions userActions;
+    private int capacityActions;
     
     private Color [][] bufferNetpbm;
         
@@ -110,7 +115,6 @@ public class MainController implements Initializable {
     private Label infoFormatPixelImage;
     
     private ArrayList uniqueColorsList;
-    private ArrayList stackActions;
     
     @FXML
     private Label infoUniqueColorsImage;
@@ -339,6 +343,8 @@ public class MainController implements Initializable {
     };
     @FXML
     private ToggleGroup saveMethod;
+    @FXML
+    private AnchorPane imageWrapper;
 
 
     @Override
@@ -450,7 +456,8 @@ public class MainController implements Initializable {
                     imgPath.getName().length())
             );
             uniqueColorsList = new ArrayList();
-            stackActions = new ArrayList();
+//            capacityActions = 6;
+            userActions = new UserActions(capacityActions);
             switch(pic.getFileFormat()) {
                 case "bmp":                
                     restartZoom();
@@ -504,11 +511,9 @@ public class MainController implements Initializable {
                    current[x][y] = negative;
                }
             }
-//            pic.setColorMatrix(current);
-//            pic.setImageModified(writableImage);
-//           imageView.setImage(writableImage);
-            sliderContext();
-            handleZoom();
+
+            negativeContext();
+//            handleZoom();
             configurationImageView();
 
         }
@@ -554,8 +559,8 @@ public class MainController implements Initializable {
 //            pic.setColorMatrix(current);
 //            pic.setImageModified(writableImage);                
 //            imageView.setImage(writableImage);
-            sliderContext();
-            handleZoom();
+            blackWhiteContext();
+//            handleZoom();
             configurationImageView();
         }
     }
@@ -1151,94 +1156,204 @@ public class MainController implements Initializable {
         }
     }
     
+    private void addToStack(Stack step) {
+        
+    }
+    
+    private void negativeContext() {
+        if(image != null) {
+            sliderContext();
+            Stack step = new Stack(writableImage, "negative");
+            userActions.addStep(step);            
+        }
+    }
+    
+    private void blackWhiteContext() {
+        if(image != null) {
+            sliderContext();
+            Stack step = new Stack(writableImage, "blackwhite");
+            userActions.addStep(step);                    
+        }
+    }
+    
+    
     @FXML
     private void grayscaleContext(ActionEvent event) {
-        double grayscaleValue = (double) sliderToGrayscale.getValue();
-        if(grayscaleValue != 0) {
-            sliderContext();
-            restartGrayscale();
-            if(grayscaleValue == 1.0 ) pic.setGrayScaleFlag(true);
+        if(image != null) {
+            double grayscaleValue = (double) sliderToGrayscale.getValue();
+            if(grayscaleValue != 0) {
+                sliderContext();
+                restartGrayscale();
+                if(grayscaleValue == 1.0 ) pic.setGrayScaleFlag(true);
+                Stack step = new Stack(writableImage, "grayscale");
+                userActions.addStep(step);   
+            }            
         }
     }
 
     @FXML
     private void brightnessContext(ActionEvent event) {
-        double brightnessValue = (double) sliderToBrightness.getValue();
-        if(brightnessValue != 0) {
-            sliderContext();
-            restartBrightness();
-            System.out.println(stackActions.size());
+        if(image != null) {
+            double brightnessValue = (double) sliderToBrightness.getValue();
+            if(brightnessValue != 0) {
+                sliderContext();
+                restartBrightness();
+                Stack step = new Stack(writableImage, "brightness");
+                userActions.addStep(step);   
+            }            
         }
     }
 
     @FXML
     private void contrastContext(ActionEvent event) {
-        double contrastValue = (double) sliderToContrast.getValue();
-        if(contrastValue != 0) {
-            sliderContext();
-            restartContrast();
+        if(image != null) {
+            double contrastValue = (double) sliderToContrast.getValue();
+            if(contrastValue != 0) {
+                sliderContext();
+                restartContrast();
+                Stack step = new Stack(writableImage, "contrast");
+                userActions.addStep(step);  
+            }            
         }
     }
 
 
     @FXML
     private void thresholdingContext(ActionEvent event) {
-        handleThresholding();
-        sliderContext();
-        restartThresholding();                 
-
+        if(image != null) {
+            handleThresholding();
+            sliderContext();
+            restartThresholding(); 
+            Stack step = new Stack(writableImage, "thresholding");
+            userActions.addStep(step);              
+        }
     }
+    
     @FXML
     private void filterAverageContext(ActionEvent event) {
-        sliderContext();
-        restartAverage();
+        if(image != null) {
+            int axisX = (int) sliderToAverageX.getValue();
+            int axisY = (int) sliderToAverageY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartAverage();
+                Stack step = new Stack(writableImage, "filterAverage");
+                userActions.addStep(step);              
+            }                    
+        }
     }
     
     @FXML
     private void filterMedianContext(ActionEvent event) {
-        sliderContext();
-        restartMedian();     
+        if(image != null) {
+            int axisX = (int) sliderToMedianX.getValue();
+            int axisY = (int) sliderToMedianY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartMedian();
+                Stack step = new Stack(writableImage, "filterMedian");
+                userActions.addStep(step);                      
+            }        
+            
+        }
     }
     
     @FXML
     private void filterGaussianContext(ActionEvent event) {
-        sliderContext();
-        restartGaussian();          
+        if(image != null) {
+            int axisX = (int) sliderToGaussianX.getValue();
+            int axisY = (int) sliderToGaussianY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartGaussian();
+                Stack step = new Stack(writableImage, "filterGaussian");
+                userActions.addStep(step);                     
+            }        
+            
+        }
     }
 
     @FXML
     private void filterLaplacianContext(ActionEvent event) {
-        sliderContext();
-        restartLaplacian();
+        if(image != null) {
+            int axisX = (int) sliderToLaplacianX.getValue();
+            int axisY = (int) sliderToLaplacianY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartLaplacian();
+                Stack step = new Stack(writableImage, "filterLaplacian");
+                userActions.addStep(step);                     
+            }        
+            
+        }
     }
     
     @FXML
     private void filterSobelContext(ActionEvent event) {
-        sliderContext();
-        restartSobel();
+        if(image != null) {
+            int axisX = (int) sliderToSobelX.getValue();
+            int axisY = (int) sliderToSobelY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartSobel();
+                Stack step = new Stack(writableImage, "filterSobel");
+                userActions.addStep(step);                        
+            }
+            
+        }
     }
     
     @FXML
     private void filterPrewittContext(ActionEvent event) {
-        sliderContext();
-        restartPrewitt();
+        if(image != null) {
+            int axisX = (int) sliderToPrewittX.getValue();
+            int axisY = (int) sliderToPrewittY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartPrewitt();
+                Stack step = new Stack(writableImage, "filterPrewitt");
+                userActions.addStep(step);                       
+            }
+            
+        }
     }
     
     @FXML
     private void filterRobertsContext(ActionEvent event) {
-        sliderContext();
-        restartRoberts();
+        if(image != null) {
+            int axis = (int) sliderToRoberts.getValue();
+            if(axis >= 2 ) {
+                sliderContext();
+                restartRoberts();
+                Stack step = new Stack(writableImage, "filterRoberts");
+                userActions.addStep(step);                       
+            }
+            
+        }
     }
     
     @FXML
     private void filterLoGContext(ActionEvent event) {
-        sliderContext();
-        restartLoG();
+        if(image != null) {
+            int axisX = (int) sliderToLoGX.getValue();
+            int axisY = (int) sliderToLoGY.getValue();
+            if(axisX + axisY > 2) {
+                sliderContext();
+                restartLoG();
+                Stack step = new Stack(writableImage, "filterLoG");
+                userActions.addStep(step);                      
+            }
+            
+        }
     }
     
     public void filterArbitraryContext() {
-        sliderContext();
-        restartArbitrary();
+        if(image != null) {
+            sliderContext();
+            restartArbitrary();
+            Stack step = new Stack(writableImage, "filterArbitrary");
+            userActions.addStep(step);                      
+        }
     }   
 
     @FXML
@@ -1267,6 +1382,7 @@ public class MainController implements Initializable {
             configurationImageView();
             restartUI();
             recalculateInfo();
+            userActions.resetSteps();
         }
 
     }
@@ -1820,18 +1936,18 @@ public class MainController implements Initializable {
                 zoomNeighbor(zoomValue);
             } else {
                 zoomInterpolation(zoomValue);
-            }  
+            }
+            boolean overflow = overflowZoom.isSelected();
+            if(overflow) {
+                imageWrapper.setPrefWidth(zoomValue * imageWidth);
+                imageWrapper.setPrefHeight(zoomValue * imageHeight);                
+            }else {
+                imageWrapper.setPrefWidth(0);
+                imageWrapper.setPrefHeight(0);       
+            }
         }
     }
     
-//    private int[] getZoomDimension(double zoomValue) {
-//
-//        boolean overflow = overflowZoom.isSelected();
-//        if(overflow) {
-// 
-//        } 
-//        return overflow;
-//    } 
     
     private void zoomNeighbor(double zoomValue) {
 //        if(zoomValue > 0.1) {
@@ -2183,10 +2299,17 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleUndo(ActionEvent event) {
+        if(image != null) {
+            userActions.decreasePointer();
+        }
     }
 
     @FXML
     private void handleRedo(ActionEvent event) {
+        if(image != null) {
+            userActions.increasePointer();
+        }
+
     }
 
 
