@@ -86,9 +86,7 @@ public class MainController implements Initializable {
 
     
     private Color [][] bufferNetpbm;
-    
-    private boolean grayScaleFlag;
-    
+        
     private int vw;
     private int vh;
 
@@ -112,6 +110,8 @@ public class MainController implements Initializable {
     private Label infoFormatPixelImage;
     
     private ArrayList uniqueColorsList;
+    private ArrayList stackActions;
+    
     @FXML
     private Label infoUniqueColorsImage;
     @FXML
@@ -374,7 +374,6 @@ public class MainController implements Initializable {
         sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
         
-        this.grayScaleFlag = false;
     }
     
     
@@ -451,6 +450,7 @@ public class MainController implements Initializable {
                     imgPath.getName().length())
             );
             uniqueColorsList = new ArrayList();
+            stackActions = new ArrayList();
             switch(pic.getFileFormat()) {
                 case "bmp":                
                     restartZoom();
@@ -1142,6 +1142,7 @@ public class MainController implements Initializable {
                     
                 }
             }
+            
             pic.setColorMatrix(current);
             pic.setScaleMatrix(current);
             handleZoom();
@@ -1165,7 +1166,8 @@ public class MainController implements Initializable {
         double brightnessValue = (double) sliderToBrightness.getValue();
         if(brightnessValue != 0) {
             sliderContext();
-            restartBrightness();                  
+            restartBrightness();
+            System.out.println(stackActions.size());
         }
     }
 
