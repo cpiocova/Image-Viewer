@@ -33,7 +33,7 @@ public class UserActions {
             addAction(step);
         }
         
-        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
+//        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
     }
     
     public void addAction(Stack step) {
@@ -82,12 +82,12 @@ public class UserActions {
     
     public void increasePointer() {
         pointer = (pointer + 1) % capacity;   
-        System.out.println("Pointer: " +pointer + "  - Counter: " + count);        
+//        System.out.println("Pointer: " +pointer + "  - Counter: " + count);        
     }
     
     public void decreasePointer() {
         pointer = Math.abs(pointer - 1) % capacity;  
-        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
+//        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
     }
     
     public Stack getStackPointer() {

@@ -349,6 +349,8 @@ public class MainController implements Initializable {
     private Button buttonRotateLeft;
     @FXML
     private Button buttonRotateRight;
+    @FXML
+    private CheckBox includeBorders;
 
 
     @Override
@@ -2238,8 +2240,15 @@ public class MainController implements Initializable {
     }
     
     public void receiveParamsArbitraryKernel(double[][] matrixConvol, int width, int height) {
-        int aY = (int) Math.round(width / 2.0 + 0.5);
-        int aX = (int) Math.round(height / 2.0 + 0.5);
+        boolean borders = includeBorders.isSelected();
+        int aY, aX;
+        if(borders) {
+            aX = 0;
+            aY = 0;
+        } else {
+            aY = (int) Math.round(width / 2.0 + 0.5);
+            aX = (int) Math.round(height / 2.0 + 0.5);
+        }
         pixelWriter = writableImage.getPixelWriter();
         Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
         for (int y = 0; y < imageHeight; y++) {
@@ -2248,7 +2257,6 @@ public class MainController implements Initializable {
                     pixelWriter.setColor(x,y,scaleMatrix[x][y]); 
             }
         }        
-        
         for (int y = aY; y < imageHeight - aY; y++) {
             for (int x = aX; x < imageWidth - aX; x++) {
                 Convolution mc = new Convolution(width, height, imageWidth, imageHeight, "arbitrary", pic);

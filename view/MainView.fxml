@@ -267,6 +267,7 @@
                         <Slider fx:id="sliderToArbitraryY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                         <Label fx:id="labelArbitraryX" layoutX="115.0" layoutY="38.0" text="1" />
                         <Label fx:id="labelArbitraryY" layoutX="115.0" layoutY="84.0" text="1" />
+                        <CheckBox fx:id="includeBorders" layoutX="21.0" layoutY="158.0" mnemonicParsing="false" text="Include borders" />
                      </children>
                   </AnchorPane>
                </content>
