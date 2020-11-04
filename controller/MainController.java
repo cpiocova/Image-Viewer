@@ -657,7 +657,6 @@ public class MainController implements Initializable {
             handleZoom();
             configurationImageView();
             int text = (int) (gv * 100);
-            if(text >= 99) this.grayScaleFlag = true;
             labelGrayscale.setText("Grayscale: " + text + "%");           
         }    
     }
@@ -880,6 +879,7 @@ public class MainController implements Initializable {
                         default:
                             if("pgm".equals(pic.getFileFormat())) {
                                 buildMatrixPgm(line, row);
+                                pic.setInitGrayScale(true);
                             }else{
                                 buildMatrixPpm(line, row);
                             }
@@ -1156,6 +1156,7 @@ public class MainController implements Initializable {
         if(grayscaleValue != 0) {
             sliderContext();
             restartGrayscale();
+            if(grayscaleValue > 0.9) pic.setGrayScaleFlag(true);
         }
     }
 
@@ -1259,6 +1260,7 @@ public class MainController implements Initializable {
             pic.setColorMatrix(current);
             pic.setScaleMatrix(current);
             pic.setImageModified(pic.getImageOriginal());
+            pic.setGrayScaleFlag(false);
             imageView.setImage(pic.getImageOriginal());
             configurationImageView();
             restartUI();
@@ -2029,9 +2031,9 @@ public class MainController implements Initializable {
         
         if(rank >= 0 && rank <= 1) {
             bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-        } else if((rank > 1 && rank <= 8) || grayScaleFlag == true) {
+        } else if((rank > 1 && rank <= 8 && pic.isGrayScaleFlag()) || pic.isInitGrayScale()) {
             bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        } else if(rank > 8 && rank <= 24) {
+        } else {
            bfImage2 = new BufferedImage(bfImage.getWidth(), bfImage.getHeight(), BufferedImage.TYPE_INT_RGB); 
         }
         
@@ -2052,13 +2054,22 @@ public class MainController implements Initializable {
         
         if(rank >= 0 && rank <= 1) {
             pbmSaver(file);
-        } else if(rank > 1 && rank <= 8 && grayScaleFlag == true) {
-            pgmSaver();
-        } else if(rank > 8 && rank <= 24) {
-            ppmSaver();
+        } else if((rank > 1 && rank <= 8 && pic.isGrayScaleFlag()) || pic.isGrayScaleFlag()) {
+            pgmSaver(file);
+        } else {
+            ppmSaver(file);
         }
         
     }
+    
+    public int mapRange(int number, int maxColor, int maxNumber){
+        double ent1 = 0;
+        double ent2 = maxColor; 
+        double ret1 = 0;
+        double ret2 = maxNumber;
+        return (int) (((ret2 - ret1)/(ent2 - ent1)) * (number - ent2) + ret2);
+    }
+    
 
     private void pbmSaver(File file) {
         PrintWriter outFile = null;
@@ -2082,10 +2093,72 @@ public class MainController implements Initializable {
     }
     
     
-    private void pgmSaver() {
+    private void pgmSaver(File file) {
+        PrintWriter outFile = null;
+        try {
+            outFile = new PrintWriter(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pixelReader = writableImage.getPixelReader();
+        outFile.println("P2");
+        outFile.println("" + imageWidth + " " + imageHeight);
+        outFile.println(uniqueColorsList.size());
         
+        int max = BlankPic.mappingRangeColor((int) uniqueColorsList.get(0));
+        
+        for(int i = 0; i< uniqueColorsList.size(); i++) {
+            int color = (int) uniqueColorsList.get(i);
+            int result = BlankPic.mappingRangeColor(color);
+            max = Math.max(max, result);
+        }
+                
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                int pixel = pixelReader.getArgb(x, y);
+                pixel = BlankPic.mappingRangeColor(pixel);
+                pixel = mapRange(pixel, max, uniqueColorsList.size());
+                outFile.print(pixel + " ");
+            }
+            outFile.println();
+
+        } 
+        outFile.close();        
     }
-    private void ppmSaver() {
+    
+    
+    private void ppmSaver(File file) {
+        PrintWriter outFile = null;
+        try {
+            outFile = new PrintWriter(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        pixelReader = writableImage.getPixelReader();
+        outFile.println("P3");
+        outFile.println("" + imageWidth + " " + imageHeight);
+        outFile.println("255");
+        
+        int max = BlankPic.mappingRangeColor((int) uniqueColorsList.get(0));
+        
+        for(int i = 0; i< uniqueColorsList.size(); i++) {
+            int color = (int) uniqueColorsList.get(i);
+            int result = BlankPic.mappingRangeColor(color);
+            max = Math.max(max, result);
+        }
+                
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                Color pixel = pixelReader.getColor(x, y);
+                int r = (int) (pixel.getRed() * 255);
+                int g = (int) (pixel.getGreen()* 255);
+                int b = (int) (pixel.getBlue()* 255);
+                outFile.print(r + " " + g + " " + b + " ");
+            }
+            outFile.println();
+
+        } 
+        outFile.close();         
         
     }
 

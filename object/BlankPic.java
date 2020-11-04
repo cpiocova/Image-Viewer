@@ -37,6 +37,29 @@ public class BlankPic {
     private String fileFormat;
         
     private int maxColor;
+    private boolean grayScaleFlag;
+    private boolean initGrayScale;
+    
+    public void BlankPic() {
+        this.grayScaleFlag = false;
+        this.initGrayScale = false;
+    }
+
+    public boolean isGrayScaleFlag() {
+        return grayScaleFlag;
+    }
+
+    public void setGrayScaleFlag(boolean grayScaleFlag) {
+        this.grayScaleFlag = grayScaleFlag;
+    }
+
+    public boolean isInitGrayScale() {
+        return initGrayScale;
+    }
+
+    public void setInitGrayScale(boolean initGrayScale) {
+        this.initGrayScale = initGrayScale;
+    }
     
  
     
@@ -129,6 +152,14 @@ public class BlankPic {
         double ret1 = 0;
         double ret2 = 1;
         return (double) (((ret2 - ret1)/(ent2 - ent1)) * (number - ent2) + ret2);
+    }
+    
+    public static int mappingRangeColor(int x){
+        double ent1 = -16777216;
+        double ent2 = -1; // En mis calculos ent1 es el negro
+        double ret1 = 0;
+        double ret2 = 255;
+        return (int) (((ret2 - ret1)/(ent2 - ent1)) * (x - ent2) + ret2);
     }
     
 }
