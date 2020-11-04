@@ -338,7 +338,7 @@ public class MainController implements Initializable {
         labelArbitraryY.setText(Integer.toString(roundedValue));
     };
     @FXML
-    private Button btnSaveImage;
+    private ToggleGroup saveMethod;
 
 
     @Override
@@ -1156,7 +1156,7 @@ public class MainController implements Initializable {
         if(grayscaleValue != 0) {
             sliderContext();
             restartGrayscale();
-            if(grayscaleValue > 0.9) pic.setGrayScaleFlag(true);
+            if(grayscaleValue == 1.0 ) pic.setGrayScaleFlag(true);
         }
     }
 
@@ -1993,34 +1993,7 @@ public class MainController implements Initializable {
         return (int) (Math.log(x) / Math.log(2) + 1e-10);
     }
     
-    @FXML 
-    private void handleSaveImage(ActionEvent event) {
-        if(image != null) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save image in BMP or Netpbm format");
-
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
-                    new FileChooser.ExtensionFilter("Netbpm", "*.pbm", "*.pgm", "*.ppm")
-            );
-
-              File file = fileChooser.showSaveDialog(null);
-
-              if(file != null){
-                String format = file.getName().substring(file.getName().lastIndexOf(".") + 1, 
-                        file.getName().length());
-                switch(format) {
-                  case "bmp":
-                      bmpSaver(writableImage, file);
-                  break;
-                  default:
-                      netBpmSaver(file);
-                }  
-              }
-        }
-    
-    }
-    
+  
     private void bmpSaver(Image content, File file){      
         
         BufferedImage bfImage = SwingFXUtils.fromFXImage(content, null);
@@ -2048,16 +2021,16 @@ public class MainController implements Initializable {
     
 
 
-    private void netBpmSaver(File file) {
+    private void netBpmSaver() {
         int size = uniqueColorsList.size();
         int rank = log2(size);
         
         if(rank >= 0 && rank <= 1) {
-            pbmSaver(file);
-        } else if((rank > 1 && rank <= 8 && pic.isGrayScaleFlag()) || pic.isGrayScaleFlag()) {
-            pgmSaver(file);
+            pbmSaver();
+        } else if((rank > 1 && rank <= 8 && pic.isGrayScaleFlag()) || pic.isInitGrayScale()) {
+            pgmSaver();
         } else {
-            ppmSaver(file);
+            ppmSaver();
         }
         
     }
@@ -2071,7 +2044,15 @@ public class MainController implements Initializable {
     }
     
 
-    private void pbmSaver(File file) {
+    private void pbmSaver() {
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save image in format");
+
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Netpbm | pbm", "*.pbm"));
+
+        File file = fileChooser.showSaveDialog(null);
+        
         PrintWriter outFile = null;
         try {
             outFile = new PrintWriter(file);
@@ -2093,7 +2074,15 @@ public class MainController implements Initializable {
     }
     
     
-    private void pgmSaver(File file) {
+    private void pgmSaver() {
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save image in Netpbm format");
+
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Netpbm | pgm", "*.pgm"));
+
+        File file = fileChooser.showSaveDialog(null);
+        
         PrintWriter outFile = null;
         try {
             outFile = new PrintWriter(file);
@@ -2127,7 +2116,15 @@ public class MainController implements Initializable {
     }
     
     
-    private void ppmSaver(File file) {
+    private void ppmSaver() {
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save image in Netpbm format");
+
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Netpbm | ppm", "*.ppm"));
+
+        File file = fileChooser.showSaveDialog(null);
+        
         PrintWriter outFile = null;
         try {
             outFile = new PrintWriter(file);
@@ -2160,6 +2157,34 @@ public class MainController implements Initializable {
         } 
         outFile.close();         
         
+    }
+
+    @FXML
+    private void handleSaveMethod(ActionEvent event) {
+        if(image != null) {
+            int saveButton = saveMethod.getToggles().indexOf(saveMethod.getSelectedToggle());
+            if(saveButton == 0) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save image in BMP format");
+
+                fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("BMP", "*.bmp"));
+                File file = fileChooser.showSaveDialog(null);
+                if(file != null){
+                    bmpSaver(writableImage, file);
+                }
+            } else {
+                netBpmSaver();
+
+            }
+        }
+    }
+
+    @FXML
+    private void handleUndo(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleRedo(ActionEvent event) {
     }
 
 
