@@ -18,7 +18,7 @@ public class UserActions {
     private int lastAction;
     private int count;
     private int capacity;
-    private ArrayList<Stack> stack;
+    private ArrayList stack;
     
     public UserActions(int cap) {
         capacity = 5;
@@ -33,7 +33,7 @@ public class UserActions {
             addAction(step);
         }
         
-        System.out.println("poimnter: "+ pointer + " y count: " + count);
+        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
     }
     
     public void addAction(Stack step) {
@@ -64,22 +64,34 @@ public class UserActions {
         lastAction = -1;
     }
     
-    public void increasePointer() {
+    public boolean canIncrease() {
         if(pointer != lastAction) {
-            pointer = (pointer + 1) % capacity;
-            System.out.println("poimnter: "+ pointer + " y count: " + count);
-        }         
+            return true;
+        } else{
+            return false;
+        }
+    }
+    
+    public boolean canDecrease() {
+        if(pointer != firstAction) {
+            return true;
+        } else{
+            return false;
+        }
+    }
+    
+    public void increasePointer() {
+        pointer = (pointer + 1) % capacity;   
+        System.out.println("Pointer: " +pointer + "  - Counter: " + count);        
     }
     
     public void decreasePointer() {
-        if(pointer != firstAction) {
-            pointer = Math.abs(pointer - 1) % capacity;
-            System.out.println("poimnter: "+ pointer + " y count: " + count);
-        }       
+        pointer = Math.abs(pointer - 1) % capacity;  
+        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
     }
     
-    public ArrayList<Stack> getStack() {
-        return stack;        
+    public Stack getStackPointer() {
+        return (Stack) stack.get(pointer);        
     }
 
     

@@ -345,6 +345,10 @@ public class MainController implements Initializable {
     private ToggleGroup saveMethod;
     @FXML
     private AnchorPane imageWrapper;
+    @FXML
+    private Button buttonRotateLeft;
+    @FXML
+    private Button buttonRotateRight;
 
 
     @Override
@@ -430,7 +434,6 @@ public class MainController implements Initializable {
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(0);
         imageView.setFitHeight(0);   
-
     }
     
     
@@ -601,20 +604,39 @@ public class MainController implements Initializable {
     }
     
     private void  displayPixelsFormatLabel() {
+        String format = pic.getFileFormat();
+        
+        switch(format) {
+            case "bmp":
+                displayPixelsFormatLabelBmp();
+                break;
+            case "pbm":
+                infoFormatPixelImage.setText("Bits per pixel original image: 1bpp.");  
+                break;
+            case "pgm":
+                infoFormatPixelImage.setText("Bits per pixel original image: 8bpp.");
+                break;
+            case "ppm":
+                infoFormatPixelImage.setText("Bits per pixel original image: 24bpp.");
+                break;
+        }
+    }
+    
+    private void  displayPixelsFormatLabelBmp() {
         PixelFormat.Type type = pixelReader.getPixelFormat​().getType();
         switch(type) {
             case INT_ARGB_PRE:
             case INT_ARGB:
             case BYTE_BGRA_PRE:
             case BYTE_BGRA:
-                infoFormatPixelImage.setText("Bits per pixel: 32bpp.");
+                infoFormatPixelImage.setText("Bits per pixel original image: 32bpp.");
                 break;
             case BYTE_INDEXED:
                 infoFormatPixelImage.setText("The pixel colors are referenced by byte index stored in the pixel array.");
                 break;
             case BYTE_RGB:
-                infoFormatPixelImage.setText("Bits per pixel: 24bpp.");                
-        }
+                infoFormatPixelImage.setText("Bits per pixel original image: 24bpp.");                
+        }        
     }
  
     private void displayUniqueColor() {
@@ -1139,31 +1161,43 @@ public class MainController implements Initializable {
     @FXML
     private void sliderContext() {
         if(image != null) {
-            Color [][] current = pic.getColorMatrix();
+            Color [][] current = new Color[imageWidth][imageHeight];
             pixelReader = writableImage.getPixelReader();
             for (int y = 0; y < imageHeight; y++) {
                 for (int x = 0; x < imageWidth; x++) {
                     current[x][y] = pixelReader.getColor(x, y);
-                    
                 }
             }
-            
             pic.setColorMatrix(current);
             pic.setScaleMatrix(current);
-            handleZoom();
             pic.setImageModified(writableImage);
+            handleZoom();
             recalculateInfo();
         }
     }
     
-    private void addToStack(Stack step) {
-        
+    private WritableImage imageWriter() {
+        int width = pic.getDimensions().getWidth();
+        int heigth = pic.getDimensions().getHeight();
+        WritableImage imageWriter = new WritableImage(width, heigth);
+        PixelWriter pW;
+        pW = imageWriter.getPixelWriter();
+        Color [][] current = pic.getColorMatrix();
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                pW.setColor(x,y,current[x][y]);
+            }
+       }
+        return imageWriter;
     }
     
     private void negativeContext() {
         if(image != null) {
             sliderContext();
-            Stack step = new Stack(writableImage, "negative");
+            
+            WritableImage changeImage = imageWriter();            
+            
+            Stack step = new Stack(changeImage, "negative");
             userActions.addStep(step);            
         }
     }
@@ -1171,9 +1205,33 @@ public class MainController implements Initializable {
     private void blackWhiteContext() {
         if(image != null) {
             sliderContext();
-            Stack step = new Stack(writableImage, "blackwhite");
+            WritableImage changeImage = imageWriter();  
+             
+            Stack step = new Stack(changeImage, "blackwhite");
             userActions.addStep(step);                    
         }
+    }
+    
+    private void rotateNegativeContext() {
+        if(image != null) {
+            sliderContext();
+//                        
+//            Stack step = new Stack(null, "rotateNegative");
+//            userActions.addStep(step);
+            userActions.resetSteps();
+        }       
+        
+    }
+    
+    private void rotatePositiveContext() {
+        if(image != null) {
+            sliderContext();
+//                        
+//            Stack step = new Stack(null, "rotatePositive");
+//            userActions.addStep(step);  
+            userActions.resetSteps();
+        }       
+        
     }
     
     
@@ -1185,7 +1243,9 @@ public class MainController implements Initializable {
                 sliderContext();
                 restartGrayscale();
                 if(grayscaleValue == 1.0 ) pic.setGrayScaleFlag(true);
-                Stack step = new Stack(writableImage, "grayscale");
+                
+                WritableImage changeImage = imageWriter();  
+                Stack step = new Stack(changeImage, "grayscale");
                 userActions.addStep(step);   
             }            
         }
@@ -1198,7 +1258,9 @@ public class MainController implements Initializable {
             if(brightnessValue != 0) {
                 sliderContext();
                 restartBrightness();
-                Stack step = new Stack(writableImage, "brightness");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "brightness");
                 userActions.addStep(step);   
             }            
         }
@@ -1211,7 +1273,9 @@ public class MainController implements Initializable {
             if(contrastValue != 0) {
                 sliderContext();
                 restartContrast();
-                Stack step = new Stack(writableImage, "contrast");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "contrast");
                 userActions.addStep(step);  
             }            
         }
@@ -1224,7 +1288,9 @@ public class MainController implements Initializable {
             handleThresholding();
             sliderContext();
             restartThresholding(); 
-            Stack step = new Stack(writableImage, "thresholding");
+            
+            WritableImage changeImage = imageWriter();
+            Stack step = new Stack(changeImage, "thresholding");
             userActions.addStep(step);              
         }
     }
@@ -1237,7 +1303,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartAverage();
-                Stack step = new Stack(writableImage, "filterAverage");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterAverage");
                 userActions.addStep(step);              
             }                    
         }
@@ -1251,7 +1319,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartMedian();
-                Stack step = new Stack(writableImage, "filterMedian");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterMedian");
                 userActions.addStep(step);                      
             }        
             
@@ -1266,7 +1336,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartGaussian();
-                Stack step = new Stack(writableImage, "filterGaussian");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterGaussian");
                 userActions.addStep(step);                     
             }        
             
@@ -1281,7 +1353,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartLaplacian();
-                Stack step = new Stack(writableImage, "filterLaplacian");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterLaplacian");
                 userActions.addStep(step);                     
             }        
             
@@ -1296,7 +1370,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartSobel();
-                Stack step = new Stack(writableImage, "filterSobel");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterSobel");
                 userActions.addStep(step);                        
             }
             
@@ -1311,7 +1387,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartPrewitt();
-                Stack step = new Stack(writableImage, "filterPrewitt");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterPrewitt");
                 userActions.addStep(step);                       
             }
             
@@ -1325,7 +1403,9 @@ public class MainController implements Initializable {
             if(axis >= 2 ) {
                 sliderContext();
                 restartRoberts();
-                Stack step = new Stack(writableImage, "filterRoberts");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterRoberts");
                 userActions.addStep(step);                       
             }
             
@@ -1340,7 +1420,9 @@ public class MainController implements Initializable {
             if(axisX + axisY > 2) {
                 sliderContext();
                 restartLoG();
-                Stack step = new Stack(writableImage, "filterLoG");
+                
+                WritableImage changeImage = imageWriter();
+                Stack step = new Stack(changeImage, "filterLoG");
                 userActions.addStep(step);                      
             }
             
@@ -1351,7 +1433,9 @@ public class MainController implements Initializable {
         if(image != null) {
             sliderContext();
             restartArbitrary();
-            Stack step = new Stack(writableImage, "filterArbitrary");
+            
+            WritableImage changeImage = imageWriter();
+            Stack step = new Stack(changeImage, "filterArbitrary");
             userActions.addStep(step);                      
         }
     }   
@@ -1506,8 +1590,7 @@ public class MainController implements Initializable {
 
     }
 
-    @FXML
-    private void handleRotate(ActionEvent event) {
+    private void handleRotate(String direction) {
         if(image != null) {
             restartBrightness();
             restartContrast();
@@ -1526,11 +1609,11 @@ public class MainController implements Initializable {
             Color [][] rotate = new Color[imageHeight][imageWidth];
             writableImage = new WritableImage(imageHeight, imageWidth);
             pixelWriter = writableImage.getPixelWriter();
-            String direction = ((Button)event.getSource()).getText();
-            if(">".equals(direction)) {
+            
+            if(direction == "positive") {
                 rotate = rotatePositive(width, height, rotate);
-            }else {
-               rotate = rotateNegative(width, height, rotate);
+            } else {
+                rotate = rotateNegative(width, height, rotate);
             }
 
             setImageSize(width, height);
@@ -1539,12 +1622,93 @@ public class MainController implements Initializable {
             pic.setScaleMatrix(rotate);
             pic.setImageModified(writableImage);
             handleZoom();
-            sliderContext();
-//            imageView.setImage(writableImage);
+            //Not Context
             configurationImageView();
                 
         }
     
+    }
+    
+    @FXML
+    private void handleRotateNegative() {                
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartLoG();
+            restartSobel();
+            restartPrewitt();
+            restartRoberts();
+            int width = imageHeight;
+            int height = imageWidth;
+            Color [][] rotate = new Color[imageHeight][imageWidth];
+            writableImage = new WritableImage(imageHeight, imageWidth);
+            pixelWriter = writableImage.getPixelWriter();
+            
+            Color [][] current = pic.getColorMatrix();
+            for (int y = 0; y < width; y++) {
+              for (int x = 0; x < height; x++) {                
+                  rotate[y][x] = current[imageWidth - 1 - x][y];
+                  pixelWriter.setColor(y,x,rotate[y][x]);
+              }
+           }
+            
+            setImageSize(width, height);
+            pic.setDimensions(new ImageSize(width, height));
+            pic.setColorMatrix(rotate);
+            pic.setScaleMatrix(rotate);
+            pic.setImageModified(writableImage);
+            handleZoom();
+            rotateNegativeContext();
+            configurationImageView(); 
+        }
+    }
+    
+
+    @FXML
+    private void handleRotatePositive() {
+        if(image != null) {
+            restartBrightness();
+            restartContrast();
+            restartGrayscale();            
+            restartThresholding();
+            restartAverage();
+            restartMedian();
+            restartGaussian();
+            restartLaplacian();
+            restartLoG();
+            restartSobel();
+            restartPrewitt();
+            restartRoberts();
+            int width = imageHeight;
+            int height = imageWidth;
+            Color [][] rotate = new Color[imageHeight][imageWidth];
+            writableImage = new WritableImage(imageHeight, imageWidth);
+            pixelWriter = writableImage.getPixelWriter();
+            
+            Color [][] current = pic.getColorMatrix();
+            for (int y = 0; y < width; y++) {
+                for (int x = 0; x < height; x++) {                
+                  rotate[y][x] = current[x][imageHeight - 1 - y];
+                  pixelWriter.setColor(y,x,rotate[y][x]);
+                }
+            }
+            
+            setImageSize(width, height);
+            pic.setDimensions(new ImageSize(width, height));
+            pic.setColorMatrix(rotate);
+            pic.setScaleMatrix(rotate);
+            pic.setImageModified(writableImage);
+            handleZoom();
+            rotatePositiveContext();
+            configurationImageView();
+                
+        }
     }
 
  
@@ -1931,13 +2095,13 @@ public class MainController implements Initializable {
             int zoomButton = zoomMethod.getToggles().indexOf(zoomMethod.getSelectedToggle());
             // 0  Neighbor   -    1  Interpolation
             double zoomValue = sliderToZoom.getValue();
+            boolean overflow = overflowZoom.isSelected();
 
             if(zoomButton == 0) {
                 zoomNeighbor(zoomValue);
             } else {
                 zoomInterpolation(zoomValue);
             }
-            boolean overflow = overflowZoom.isSelected();
             if(overflow) {
                 imageWrapper.setPrefWidth(zoomValue * imageWidth);
                 imageWrapper.setPrefHeight(zoomValue * imageHeight);                
@@ -1950,7 +2114,6 @@ public class MainController implements Initializable {
     
     
     private void zoomNeighbor(double zoomValue) {
-//        if(zoomValue > 0.1) {
             int width = (int) Math.round(imageWidth * zoomValue);
             int height = (int) Math.round(imageHeight * zoomValue);
             width = width > 0 ? width : 1;
@@ -1969,18 +2132,15 @@ public class MainController implements Initializable {
                 }
             }
             imageView.setImage(zoomWritable);
-            configurationImageView();
-//        }
-            
+            configurationImageView();            
     }
         
     private void zoomInterpolation(double zoomValue) {
-//        if(zoomValue > 0.1) {
             int width = (int) Math.round(imageWidth * zoomValue);
             int height = (int) Math.round(imageHeight * zoomValue);
             width = width > 0 ? width : 1;
             height = height > 0 ? height : 1;
-            Color [][] current = pic.getScaleMatrix();
+            Color [][] current = pic.getScaleMatrix();            
             zoomWritable = new WritableImage(width, height);
             zoomWriter = zoomWritable.getPixelWriter();
             for (int y = 0; y < height; y++) {
@@ -2005,8 +2165,6 @@ public class MainController implements Initializable {
             }
             imageView.setImage(zoomWritable);
             configurationImageView();  
-
-//        }
 
     }
        
@@ -2300,17 +2458,50 @@ public class MainController implements Initializable {
     @FXML
     private void handleUndo(ActionEvent event) {
         if(image != null) {
-            userActions.decreasePointer();
+            if(userActions.canDecrease()) {
+                userActions.decreasePointer();
+                Stack stack = userActions.getStackPointer();
+                WritableImage imageStack = stack.getImageCurrent();
+                if(imageStack != null) {
+                    writableImage = imageStack;
+                }else {
+                    boolean rotationInvert = stack.getOrientationRotate();
+                    if(rotationInvert) {
+                        handleRotate("negative");
+                    } else {
+                        handleRotate("positive");
+                    }
+                }
+                sliderContext();                
+            }
         }
     }
 
     @FXML
     private void handleRedo(ActionEvent event) {
         if(image != null) {
-            userActions.increasePointer();
+            if(userActions.canIncrease()) {
+                userActions.increasePointer();
+                Stack stack = userActions.getStackPointer();
+                WritableImage imageStack = stack.getImageCurrent();
+                if(imageStack != null) {
+                    writableImage = imageStack;
+                } else {
+                    boolean rotationDirect = stack.getOrientationRotate();
+                    if(rotationDirect) {
+                        handleRotate("positive");
+                    } else {
+                        handleRotate("negative");
+                    }
+                }
+                sliderContext();                
+            }
+
         }
 
     }
+
+
 
 
 

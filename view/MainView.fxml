@@ -98,8 +98,8 @@
                <content>
                   <AnchorPane prefHeight="84.0" prefWidth="125.0">
                      <children>
-                        <Button layoutX="30.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotate" text="&lt;" />
-                        <Button layoutX="103.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotate" text="&gt;" />
+                        <Button fx:id="buttonRotateLeft" layoutX="30.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotateNegative" text="&lt;" />
+                        <Button fx:id="buttonRotateRight" layoutX="103.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotatePositive" text="&gt;" />
                      </children>
                   </AnchorPane>
                </content>
