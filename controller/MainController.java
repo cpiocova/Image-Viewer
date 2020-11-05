@@ -461,7 +461,7 @@ public class MainController implements Initializable {
                     imgPath.getName().length())
             );
             uniqueColorsList = new ArrayList();
-//            capacityActions = 6;
+            capacityActions = 30;
             userActions = new UserActions(capacityActions);
             switch(pic.getFileFormat()) {
                 case "bmp":                

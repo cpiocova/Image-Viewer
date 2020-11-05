@@ -21,7 +21,7 @@ public class UserActions {
     private ArrayList stack;
     
     public UserActions(int cap) {
-        capacity = 5;
+        capacity = cap;
         stack = new ArrayList<Stack>(capacity);
         count = 0;
     }  
