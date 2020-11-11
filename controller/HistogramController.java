@@ -20,6 +20,8 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import java.util.Collections;
+
 
 /**
  * FXML Controller class
@@ -171,7 +173,7 @@ public class HistogramController implements Initializable {
 
     private int mappingRangeColorInvert(double x) {
         double ent1 = 0;
-        double ent2 = 255; // En mis calculos ent1 es el negro
+        double ent2 = 1; // En mis calculos ent1 es el negro
         double ret1 = -16777216;
         double ret2 = -1;
         return (int) (((ret2 - ret1) / (ent2 - ent1)) * (x - ent2) + ret2);
@@ -252,24 +254,14 @@ public class HistogramController implements Initializable {
 
 
 
-    private void generateEQValues() {
-        for (int i = 0; i < cdf.length; i++) {
-            double expression = (
-                    (double) (cdf[i] - cdfMin) 
-                    / (double) (imageWidth * imageHeight - cdfMin)
-                    ) *  -16777216;
-            histogramEQ[i] = (int) (expression);
-//            System.out.println(histogramEQ[i]);
-
-        }
-    }
-
     private Color intToColor(int value) {
         double r = (value & 0xFF0000) >> 16;
         double g = (value & 0xFF00) >> 8;
         double b = (value & 0xFF);
         return new Color(r / 255, g / 255, b / 255, 1.0);
     }
+    
+
     
     private void checkUniqueColors(int colorPixel, ArrayList arrCol) {
         DataColor data = new DataColor(colorPixel);
@@ -293,7 +285,7 @@ public class HistogramController implements Initializable {
                 checkUniqueColors(color, arrayAllColor);
             }
         }
-        
+        Collections.sort(arrayAllColor);
         histogramAll = new int[arrayAllColor.size()];
         cdf = new int[arrayAllColor.size()];
         histogramEQ = new int[arrayAllColor.size()];
@@ -314,10 +306,21 @@ public class HistogramController implements Initializable {
         for (int i = 0; i < arrayAllColor.size(); i++) {
             DataColor data = (DataColor) arrayAllColor.get(i);
             histogramAll[i] = data.getColor();
-            
+
             accumulated = accumulated + data.getRepetitions();
             cdf[i] = accumulated;
 //            System.out.println(cdf[i]);
+        }
+    }
+    
+        private void generateEQValues() {
+        for (int i = 0; i < cdf.length; i++) {
+            double expression = (
+                    (double) (cdf[i] - cdfMin) 
+                    / (double) (imageWidth * imageHeight - cdfMin));
+//                    *  -16777216);
+            int expression2 = mappingRangeColorInvert(expression);
+            histogramEQ[i] = (int) (expression2);
         }
     }
     
@@ -338,8 +341,9 @@ public class HistogramController implements Initializable {
                 DataColor data = new DataColor(color);
                 int index = arrayAllColor.indexOf(data);
                 int valueStrecth = histogramEQ[index];
-//                Color colorStrecth = intToColor(valueStrecth);
-                writerStrecth.setArgb(x, y, valueStrecth);
+//                writerStrecth.setArgb(x, y, valueStrecth);
+                Color colorStrecth = intToColor(valueStrecth);
+                writerStrecth.setColor(x, y, colorStrecth);
             }
         }
                 

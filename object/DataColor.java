@@ -9,7 +9,7 @@ package object;
  *
  * @author Jose Pio
  */
-public class DataColor {
+public class DataColor implements Comparable<DataColor>{
     
     private int color;
     private int repetitions;
@@ -49,8 +49,24 @@ public class DataColor {
     }
 
     @Override
+    public int compareTo(DataColor o) {
+        if (this.color < o.getColor()) {
+            return -1;
+        }
+        if (this.color > o.getColor()) {
+            return 1;
+        }
+        return 0;
+    }
+    
+    
+    @Override
     public int hashCode() {
         return this.color;
     }
+    
+
+    
+    
      
 }
