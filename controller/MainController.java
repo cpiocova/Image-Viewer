@@ -1577,7 +1577,7 @@ public class MainController implements Initializable {
                 
                 HistogramController histogramInstanceController = (HistogramController)loader.getController();
                 
-                histogramInstanceController.allColors(pic);
+                histogramInstanceController.allColors(mainInstanceController, pic);
                
                Scene scene = new Scene(root);
                Stage stage = new Stage();
@@ -1591,6 +1591,12 @@ public class MainController implements Initializable {
         }
 
     }
+    
+    public void setEqualizedImage(WritableImage imageStrecth) {
+        writableImage = imageStrecth;
+        sliderContext();
+    }
+
 
     private void handleRotate(String direction) {
         if(image != null) {

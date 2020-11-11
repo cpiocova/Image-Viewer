@@ -8,16 +8,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="354.0" prefWidth="429.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HistogramController">
+<AnchorPane id="AnchorPane" prefHeight="424.0" prefWidth="492.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HistogramController">
    <children>
-      <AnchorPane layoutX="86.0" layoutY="77.0" prefHeight="200.0" prefWidth="256.0">
+      <AnchorPane layoutX="117.0" layoutY="73.0" prefHeight="200.0" prefWidth="256.0">
          <children>
             <Line endX="156.0" layoutX="101.0" layoutY="200.0" startX="-100.0" stroke="#00000066" />
             <Line endX="100.0" layoutX="1.0" layoutY="100.0" rotate="90.0" startX="-100.0" stroke="#00000080" AnchorPane.leftAnchor="-99.5" />
             <ImageView fx:id="imageView" fitHeight="200.0" fitWidth="256.0" layoutX="1.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true" x="2.0" y="-2.0" />
          </children>
       </AnchorPane>
-      <Label layoutX="86.0" layoutY="282.0" text="0" />
-      <Label layoutX="325.0" layoutY="282.0" text="255" />
+      <Label layoutX="117.0" layoutY="278.0" text="0" />
+      <Label layoutX="356.0" layoutY="278.0" text="255" />
+      <Button layoutX="188.0" layoutY="352.0" mnemonicParsing="false" onAction="#equalizeHistogram" text="Equalize histogram" />
    </children>
 </AnchorPane>
