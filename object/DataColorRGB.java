@@ -5,27 +5,29 @@
  */
 package object;
 
+import static java.lang.Double.doubleToLongBits;
 import java.util.ArrayList;
 
 /**
  *
  * @author Jose Pio
  */
-public class DataColor implements Comparable<DataColor>{
+public class DataColorRGB implements Comparable<DataColorRGB>{
     
-    private int color;
+    private double color;
     private int repetitions;
+    private int colorInt;
 
-    public DataColor(int color) {
+    public DataColorRGB(double color) {
         this.color = color;
         this.repetitions = 1;
     }
 
-    public int getColor() {
+    public double getColor() {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(double color) {
         this.color = color;
     }
 
@@ -35,24 +37,36 @@ public class DataColor implements Comparable<DataColor>{
 
     public void setRepetitions(int repetitions) {
         this.repetitions = repetitions;
-    }   
+    }
     
+    public static void checkUniqueColors(double colorPixel, ArrayList arrCol) {
+        DataColorRGB data = new DataColorRGB(colorPixel);
+        if (!arrCol.contains(data)) {
+            arrCol.add(data);
+        } else {
+            int index = arrCol.indexOf(data);
+            DataColorRGB newData = (DataColorRGB) arrCol.get(index);
+            int repeat = newData.getRepetitions() + 1;
+            newData.setRepetitions(repeat);
+            arrCol.set(index, newData);
+        }
+    }
     
     @Override
     public boolean equals(Object object)
     {
         boolean isEqual= false;
 
-        if (object != null && object instanceof DataColor)
+        if (object != null && object instanceof DataColorRGB)
         {
-            isEqual = (this.color == ((DataColor) object).color);
+            isEqual = (this.color == ((DataColorRGB) object).color);
         }
 
         return isEqual;
     }
 
     @Override
-    public int compareTo(DataColor o) {
+    public int compareTo(DataColorRGB o) {
         if (this.color < o.getColor()) {
             return -1;
         }
@@ -65,7 +79,7 @@ public class DataColor implements Comparable<DataColor>{
     
     @Override
     public int hashCode() {
-        return this.color;
+        return ((int) Math.round(this.color * 255));
     }
     
 

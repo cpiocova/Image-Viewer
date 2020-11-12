@@ -21,6 +21,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.util.Collections;
+import object.DataColorRGB;
 
 
 /**
@@ -47,25 +48,38 @@ public class HistogramController implements Initializable {
     private int maxRepeat;
     private int minRepeat;
 
-    private int[] histogramNormal;
     private int[] histogramAll;
     private int[] histogramEQ;
     private int[] cdf;
+    
+    private double[] histogramEQRed;
+    private double[] histogramEQGreen;
+    private double[] histogramEQBlue;
+
+    
+    private double[] histogramRed;
+    private double[] histogramBlue;
+    private double[] histogramGreen;
+    
+    private int[] cdfRed;
+    private int[] cdfGreen;
+    private int[] cdfBlue;
+    
 
     private int cdfMin;
+    private int cdfMinRed;
+    private int cdfMinGreen;
+    private int cdfMinBlue;
 
-    //Borrar si no uso ---
-    private int repeatColorDarker;
-    private int repeatColorLighter;
-    private int colorDarker;
-    private int colorLighter;
-    // Borrar si no uso ---
 
     private PixelReader pixelReaderImage;
     private PixelWriter pixelHistogramWriter;
 
     private ArrayList arrayNormalColor;
     private ArrayList arrayAllColor;
+    private ArrayList arrayRedColor;
+    private ArrayList arrayGreenColor;
+    private ArrayList arrayBlueColor;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -82,6 +96,10 @@ public class HistogramController implements Initializable {
         imageHeight = pic.getDimensions().getHeight();
         
         arrayNormalColor = new ArrayList();
+        arrayRedColor = new ArrayList();
+        arrayGreenColor = new ArrayList();
+        arrayBlueColor = new ArrayList();
+        
 
         if (pic.getImageModified() instanceof Image) {
             imagePic = pic.getImageModified();
@@ -130,6 +148,40 @@ public class HistogramController implements Initializable {
             }
         }
 
+    }
+    
+    private void traverseMatrixRGB() {
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                Color color = pixelReaderImage.getColor(x, y);
+                int colorInt = pixelReaderImage.getArgb(x, y);
+                double r = color.getRed();
+                double g = color.getGreen();
+                double b = color.getBlue();
+                                
+                DataColorRGB.checkUniqueColors(r, arrayRedColor);
+                DataColorRGB.checkUniqueColors(g, arrayGreenColor);
+                DataColorRGB.checkUniqueColors(b, arrayBlueColor);
+            }
+        }
+        
+        Collections.sort(arrayRedColor);
+        Collections.sort(arrayGreenColor);
+        Collections.sort(arrayBlueColor);
+        
+        System.out.println("red: " + arrayRedColor.size() + " , green: " + arrayGreenColor.size() + ", blue: " + arrayBlueColor.size() );
+        
+        histogramRed = new double[arrayRedColor.size()];
+        cdfRed = new int[arrayRedColor.size()];
+        histogramEQRed = new double[arrayRedColor.size()];
+        
+        histogramBlue = new double[arrayBlueColor.size()];
+        cdfBlue = new int[arrayBlueColor.size()];
+        histogramEQBlue = new double[arrayBlueColor.size()];
+        
+        histogramGreen = new double[arrayGreenColor.size()];
+        cdfGreen = new int[arrayGreenColor.size()];
+        histogramEQGreen = new double[arrayGreenColor.size()];
     }
 
     private void traverseMatrixNormalColors() {
@@ -232,26 +284,6 @@ public class HistogramController implements Initializable {
         return new int[]{max, min};
     }
 
-    private void findDarker() {
-        for (int i = 0; i < histogramAll.length; i++) {
-            if (histogramAll[i] >= 1) {
-                colorDarker = i;
-                repeatColorDarker = histogramAll[i];
-                break;
-            }
-        }
-    }
-
-    private void findLighter() {
-        for (int i = histogramAll.length - 1; i >= 0; i--) {
-            if (histogramAll[i] >= 1) {
-                colorLighter = i;
-                repeatColorLighter = histogramAll[i];
-                break;
-            }
-        }
-    }
-
 
 
     private Color intToColor(int value) {
@@ -291,7 +323,7 @@ public class HistogramController implements Initializable {
         histogramEQ = new int[arrayAllColor.size()];
     }
     
-    private void findCdfMin() {
+    private void findCdfMinAll() {
         int min = imageWidth * imageHeight;
         for (int i = 0; i < cdf.length; i++) {
             if (cdf[i] < min && cdf[i] > 0) {
@@ -299,6 +331,16 @@ public class HistogramController implements Initializable {
             }
         }
         cdfMin = min;
+    }
+    
+    private int findCdfMin(int[]cdfColor) {
+        int min = imageWidth * imageHeight;
+        for (int i = 0; i < cdfColor.length; i++) {
+            if (cdfColor[i] < min && cdfColor[i] > 0) {
+                min = cdfColor[i];
+            }
+        }
+        return min;
     }
     
     private void fillHistogramAll() {
@@ -313,36 +355,64 @@ public class HistogramController implements Initializable {
         }
     }
     
-        private void generateEQValues() {
-        for (int i = 0; i < cdf.length; i++) {
+    private void fillHistogram(ArrayList arrayColor, double[] histogram, int[] cdfColor ) {
+        int accumulated = 0;
+        for (int i = 0; i < arrayColor.size(); i++) {
+            DataColorRGB data = (DataColorRGB) arrayColor.get(i);
+            histogram[i] = data.getColor();
+
+            accumulated = accumulated + data.getRepetitions();
+            cdfColor[i] = accumulated;
+        }
+    }
+    
+        private void generateEQValues(int[] cdfColor, int cdfMinColor, double[] histogram) {
+        for (int i = 0; i < cdfColor.length; i++) {
             double expression = (
-                    (double) (cdf[i] - cdfMin) 
-                    / (double) (imageWidth * imageHeight - cdfMin));
-//                    *  -16777216);
-            int expression2 = mappingRangeColorInvert(expression);
-            histogramEQ[i] = (int) (expression2);
+                    (double) (cdfColor[i] - cdfMinColor) 
+                    / (double) (imageWidth * imageHeight - cdfMinColor));
+            histogram[i] = expression;
         }
     }
     
 
     @FXML
     private void equalizeHistogram(ActionEvent event) {
-        initMatrixEQ();
-        fillHistogramAll();
-        findCdfMin();
-        generateEQValues();
+        traverseMatrixRGB();
+        fillHistogram(arrayRedColor, histogramRed, cdfRed);
+        fillHistogram(arrayGreenColor, histogramGreen, cdfGreen);
+        fillHistogram(arrayBlueColor, histogramBlue, cdfBlue);
+        cdfMinRed = findCdfMin(cdfRed);
+        cdfMinGreen = findCdfMin(cdfGreen);
+        cdfMinBlue = findCdfMin(cdfBlue);
+        generateEQValues(cdfRed, cdfMinRed, histogramEQRed);
+        generateEQValues(cdfGreen, cdfMinGreen, histogramEQGreen);
+        generateEQValues(cdfBlue, cdfMinBlue, histogramEQBlue);
     
         WritableImage imageStrecth = new WritableImage(imageWidth, imageHeight); 
         PixelWriter writerStrecth = imageStrecth.getPixelWriter();
         
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
-                int color = pixelReaderImage.getArgb(x, y);
-                DataColor data = new DataColor(color);
-                int index = arrayAllColor.indexOf(data);
-                int valueStrecth = histogramEQ[index];
+                int colorInt = pixelReaderImage.getArgb(x, y);
+                Color colorRGB = pixelReaderImage.getColor(x, y);
+                DataColorRGB dataRed = new DataColorRGB(colorRGB.getRed());
+                DataColorRGB dataGreen = new DataColorRGB(colorRGB.getGreen());
+                DataColorRGB dataBlue = new DataColorRGB(colorRGB.getBlue());
+                
+                int indexRed = arrayRedColor.indexOf(dataRed);
+                int indexGreen = arrayGreenColor.indexOf(dataGreen);
+                int indexBlue = arrayBlueColor.indexOf(dataBlue);
+                
+                double r = histogramEQRed[indexRed];
+                double g = histogramEQGreen[indexGreen];
+                double b = histogramEQBlue[indexBlue];
+                
+                Color colorStrecth = new Color(r,g,b,1.0);
+                
+                
 //                writerStrecth.setArgb(x, y, valueStrecth);
-                Color colorStrecth = intToColor(valueStrecth);
+//                Color colorStrecth = intToColor(valueStrecth);
                 writerStrecth.setColor(x, y, colorStrecth);
             }
         }
@@ -351,6 +421,8 @@ public class HistogramController implements Initializable {
         allColors(mainController, picCopy);
 
     }
+    
+
     
     
 
