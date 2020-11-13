@@ -50,6 +50,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import object.Convolution;
+import object.OpenCVUtils;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 
 
@@ -81,21 +85,17 @@ public class MainController implements Initializable {
     
     private int imageWidth;
     private int imageHeight;
-    private int imageWidthOriginal;
-    private int imageHeightOriginal;
     
     private int imageX;
     private int imageY;
+    
+    private boolean isBlackWhite;
 
     private UserActions userActions;
     private int capacityActions;
     
     private Color [][] bufferNetpbm;
-        
-    private int vw;
-    private int vh;
-
-      
+             
     @FXML
     private ImageView imageView;
     
@@ -351,6 +351,34 @@ public class MainController implements Initializable {
     private Button buttonRotateRight;
     @FXML
     private CheckBox includeBorders;
+    @FXML
+    private Button structuringElemButton;
+    @FXML
+    private Button erosionButton;
+    @FXML
+    private Button dilationButton;
+    @FXML
+    private Button apertureButton;
+    @FXML
+    private Button closureButton;
+    @FXML
+    private AnchorPane showColorPick;
+    @FXML
+    private RadioButton regionFixedButton;
+    @FXML
+    private ToggleGroup regionRank;
+    @FXML
+    private RadioButton regionFloatButton;
+    @FXML
+    private RadioButton regionNeighbor4;
+    @FXML
+    private ToggleGroup regionNeighbors;
+    @FXML
+    private RadioButton regionNeighbor8;
+    @FXML
+    private CheckBox colorPickerButton;
+    @FXML
+    private Label colorPickerRGB;
 
 
     @Override
@@ -386,6 +414,38 @@ public class MainController implements Initializable {
         sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
         
+        imageView.setPickOnBounds(true);
+
+        imageView.setOnMouseDragged(e -> {
+            if(image != null && colorPickerButton.isSelected()) {
+                double zoomValue = sliderToZoom.getValue();
+
+                int eX = (int) (e.getX() / zoomValue);
+                int eY = (int) (e.getY() / zoomValue);
+                
+                if(eX < 0) eX = 0;
+                if(eX > imageWidth - 1) eX = imageWidth - 1;
+                if(eY < 0) eY = 0;
+                if(eY > imageHeight - 1) eY = imageHeight - 1;
+                
+                
+                pixelReader = writableImage.getPixelReader();
+                Color pick = pixelReader.getColor(eX, eY);
+                int red = (int) (pick.getRed() * 255);
+                int green = (int) (pick.getGreen() * 255);
+                int blue = (int) (pick.getBlue() * 255);
+                showColorPick.setStyle(
+                        "-fx-background-color: rgba("
+                        + red + ","
+                        + green + "," 
+                        + blue + "," 
+                        +"1.0"
+                        + ");"
+                );
+                colorPickerRGB.setText("rgb(" + red + "," + blue + "," + green + ")");
+            }
+        });
+        
     }
     
     
@@ -394,15 +454,6 @@ public class MainController implements Initializable {
         this.image = image;
     }
     
-    private void setViewport() {
-        if(imageWidth > 500 || imageHeight > 500) {
-            vw = 500;
-            vh = 500;
-        } else {
-        vw = 0;
-        vh = 0;  
-        }
-    }
     
     private void recalculateInfo() {
         if(image != null) {
@@ -420,13 +471,43 @@ public class MainController implements Initializable {
                 addColorsUnique(pixelReader.getArgb(x, y));
             }
         }
-
-        
+        erosionButton.setDisable(false);
+        dilationButton.setDisable(false);
+        apertureButton.setDisable(false);
+        closureButton.setDisable(false);
+//        enableButtonMorph();
+    }
+    
+    private void enableButtonMorph() {
+        if(uniqueColorsList.size() == 2) {
+            if(checkBlackWhite()) {
+                erosionButton.setDisable(false);
+                dilationButton.setDisable(false);
+                apertureButton.setDisable(false);
+                closureButton.setDisable(false);
+            }
+        } else {
+            erosionButton.setDisable(true);
+            dilationButton.setDisable(true);
+            apertureButton.setDisable(true);
+            closureButton.setDisable(true); 
+        }
+    }
+    
+    private boolean checkBlackWhite() {
+        int accumulated = 0;
+        for (int i = 0; i < uniqueColorsList.size(); i++) {
+            int number = (int) uniqueColorsList.get(i);
+            accumulated = accumulated + number;
+        }
+        if(accumulated == -16777217) {
+            return true;
+        }
+        return false;
     }
      
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
-        setViewport();
         configurationImageView();        
         labelLoadMessage.setText("Loaded successfully!");
         recalculateInfo();
@@ -527,7 +608,7 @@ public class MainController implements Initializable {
  
     
     @FXML
-    private void convertToBlackWhite(ActionEvent event) {        
+    private void convertToBlackWhite() {        
         if(image != null) {
             restartBrightness();
             restartContrast();
@@ -1214,6 +1295,14 @@ public class MainController implements Initializable {
         }
     }
     
+    @FXML
+    private void regionsGrowthContext() {
+        if(image != null) {
+            sliderContext();
+            restartRegionsGrowth();
+        }
+    }
+    
     private void rotateNegativeContext() {
         if(image != null) {
             sliderContext();
@@ -1565,6 +1654,11 @@ public class MainController implements Initializable {
         labelArbitraryY.setText("1");    
         sliderToArbitraryX.setValue(1);
         sliderToArbitraryY.setValue(1);     
+    }
+    
+    private void restartRegionsGrowth() {
+        colorPickerRGB.setText("-");
+        showColorPick.setStyle("-fx-background-color: rgba(0,0,0,0.2)");   
     }
  
 
@@ -2513,6 +2607,60 @@ public class MainController implements Initializable {
 
         }
 
+    }
+
+    @FXML
+    private void setStructuringElem() {
+//        Mat element = Imgproc.getStructuringElement(elementType, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
+//            new Point(kernelSize, kernelSize));
+    }
+
+    @FXML
+    private void handleErosion() {
+        Mat dst = new Mat();
+        Mat src = OpenCVUtils.image2Mat(writableImage);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+        
+        Imgproc.erode(src, dst, kernel);
+        
+        writableImage = OpenCVUtils.mat2WritableImage(dst);
+        sliderContext();
+//        convertToBlackWhite();
+    }
+
+    @FXML
+    private void handleDilation() {
+        Mat dst = new Mat();
+        Mat src = OpenCVUtils.image2Mat(writableImage);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+        
+        Imgproc.dilate(src, dst, kernel);
+        
+        writableImage = OpenCVUtils.mat2WritableImage(dst);
+        sliderContext();
+//        convertToBlackWhite();
+    }
+
+    @FXML
+    private void handleAperture() {
+        handleErosion();
+        handleDilation();
+    }
+
+    @FXML
+    private void handleClosure() {
+        handleDilation();        
+        handleErosion();
+    }
+
+    @FXML
+    private void handleKMeans(ActionEvent event) {
+
+        Mat src = OpenCVUtils.image2Mat(writableImage);
+        Mat dst = OpenCVUtils.kmeans(src, 4); 
+        
+        writableImage = OpenCVUtils.mat2WritableImage(dst);
+        sliderContext();
     }
 
 

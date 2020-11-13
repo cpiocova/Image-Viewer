@@ -169,7 +169,6 @@ public class HistogramController implements Initializable {
         Collections.sort(arrayGreenColor);
         Collections.sort(arrayBlueColor);
         
-        System.out.println("red: " + arrayRedColor.size() + " , green: " + arrayGreenColor.size() + ", blue: " + arrayBlueColor.size() );
         
         histogramRed = new double[arrayRedColor.size()];
         cdfRed = new int[arrayRedColor.size()];

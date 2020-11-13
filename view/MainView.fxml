@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
@@ -9,12 +10,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="827.0" prefWidth="657.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+<AnchorPane id="AnchorPane" prefHeight="863.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
     <children>
-        <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="33.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="170.0" text="Load File" />
-      <Accordion layoutX="14.0" layoutY="58.0" prefHeight="136.0" prefWidth="170.0">
-         <panes>
-          <TitledPane animated="false" expanded="false" prefHeight="111.0" prefWidth="143.0" text="Save File">
+        <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="33.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="174.0" text="Load File" />
+      <Button defaultButton="true" layoutX="344.0" layoutY="33.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
+      <Label fx:id="labelLoadMessage" layoutX="370.0" layoutY="480.0" prefHeight="25.0" prefWidth="125.0" textFill="#05adf0cc" />
+      <Button fx:id="btnDefault" layoutX="350.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
+      <Accordion layoutX="14.0" layoutY="58.0" prefHeight="721.0" prefWidth="174.0">
+        <panes>
+          <TitledPane animated="false" expanded="false" prefHeight="108.0" prefWidth="174.0" text="Save File">
                <content>
                   <AnchorPane prefHeight="85.0" prefWidth="135.0">
                      <children>
@@ -29,13 +33,6 @@
                   </AnchorPane>
                </content>
             </TitledPane>
-         </panes>
-      </Accordion>
-      <Button defaultButton="true" layoutX="344.0" layoutY="33.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
-      <Label fx:id="labelLoadMessage" layoutX="370.0" layoutY="480.0" prefHeight="25.0" prefWidth="125.0" textFill="#05adf0cc" />
-      <Button fx:id="btnDefault" layoutX="350.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
-      <Accordion layoutX="14.0" layoutY="193.0" prefHeight="621.0" prefWidth="170.0">
-        <panes>
             <TitledPane animated="false" prefHeight="134.0" prefWidth="172.0" text="Negative">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="69.0">
@@ -268,6 +265,71 @@
                         <Label fx:id="labelArbitraryX" layoutX="115.0" layoutY="38.0" text="1" />
                         <Label fx:id="labelArbitraryY" layoutX="115.0" layoutY="84.0" text="1" />
                         <CheckBox fx:id="includeBorders" layoutX="21.0" layoutY="158.0" mnemonicParsing="false" text="Include borders" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Mathematical Morphology">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <Button fx:id="structuringElemButton" disable="true" layoutX="24.0" layoutY="178.0" mnemonicParsing="false" onAction="#setStructuringElem" prefHeight="25.0" prefWidth="125.0" text="Set structuring elem" />
+                        <Button fx:id="erosionButton" disable="true" layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleErosion" text="Apply erosion" />
+                        <Button fx:id="dilationButton" disable="true" layoutX="24.0" layoutY="59.0" mnemonicParsing="false" onAction="#handleDilation" text="Apply dilation" />
+                        <Button fx:id="apertureButton" disable="true" layoutX="24.0" layoutY="94.0" mnemonicParsing="false" onAction="#handleAperture" text="Apply opening" />
+                        <Button fx:id="closureButton" disable="true" layoutX="24.0" layoutY="129.0" mnemonicParsing="false" onAction="#handleClosure" text="Apply closing" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Regions Growth">
+               <content>
+                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                     <children>
+                        <CheckBox fx:id="colorPickerButton" layoutX="34.0" layoutY="14.0" mnemonicParsing="false" text="Color Picker" />
+                        <AnchorPane fx:id="showColorPick" layoutX="53.0" layoutY="34.0" prefHeight="44.0" prefWidth="46.0" style="-fx-background-color: rgba(0,0,0,0.2);" />
+                        <Label layoutX="45.0" layoutY="78.0" prefHeight="17.0" prefWidth="73.0" text="Color Selected:">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <RadioButton fx:id="regionFixedButton" layoutX="10.0" layoutY="131.0" mnemonicParsing="false" selected="true" text="Fixed">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="regionRank" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="regionFloatButton" layoutX="10.0" layoutY="149.0" mnemonicParsing="false" text="Float" toggleGroup="$regionRank" />
+                        <RadioButton fx:id="regionNeighbor4" layoutX="100.0" layoutY="131.0" mnemonicParsing="false" selected="true" text="4">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="regionNeighbors" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="regionNeighbor8" layoutX="100.0" layoutY="149.0" mnemonicParsing="false" text="8" toggleGroup="$regionNeighbors" />
+                        <Button layoutX="54.0" layoutY="180.0" mnemonicParsing="false" onAction="#regionsGrowthContext" text="Apply" />
+                        <Label layoutX="20.0" layoutY="113.0" text="Rank:">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="80.0" layoutY="113.0" text="Neighborhood:">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="colorPickerRGB" layoutX="46.0" layoutY="94.0" text="-">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" prefHeight="0.0" prefWidth="126.0" text="K-means">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="133.0">
+                     <children>
+                        <Button layoutX="60.0" layoutY="62.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
                      </children>
                   </AnchorPane>
                </content>
