@@ -129,7 +129,7 @@ public class OpenCVUtils {
 
         Mat labels = new Mat();
 
-        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 100, 0.5);
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 200, 0.05);
 
         Mat centers = new Mat();
 

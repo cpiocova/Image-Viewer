@@ -2690,7 +2690,7 @@ public class MainController implements Initializable {
             String k = inputKMeans.getText();
             int kNumber = Integer.parseInt(k);
 
-            if(k != null && !k.isEmpty() && isNumeric(k) && kNumber >= 1) {
+            if(k != null && !k.isEmpty() && isNumeric(k) && kNumber >= 1 && kNumber <= uniqueColorsList.size() ) {
                 Mat src = OpenCVUtils.image2Mat(writableImage);
                 Mat dst = OpenCVUtils.kmeans(src, kNumber); 
                 writableImage = OpenCVUtils.mat2WritableImage(dst);
