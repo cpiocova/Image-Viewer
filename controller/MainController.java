@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package controller;
+import static controller.ArbitraryKernelViewController.isNumeric;
 import java.awt.image.BufferedImage;
 import object.BlankPic;
 import object.ImageSize;
@@ -42,6 +43,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
@@ -233,6 +235,48 @@ public class MainController implements Initializable {
     @FXML
     private Label labelArbitraryY;
     
+        @FXML
+    private ToggleGroup saveMethod;
+    @FXML
+    private AnchorPane imageWrapper;
+    @FXML
+    private Button buttonRotateLeft;
+    @FXML
+    private Button buttonRotateRight;
+    @FXML
+    private CheckBox includeBorders;
+    @FXML
+    private Button structuringElemButton;
+    @FXML
+    private Button erosionButton;
+    @FXML
+    private Button dilationButton;
+    @FXML
+    private Button apertureButton;
+    @FXML
+    private Button closureButton;
+    @FXML
+    private AnchorPane showColorPick;
+    @FXML
+    private RadioButton regionFixedButton;
+    @FXML
+    private ToggleGroup regionRank;
+    @FXML
+    private RadioButton regionFloatButton;
+    @FXML
+    private RadioButton regionNeighbor4;
+    @FXML
+    private ToggleGroup regionNeighbors;
+    @FXML
+    private RadioButton regionNeighbor8;
+    @FXML
+    private CheckBox colorPickerButton;
+    @FXML
+    private Label colorPickerRGB;
+    private Slider sliderToKMeans;
+    private Label labelKMeans;
+
+    
    
     
     final ChangeListener<Number> sliderGaussianX = (obs, old, val) -> {
@@ -342,43 +386,10 @@ public class MainController implements Initializable {
         labelArbitraryY.setText(Integer.toString(roundedValue));
     };
     @FXML
-    private ToggleGroup saveMethod;
-    @FXML
-    private AnchorPane imageWrapper;
-    @FXML
-    private Button buttonRotateLeft;
-    @FXML
-    private Button buttonRotateRight;
-    @FXML
-    private CheckBox includeBorders;
-    @FXML
-    private Button structuringElemButton;
-    @FXML
-    private Button erosionButton;
-    @FXML
-    private Button dilationButton;
-    @FXML
-    private Button apertureButton;
-    @FXML
-    private Button closureButton;
-    @FXML
-    private AnchorPane showColorPick;
-    @FXML
-    private RadioButton regionFixedButton;
-    @FXML
-    private ToggleGroup regionRank;
-    @FXML
-    private RadioButton regionFloatButton;
-    @FXML
-    private RadioButton regionNeighbor4;
-    @FXML
-    private ToggleGroup regionNeighbors;
-    @FXML
-    private RadioButton regionNeighbor8;
-    @FXML
-    private CheckBox colorPickerButton;
-    @FXML
-    private Label colorPickerRGB;
+    private TextField inputKMeans;
+    
+    
+    
 
 
     @Override
@@ -413,6 +424,7 @@ public class MainController implements Initializable {
         
         sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
+        
         
         imageView.setPickOnBounds(true);
 
@@ -1530,6 +1542,18 @@ public class MainController implements Initializable {
             userActions.addStep(step);                      
         }
     }   
+    
+    
+    private void kMeansContext(ActionEvent event) {
+        if(image != null) {
+            sliderContext();
+            restartKMeans();
+
+            WritableImage changeImage = imageWriter();
+            Stack step = new Stack(changeImage, "filterArbitrary");
+            userActions.addStep(step);                      
+        }
+    }
 
     @FXML
     private void convertToDefault(ActionEvent event) {
@@ -1659,6 +1683,10 @@ public class MainController implements Initializable {
     private void restartRegionsGrowth() {
         colorPickerRGB.setText("-");
         showColorPick.setStyle("-fx-background-color: rgba(0,0,0,0.2)");   
+    }
+    private void restartKMeans() {
+//        labelKMeans.setText("1");
+//        sliderToKMeans.setValue(1);   
     }
  
 
@@ -1930,7 +1958,7 @@ public class MainController implements Initializable {
                 restartSobel();
                 restartPrewitt();
                 restartRoberts();
-                Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+               Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
                pixelWriter = writableImage.getPixelWriter();              
                for (int y = 0; y < imageHeight; y++) {
                    for (int x = 0; x < imageWidth; x++) {
@@ -2653,14 +2681,22 @@ public class MainController implements Initializable {
         handleErosion();
     }
 
-    @FXML
-    private void handleKMeans(ActionEvent event) {
 
-        Mat src = OpenCVUtils.image2Mat(writableImage);
-        Mat dst = OpenCVUtils.kmeans(src, 4); 
-        
-        writableImage = OpenCVUtils.mat2WritableImage(dst);
-        sliderContext();
+
+
+    @FXML
+    private void handleKMeans() {
+        if(image != null) {
+            String k = inputKMeans.getText();
+            int kNumber = Integer.parseInt(k);
+
+            if(k != null && !k.isEmpty() && isNumeric(k) && kNumber >= 1) {
+                Mat src = OpenCVUtils.image2Mat(writableImage);
+                Mat dst = OpenCVUtils.kmeans(src, kNumber); 
+                writableImage = OpenCVUtils.mat2WritableImage(dst);
+                sliderContext();    
+            }
+        }
     }
 
 

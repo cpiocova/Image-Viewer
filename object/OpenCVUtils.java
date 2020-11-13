@@ -115,11 +115,13 @@ public class OpenCVUtils {
      } 
     
     
-    public static Mat kmeans(Mat cutout, int k) {
+    public static Mat kmeans(Mat entry, int k) {
         
-        int n = cutout.cols() * cutout.rows();
+        Imgproc.cvtColor(entry, entry, Imgproc.COLOR_BGRA2BGR);
+        
+        int n = entry.cols() * entry.rows();
 
-        Mat samples = cutout.reshape(1, n);
+        Mat samples = entry.reshape(1, n);
 
         Mat samples32f = new Mat();
 
@@ -134,18 +136,18 @@ public class OpenCVUtils {
         Core.kmeans(samples32f, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
         
         centers.convertTo(centers, CvType.CV_8UC1, 255.0);
-        centers.reshape(4);
+        centers.reshape(3);
 
 
 
-//        Mat dst = cutout.clone();
-        Mat dst = new Mat();
+        Mat dst = entry.clone();
+//        Mat dst = new Mat();
 
         int rows = 0;
 
-        for(int y = 0; y < cutout.rows(); y++) {
+        for(int y = 0; y < entry.rows(); y++) {
 
-            for(int x = 0; x < cutout.cols(); x++) {
+            for(int x = 0; x < entry.cols(); x++) {
 
                 int label = (int)labels.get(rows,0)[0];
 
