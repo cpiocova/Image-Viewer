@@ -13,21 +13,21 @@ import javafx.scene.paint.Color;
  *
  * @author Jose Pio
  */
-public class Point {
+public class PointXY {
     private int posX;
     private int posY;
     private int indexRow;
     private int indexColumn;
     
 // El indice es para ver a cual posicion xy pertenece a la matriz de convolucion, para saber por cual coeficiente hay que multiplicarlo
-   public Point(int posX, int posY, int indexRow, int indexColumn) {
+   public PointXY(int posX, int posY, int indexRow, int indexColumn) {
        this.posX = posX;
        this.posY = posY;
        this.indexRow = indexRow;
        this.indexColumn = indexColumn;       
    }
 
-    Point() {
+    PointXY() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

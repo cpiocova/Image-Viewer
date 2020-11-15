@@ -10,334 +10,363 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="863.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+<AnchorPane id="AnchorPane" prefHeight="960.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
     <children>
-        <Button fx:id="btnLoadImage" layoutX="14.0" layoutY="33.0" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="174.0" text="Load File" />
-      <Button defaultButton="true" layoutX="344.0" layoutY="33.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <ScrollPane pannable="true" prefHeight="936.0" prefWidth="230.0">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="787.0" prefWidth="200.0">
+                     <children>
+                          <Button fx:id="btnLoadImage" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="174.0" text="Load File" />
+                        <Accordion layoutY="25.0" prefHeight="821.0" prefWidth="174.0">
+                          <panes>
+                            <TitledPane animated="false" expanded="false" prefHeight="108.0" prefWidth="174.0" text="Save File">
+                                 <content>
+                                    <AnchorPane prefHeight="85.0" prefWidth="135.0">
+                                       <children>
+                                          <RadioButton layoutX="14.0" layoutY="11.0" mnemonicParsing="false" selected="true" text="Bmp">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="saveMethod" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Netpbm" toggleGroup="$saveMethod" />
+                                          <Button layoutX="59.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleSaveMethod" text="Save" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="134.0" prefWidth="172.0" text="Negative">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="69.0">
+                                       <children>
+                                          <Button fx:id="buttonToNegative" layoutX="60.0" layoutY="62.0" mnemonicParsing="false" onAction="#convertToNegative" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="0.0" prefWidth="126.0" text="Black &amp; white">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="133.0">
+                                       <children>
+                                          <Button fx:id="buttonToBlackWhite" layoutX="60.0" layoutY="62.0" mnemonicParsing="false" onAction="#convertToBlackWhite" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                            <TitledPane fx:id="labelGrayscale" animated="false" prefHeight="134.0" prefWidth="207.0" text="Grayscale: 0%">
+                                 <content>
+                                    <AnchorPane prefHeight="108.0" prefWidth="113.0">
+                                       <children>
+                                          <Slider fx:id="sliderToGrayscale" blockIncrement="0.1" layoutX="13.0" layoutY="48.0" max="1.0" onMouseDragged="#handleGrayscale" onMouseReleased="#handleGrayscale" onTouchReleased="#sliderContext" prefHeight="14.0" prefWidth="123.0" />
+                                          <Button layoutX="51.0" layoutY="75.0" mnemonicParsing="false" onAction="#grayscaleContext" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                            <TitledPane fx:id="labelBrightness" animated="false" prefHeight="134.0" prefWidth="184.0" text="Brightness: 0%">
+                                 <content>
+                                    <AnchorPane prefHeight="15.0" prefWidth="0.0">
+                                       <children>
+                                          <Slider fx:id="sliderToBrightness" blockIncrement="0.001" layoutX="13.0" layoutY="47.0" max="1.0" min="-1.0" onMouseDragged="#handleBrightness" onMouseReleased="#handleBrightness" prefHeight="14.0" prefWidth="123.0" />
+                                          <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#brightnessContext" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane fx:id="labelContrast" animated="false" layoutX="10.0" layoutY="85.0" prefHeight="134.0" prefWidth="162.0" text="Contrast: 0%">
+                                 <content>
+                                    <AnchorPane prefHeight="108.0" prefWidth="107.0">
+                                       <children>
+                                          <Slider fx:id="sliderToContrast" blockIncrement="0.001" layoutX="13.0" layoutY="47.0" max="1.0" min="-1.0" onMouseDragged="#handleContrast" onMouseReleased="#handleContrast" prefHeight="14.0" prefWidth="123.0" />
+                                          <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#contrastContext" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane fx:id="labelThresholding" animated="false" prefHeight="134.0" prefWidth="162.0" text="Thresholding: 127">
+                                 <content>
+                                    <AnchorPane prefHeight="108.0" prefWidth="107.0">
+                                       <children>
+                                          <Slider fx:id="sliderToThresholding" blockIncrement="0.004" layoutX="13.0" layoutY="47.0" max="1.0" onMouseDragged="#handleThresholding" onMouseReleased="#handleThresholding" prefHeight="14.0" prefWidth="123.0" value="0.5" />
+                                          <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#thresholdingContext" text="Apply" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Rotation 90°">
+                                 <content>
+                                    <AnchorPane prefHeight="84.0" prefWidth="125.0">
+                                       <children>
+                                          <Button fx:id="buttonRotateLeft" layoutX="30.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotateNegative" text="&lt;" />
+                                          <Button fx:id="buttonRotateRight" layoutX="103.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotatePositive" text="&gt;" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Average Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterAverageContext" text="Apply" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToAverageX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleAverage" onMouseReleased="#handleAverage" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Slider fx:id="sliderToAverageY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleAverage" onMouseReleased="#handleAverage" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelAverageX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelAverageY" layoutX="115.0" layoutY="84.0" text="1" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Median Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterMedianContext" text="Apply" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToMedianX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedian" onMouseReleased="#handleMedian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Slider fx:id="sliderToMedianY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedian" onMouseReleased="#handleMedian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelMedianX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelMedianY" layoutX="115.0" layoutY="84.0" text="1" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Gaussian Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterGaussianContext" text="Apply" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToGaussianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelGaussianX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelGaussianY" layoutX="115.0" layoutY="84.0" text="1" />
+                                          <Slider fx:id="sliderToGaussianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Laplacian Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterLaplacianContext" text="Apply" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToLaplacianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelLaplacianX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelLaplacianY" layoutX="115.0" layoutY="84.0" text="1" />
+                                          <Slider fx:id="sliderToLaplacianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="LoG Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterLoGContext" text="Apply" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToLoGY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLoG" onMouseReleased="#handleLoG" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelLoGX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelLoGY" layoutX="115.0" layoutY="84.0" text="1" />
+                                          <Slider fx:id="sliderToLoGX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLoG" onMouseReleased="#handleLoG" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Sobel Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="26.0" layoutY="118.0" text="X" />
+                                          <Button layoutX="57.0" layoutY="205.0" mnemonicParsing="false" onAction="#filterSobelContext" text="Apply" />
+                                          <Label layoutX="26.0" layoutY="166.0" text="Y" />
+                                          <Slider fx:id="sliderToSobelY" blockIncrement="2.0" layoutX="47.0" layoutY="167.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelSobelX" layoutX="125.0" layoutY="118.0" text="1" />
+                                          <Label fx:id="labelSobelY" layoutX="125.0" layoutY="164.0" text="1" />
+                                          <Slider fx:id="sliderToSobelX" blockIncrement="2.0" layoutX="47.0" layoutY="117.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <RadioButton layoutX="26.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleSobel" selected="true" text="Derivate in X">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="sobelDerivate" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton layoutX="26.0" layoutY="63.0" mnemonicParsing="false" onAction="#handleSobel" text="Derivate in Y" toggleGroup="$sobelDerivate" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Prewitt Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="26.0" layoutY="108.0" text="X" />
+                                          <Button layoutX="57.0" layoutY="195.0" mnemonicParsing="false" onAction="#filterPrewittContext" text="Apply" />
+                                          <Label layoutX="26.0" layoutY="156.0" text="Y" />
+                                          <Slider fx:id="sliderToPrewittY" blockIncrement="2.0" layoutX="47.0" layoutY="157.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelPrewittX" layoutX="125.0" layoutY="108.0" text="1" />
+                                          <Label fx:id="labelPrewittY" layoutX="125.0" layoutY="154.0" text="1" />
+                                          <Slider fx:id="sliderToPrewittX" blockIncrement="2.0" layoutX="47.0" layoutY="107.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <RadioButton layoutX="30.0" layoutY="27.0" mnemonicParsing="false" onAction="#handlePrewitt" selected="true" text="Derivate in X">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="prewittDerivate" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton layoutX="30.0" layoutY="57.0" mnemonicParsing="false" onAction="#handlePrewitt" text="Derivate in Y" toggleGroup="$prewittDerivate" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Roberts Filter">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="19.0" layoutY="118.0" text="Dim" />
+                                          <Button layoutX="57.0" layoutY="175.0" mnemonicParsing="false" onAction="#filterRobertsContext" text="Apply" />
+                                          <Label fx:id="labelRoberts" layoutX="129.0" layoutY="118.0" text="1" />
+                                          <Slider fx:id="sliderToRoberts" blockIncrement="1.0" layoutX="47.0" layoutY="117.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleRoberts" onMouseReleased="#handleRoberts" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <RadioButton layoutX="19.0" layoutY="31.0" mnemonicParsing="false" onAction="#handleRoberts" selected="true" text="Derivate in X">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="robertsDerivate" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton layoutX="19.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRoberts" text="Derivate in Y" toggleGroup="$robertsDerivate" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="232.0" prefWidth="170.0" text="Zoom">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Slider fx:id="sliderToZoom" blockIncrement="0.1" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="20.0" min="0.1" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="125.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelZoom" layoutX="66.0" layoutY="89.0" text="1.0x" />
+                                          <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="zoomMethod" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton fx:id="zoomInterpolation" layoutX="17.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleZoom" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
+                                          <CheckBox fx:id="overflowZoom" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Overflow" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Arbitrary Kernel">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="38.0" text="X" />
+                                          <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#setAribitraryKernel" prefHeight="25.0" prefWidth="52.0" text="Set" />
+                                          <Label layoutX="16.0" layoutY="86.0" text="Y" />
+                                          <Slider fx:id="sliderToArbitraryX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Slider fx:id="sliderToArbitraryY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelArbitraryX" layoutX="115.0" layoutY="38.0" text="1" />
+                                          <Label fx:id="labelArbitraryY" layoutX="115.0" layoutY="84.0" text="1" />
+                                          <CheckBox fx:id="includeBorders" layoutX="21.0" layoutY="158.0" mnemonicParsing="false" text="Include borders" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Mathematical Morphology">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Button fx:id="structuringElemButton" layoutX="24.0" layoutY="178.0" mnemonicParsing="false" onAction="#setStructuringElem" prefHeight="25.0" prefWidth="125.0" text="Set structuring elem" />
+                                          <Button fx:id="erosionButton" layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleErosion" text="Apply erosion" />
+                                          <Button fx:id="dilationButton" layoutX="24.0" layoutY="59.0" mnemonicParsing="false" onAction="#handleDilation" text="Apply dilation" />
+                                          <Button fx:id="apertureButton" layoutX="24.0" layoutY="94.0" mnemonicParsing="false" onAction="#handleAperture" text="Apply opening" />
+                                          <Button fx:id="closureButton" layoutX="24.0" layoutY="129.0" mnemonicParsing="false" onAction="#handleClosure" text="Apply closing" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Regions Growth">
+                                 <content>
+                                    <AnchorPane prefHeight="257.0" prefWidth="172.0">
+                                       <children>
+                                          <CheckBox fx:id="colorPickerButton" layoutX="34.0" layoutY="11.0" mnemonicParsing="false" text="Color Picker" />
+                                          <AnchorPane fx:id="showColorPick" layoutX="53.0" layoutY="31.0" prefHeight="44.0" prefWidth="46.0" style="-fx-background-color: rgba(0,0,0,0.2);" />
+                                          <Label layoutX="45.0" layoutY="72.0" prefHeight="17.0" prefWidth="73.0" text="Color Selected:">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <RadioButton fx:id="regionFixedButton" layoutX="10.0" layoutY="122.0" mnemonicParsing="false" onAction="#handleGrowth" selected="true" text="Fixed">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="regionRank" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton fx:id="regionFloatButton" layoutX="10.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleGrowth" text="Float" toggleGroup="$regionRank" />
+                                          <RadioButton fx:id="regionNeighbor4" layoutX="100.0" layoutY="122.0" mnemonicParsing="false" onAction="#handleGrowth" selected="true" text="4">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="regionNeighbors" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton fx:id="regionNeighbor8" layoutX="100.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleGrowth" text="8" toggleGroup="$regionNeighbors" />
+                                          <Button layoutX="54.0" layoutY="230.0" mnemonicParsing="false" onAction="#growthContext" text="Apply" />
+                                          <Label layoutX="20.0" layoutY="104.0" text="Rank:">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="80.0" layoutY="104.0" text="Neighborhood:">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="colorPickerRGB" layoutX="46.0" layoutY="88.0" text="-">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Slider fx:id="sliderToTolerance" blockIncrement="1.0" layoutX="30.0" layoutY="184.0" majorTickUnit="1.0" max="20.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGrowth" onMouseReleased="#handleGrowth" prefHeight="14.0" prefWidth="100.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label layoutX="58.0" layoutY="168.0" text="Tolerance">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="K-means">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="31.0" layoutY="68.0" text="K:" />
+                                          <Button layoutX="48.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
+                                          <TextField fx:id="inputKMeans" layoutX="53.0" layoutY="64.0" prefHeight="25.0" prefWidth="38.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Thresholding Methods">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleThresholdOtsu" text="Apply Otsu" />
+                                          <Button layoutX="24.0" layoutY="89.0" mnemonicParsing="false" onAction="#handleThresholdKmeans" text="Apply K-means" />
+                                          <Button layoutX="24.0" layoutY="139.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Quantize Threshold" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
+      <Button defaultButton="true" layoutX="348.0" layoutY="3.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
       <Label fx:id="labelLoadMessage" layoutX="370.0" layoutY="480.0" prefHeight="25.0" prefWidth="125.0" textFill="#05adf0cc" />
       <Button fx:id="btnDefault" layoutX="350.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
-      <Accordion layoutX="14.0" layoutY="58.0" prefHeight="721.0" prefWidth="174.0">
-        <panes>
-          <TitledPane animated="false" expanded="false" prefHeight="108.0" prefWidth="174.0" text="Save File">
-               <content>
-                  <AnchorPane prefHeight="85.0" prefWidth="135.0">
-                     <children>
-                        <RadioButton layoutX="14.0" layoutY="11.0" mnemonicParsing="false" selected="true" text="Bmp">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="saveMethod" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Netpbm" toggleGroup="$saveMethod" />
-                        <Button layoutX="59.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleSaveMethod" text="Save" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="134.0" prefWidth="172.0" text="Negative">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="69.0">
-                     <children>
-                        <Button fx:id="buttonToNegative" layoutX="60.0" layoutY="62.0" mnemonicParsing="false" onAction="#convertToNegative" text="Apply" />
-                     </children>
-                  </AnchorPane>
-              </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="0.0" prefWidth="126.0" text="Black &amp; white">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="133.0">
-                     <children>
-                        <Button fx:id="buttonToBlackWhite" layoutX="60.0" layoutY="62.0" mnemonicParsing="false" onAction="#convertToBlackWhite" text="Apply" />
-                     </children>
-                  </AnchorPane>
-              </content>
-            </TitledPane>
-          <TitledPane fx:id="labelGrayscale" animated="false" prefHeight="134.0" prefWidth="207.0" text="Grayscale: 0%">
-               <content>
-                  <AnchorPane prefHeight="108.0" prefWidth="113.0">
-                     <children>
-                        <Slider fx:id="sliderToGrayscale" blockIncrement="0.1" layoutX="13.0" layoutY="48.0" max="1.0" onMouseDragged="#handleGrayscale" onMouseReleased="#handleGrayscale" onTouchReleased="#sliderContext" prefHeight="14.0" prefWidth="123.0" />
-                        <Button layoutX="51.0" layoutY="75.0" mnemonicParsing="false" onAction="#grayscaleContext" text="Apply" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-          <TitledPane fx:id="labelBrightness" animated="false" prefHeight="134.0" prefWidth="184.0" text="Brightness: 0%">
-               <content>
-                  <AnchorPane prefHeight="15.0" prefWidth="0.0">
-                     <children>
-                        <Slider fx:id="sliderToBrightness" blockIncrement="0.001" layoutX="13.0" layoutY="47.0" max="1.0" min="-1.0" onMouseDragged="#handleBrightness" onMouseReleased="#handleBrightness" prefHeight="14.0" prefWidth="123.0" />
-                        <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#brightnessContext" text="Apply" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane fx:id="labelContrast" animated="false" layoutX="10.0" layoutY="85.0" prefHeight="134.0" prefWidth="162.0" text="Contrast: 0%">
-               <content>
-                  <AnchorPane prefHeight="108.0" prefWidth="107.0">
-                     <children>
-                        <Slider fx:id="sliderToContrast" blockIncrement="0.001" layoutX="13.0" layoutY="47.0" max="1.0" min="-1.0" onMouseDragged="#handleContrast" onMouseReleased="#handleContrast" prefHeight="14.0" prefWidth="123.0" />
-                        <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#contrastContext" text="Apply" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane fx:id="labelThresholding" animated="false" prefHeight="134.0" prefWidth="162.0" text="Thresholding: 127">
-               <content>
-                  <AnchorPane prefHeight="108.0" prefWidth="107.0">
-                     <children>
-                        <Slider fx:id="sliderToThresholding" blockIncrement="0.004" layoutX="13.0" layoutY="47.0" max="1.0" onMouseDragged="#handleThresholding" onMouseReleased="#handleThresholding" prefHeight="14.0" prefWidth="123.0" value="0.5" />
-                        <Button layoutX="49.0" layoutY="74.0" mnemonicParsing="false" onAction="#thresholdingContext" text="Apply" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Rotation 90°">
-               <content>
-                  <AnchorPane prefHeight="84.0" prefWidth="125.0">
-                     <children>
-                        <Button fx:id="buttonRotateLeft" layoutX="30.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotateNegative" text="&lt;" />
-                        <Button fx:id="buttonRotateRight" layoutX="103.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRotatePositive" text="&gt;" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Average Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterAverageContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToAverageX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleAverage" onMouseReleased="#handleAverage" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Slider fx:id="sliderToAverageY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleAverage" onMouseReleased="#handleAverage" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelAverageX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelAverageY" layoutX="115.0" layoutY="84.0" text="1" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Median Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterMedianContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToMedianX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedian" onMouseReleased="#handleMedian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Slider fx:id="sliderToMedianY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedian" onMouseReleased="#handleMedian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelMedianX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelMedianY" layoutX="115.0" layoutY="84.0" text="1" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Gaussian Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterGaussianContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToGaussianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelGaussianX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelGaussianY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToGaussianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGaussian" onMouseReleased="#handleGaussian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Laplacian Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterLaplacianContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToLaplacianY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelLaplacianX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelLaplacianY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToLaplacianX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLaplacian" onMouseReleased="#handleLaplacian" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="LoG Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#filterLoGContext" text="Apply" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToLoGY" blockIncrement="2.0" layoutX="37.0" layoutY="87.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLoG" onMouseReleased="#handleLoG" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelLoGX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelLoGY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <Slider fx:id="sliderToLoGX" blockIncrement="2.0" layoutX="37.0" layoutY="37.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleLoG" onMouseReleased="#handleLoG" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Sobel Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="26.0" layoutY="118.0" text="X" />
-                        <Button layoutX="57.0" layoutY="205.0" mnemonicParsing="false" onAction="#filterSobelContext" text="Apply" />
-                        <Label layoutX="26.0" layoutY="166.0" text="Y" />
-                        <Slider fx:id="sliderToSobelY" blockIncrement="2.0" layoutX="47.0" layoutY="167.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelSobelX" layoutX="125.0" layoutY="118.0" text="1" />
-                        <Label fx:id="labelSobelY" layoutX="125.0" layoutY="164.0" text="1" />
-                        <Slider fx:id="sliderToSobelX" blockIncrement="2.0" layoutX="47.0" layoutY="117.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleSobel" onMouseReleased="#handleSobel" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <RadioButton layoutX="26.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleSobel" selected="true" text="Derivate in X">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="sobelDerivate" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton layoutX="26.0" layoutY="63.0" mnemonicParsing="false" onAction="#handleSobel" text="Derivate in Y" toggleGroup="$sobelDerivate" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Prewitt Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="26.0" layoutY="108.0" text="X" />
-                        <Button layoutX="57.0" layoutY="195.0" mnemonicParsing="false" onAction="#filterPrewittContext" text="Apply" />
-                        <Label layoutX="26.0" layoutY="156.0" text="Y" />
-                        <Slider fx:id="sliderToPrewittY" blockIncrement="2.0" layoutX="47.0" layoutY="157.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelPrewittX" layoutX="125.0" layoutY="108.0" text="1" />
-                        <Label fx:id="labelPrewittY" layoutX="125.0" layoutY="154.0" text="1" />
-                        <Slider fx:id="sliderToPrewittX" blockIncrement="2.0" layoutX="47.0" layoutY="107.0" majorTickUnit="2.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handlePrewitt" onMouseReleased="#handlePrewitt" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <RadioButton layoutX="30.0" layoutY="27.0" mnemonicParsing="false" onAction="#handlePrewitt" selected="true" text="Derivate in X">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="prewittDerivate" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton layoutX="30.0" layoutY="57.0" mnemonicParsing="false" onAction="#handlePrewitt" text="Derivate in Y" toggleGroup="$prewittDerivate" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Roberts Filter">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="19.0" layoutY="118.0" text="Dim" />
-                        <Button layoutX="57.0" layoutY="175.0" mnemonicParsing="false" onAction="#filterRobertsContext" text="Apply" />
-                        <Label fx:id="labelRoberts" layoutX="129.0" layoutY="118.0" text="1" />
-                        <Slider fx:id="sliderToRoberts" blockIncrement="1.0" layoutX="47.0" layoutY="117.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleRoberts" onMouseReleased="#handleRoberts" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <RadioButton layoutX="19.0" layoutY="31.0" mnemonicParsing="false" onAction="#handleRoberts" selected="true" text="Derivate in X">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="robertsDerivate" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton layoutX="19.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleRoberts" text="Derivate in Y" toggleGroup="$robertsDerivate" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="232.0" prefWidth="170.0" text="Zoom">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Slider fx:id="sliderToZoom" blockIncrement="0.1" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="20.0" min="0.1" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="125.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelZoom" layoutX="66.0" layoutY="89.0" text="1.0x" />
-                        <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="zoomMethod" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="zoomInterpolation" layoutX="17.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleZoom" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
-                        <CheckBox fx:id="overflowZoom" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Overflow" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Arbitrary Kernel">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="16.0" layoutY="38.0" text="X" />
-                        <Button layoutX="47.0" layoutY="125.0" mnemonicParsing="false" onAction="#setAribitraryKernel" prefHeight="25.0" prefWidth="52.0" text="Set" />
-                        <Label layoutX="16.0" layoutY="86.0" text="Y" />
-                        <Slider fx:id="sliderToArbitraryX" blockIncrement="1.0" layoutX="36.0" layoutY="40.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Slider fx:id="sliderToArbitraryY" blockIncrement="1.0" layoutX="37.0" layoutY="87.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleArbitrary" onMouseReleased="#handleArbitrary" prefHeight="14.0" prefWidth="68.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                        <Label fx:id="labelArbitraryX" layoutX="115.0" layoutY="38.0" text="1" />
-                        <Label fx:id="labelArbitraryY" layoutX="115.0" layoutY="84.0" text="1" />
-                        <CheckBox fx:id="includeBorders" layoutX="21.0" layoutY="158.0" mnemonicParsing="false" text="Include borders" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Mathematical Morphology">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Button fx:id="structuringElemButton" disable="true" layoutX="24.0" layoutY="178.0" mnemonicParsing="false" onAction="#setStructuringElem" prefHeight="25.0" prefWidth="125.0" text="Set structuring elem" />
-                        <Button fx:id="erosionButton" disable="true" layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleErosion" text="Apply erosion" />
-                        <Button fx:id="dilationButton" disable="true" layoutX="24.0" layoutY="59.0" mnemonicParsing="false" onAction="#handleDilation" text="Apply dilation" />
-                        <Button fx:id="apertureButton" disable="true" layoutX="24.0" layoutY="94.0" mnemonicParsing="false" onAction="#handleAperture" text="Apply opening" />
-                        <Button fx:id="closureButton" disable="true" layoutX="24.0" layoutY="129.0" mnemonicParsing="false" onAction="#handleClosure" text="Apply closing" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Regions Growth">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <CheckBox fx:id="colorPickerButton" layoutX="34.0" layoutY="14.0" mnemonicParsing="false" text="Color Picker" />
-                        <AnchorPane fx:id="showColorPick" layoutX="53.0" layoutY="34.0" prefHeight="44.0" prefWidth="46.0" style="-fx-background-color: rgba(0,0,0,0.2);" />
-                        <Label layoutX="45.0" layoutY="78.0" prefHeight="17.0" prefWidth="73.0" text="Color Selected:">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Label>
-                        <RadioButton fx:id="regionFixedButton" layoutX="10.0" layoutY="131.0" mnemonicParsing="false" selected="true" text="Fixed">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="regionRank" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="regionFloatButton" layoutX="10.0" layoutY="149.0" mnemonicParsing="false" text="Float" toggleGroup="$regionRank" />
-                        <RadioButton fx:id="regionNeighbor4" layoutX="100.0" layoutY="131.0" mnemonicParsing="false" selected="true" text="4">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="regionNeighbors" />
-                           </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="regionNeighbor8" layoutX="100.0" layoutY="149.0" mnemonicParsing="false" text="8" toggleGroup="$regionNeighbors" />
-                        <Button layoutX="54.0" layoutY="180.0" mnemonicParsing="false" onAction="#regionsGrowthContext" text="Apply" />
-                        <Label layoutX="20.0" layoutY="113.0" text="Rank:">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="80.0" layoutY="113.0" text="Neighborhood:">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="colorPickerRGB" layoutX="46.0" layoutY="94.0" text="-">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="K-means">
-               <content>
-                  <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                     <children>
-                        <Label layoutX="31.0" layoutY="68.0" text="K:" />
-                        <Button layoutX="48.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
-                        <TextField fx:id="inputKMeans" layoutX="53.0" layoutY="64.0" prefHeight="25.0" prefWidth="38.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-        </panes>
-      </Accordion>
       <AnchorPane layoutX="247.0" layoutY="84.0" prefHeight="419.0" prefWidth="383.0">
          <children>
             <ScrollPane prefHeight="358.0" prefWidth="383.0">

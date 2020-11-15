@@ -53,7 +53,11 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import object.Convolution;
 import object.OpenCVUtils;
+import object.PointXY;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -75,6 +79,7 @@ public class MainController implements Initializable {
     private WritableImage writableImage;
     private WritableImage writableNetpbm;
     private WritableImage zoomWritable;
+    private WritableImage regionImage;
 
     
     private PixelReader pixelReader;
@@ -87,6 +92,8 @@ public class MainController implements Initializable {
     
     private int imageWidth;
     private int imageHeight;
+    
+    private PointXY pixelPicker;
     
     private int imageX;
     private int imageY;
@@ -275,6 +282,10 @@ public class MainController implements Initializable {
     private Label colorPickerRGB;
     private Slider sliderToKMeans;
     private Label labelKMeans;
+    @FXML
+    private TextField inputKMeans;
+    @FXML
+    private Slider sliderToTolerance;
 
     
    
@@ -385,8 +396,12 @@ public class MainController implements Initializable {
         sliderToArbitraryY.valueProperty().set(roundedValue);
         labelArbitraryY.setText(Integer.toString(roundedValue));
     };
-    @FXML
-    private TextField inputKMeans;
+    
+    final ChangeListener<Number> sliderTolerance = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToTolerance.valueProperty().set(roundedValue);
+    };
+
     
     
     
@@ -396,6 +411,7 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         mainInstanceController = this;
+        pixelPicker = null;
         
         sliderToGaussianX.valueProperty().addListener(sliderGaussianX);
         sliderToGaussianY.valueProperty().addListener(sliderGaussianY);
@@ -425,9 +441,10 @@ public class MainController implements Initializable {
         sliderToArbitraryX.valueProperty().addListener(sliderArbitraryX);
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
         
+        sliderToTolerance.valueProperty().addListener(sliderTolerance);
+        
         
         imageView.setPickOnBounds(true);
-
         imageView.setOnMouseDragged(e -> {
             if(image != null && colorPickerButton.isSelected()) {
                 double zoomValue = sliderToZoom.getValue();
@@ -443,6 +460,7 @@ public class MainController implements Initializable {
                 
                 pixelReader = writableImage.getPixelReader();
                 Color pick = pixelReader.getColor(eX, eY);
+                pixelPicker = new PointXY(eX, eY, 0, 0);
                 int red = (int) (pick.getRed() * 255);
                 int green = (int) (pick.getGreen() * 255);
                 int blue = (int) (pick.getBlue() * 255);
@@ -483,40 +501,9 @@ public class MainController implements Initializable {
                 addColorsUnique(pixelReader.getArgb(x, y));
             }
         }
-        erosionButton.setDisable(false);
-        dilationButton.setDisable(false);
-        apertureButton.setDisable(false);
-        closureButton.setDisable(false);
-//        enableButtonMorph();
+
     }
     
-    private void enableButtonMorph() {
-        if(uniqueColorsList.size() == 2) {
-            if(checkBlackWhite()) {
-                erosionButton.setDisable(false);
-                dilationButton.setDisable(false);
-                apertureButton.setDisable(false);
-                closureButton.setDisable(false);
-            }
-        } else {
-            erosionButton.setDisable(true);
-            dilationButton.setDisable(true);
-            apertureButton.setDisable(true);
-            closureButton.setDisable(true); 
-        }
-    }
-    
-    private boolean checkBlackWhite() {
-        int accumulated = 0;
-        for (int i = 0; i < uniqueColorsList.size(); i++) {
-            int number = (int) uniqueColorsList.get(i);
-            accumulated = accumulated + number;
-        }
-        if(accumulated == -16777217) {
-            return true;
-        }
-        return false;
-    }
      
     private void configurationInit() {
         imageView.setImage(pic.getImageOriginal());
@@ -1307,9 +1294,10 @@ public class MainController implements Initializable {
         }
     }
     
-    @FXML
-    private void regionsGrowthContext() {
-        if(image != null) {
+       @FXML
+    private void growthContext(ActionEvent event) {
+        if(image != null && regionImage != null) {
+            writableImage = regionImage;
             sliderContext();
             restartRegionsGrowth();
         }
@@ -2640,7 +2628,7 @@ public class MainController implements Initializable {
     @FXML
     private void setStructuringElem() {
 //        Mat element = Imgproc.getStructuringElement(elementType, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
-//            new Point(kernelSize, kernelSize));
+//            new PointXY(kernelSize, kernelSize));
     }
 
     @FXML
@@ -2653,7 +2641,6 @@ public class MainController implements Initializable {
         
         writableImage = OpenCVUtils.mat2WritableImage(dst);
         sliderContext();
-//        convertToBlackWhite();
     }
 
     @FXML
@@ -2666,7 +2653,6 @@ public class MainController implements Initializable {
         
         writableImage = OpenCVUtils.mat2WritableImage(dst);
         sliderContext();
-//        convertToBlackWhite();
     }
 
     @FXML
@@ -2689,7 +2675,6 @@ public class MainController implements Initializable {
         if(image != null) {
             String k = inputKMeans.getText();
             int kNumber = Integer.parseInt(k);
-
             if(k != null && !k.isEmpty() && isNumeric(k) && kNumber >= 1 && kNumber <= uniqueColorsList.size() ) {
                 Mat src = OpenCVUtils.image2Mat(writableImage);
                 Mat dst = OpenCVUtils.kmeans(src, kNumber); 
@@ -2698,6 +2683,87 @@ public class MainController implements Initializable {
             }
         }
     }
+
+    @FXML
+    private void handleThresholdOtsu(ActionEvent event) {
+        if(image != null) {
+            Mat dst = new Mat();
+            Mat gray = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
+            Imgproc.threshold(gray, dst, 0, 255, Imgproc.THRESH_OTSU); 
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            sliderContext();
+        }        
+    }
+
+    @FXML
+    private void handleThresholdKmeans(ActionEvent event) {
+        if(image != null) {
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Mat dst = OpenCVUtils.kmeansThreshold(src, 2); 
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            sliderContext();
+        }
+    }
+
+    @FXML
+    private void handleQuantizeThreshold(ActionEvent event) {
+        if(image != null) {
+            Mat dst = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Imgproc.threshold(src, dst, 180, 200, Imgproc.THRESH_BINARY); 
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            sliderContext();
+        }        
+    }
+
+    @FXML
+    private void handleGrowth() {
+        if(image != null) {
+            int flags;
+            int neighbors = regionNeighbors.getToggles().indexOf(regionNeighbors.getSelectedToggle());
+            int fill = regionRank.getToggles().indexOf(regionRank.getSelectedToggle());
+            int conectivity = neighbors == 0 ? 4 : 8;
+            int t = (int) Math.round(sliderToTolerance.getValue());
+                        
+            if(fill == 0) {
+                flags = conectivity | (100 <<8 ) | Imgproc.FLOODFILL_FIXED_RANGE;
+            } else {
+                flags = conectivity | (100 <<8 );
+            }
+            
+            Mat dst = new Mat();
+            Mat mask = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Imgproc.cvtColor(src, src, Imgproc.COLOR_BGRA2BGR);
+            
+            int posX = pixelPicker.getPosX();
+            int posY = pixelPicker.getPosY();
+            
+            Imgproc.floodFill(src, mask, new Point(posX,posY), new Scalar(200), new Rect(), new Scalar(t, t, t), new Scalar(t, t, t), flags);
+
+            
+//            writableImage = OpenCVUtils.mat2WritableImage(src);
+            regionImage = OpenCVUtils.mat2WritableImage(src);
+            PixelReader regionReader = regionImage.getPixelReader();
+            Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
+            for(int y = 0; y < imageHeight; y++) {
+                for(int x = 0; x< imageWidth; x ++) {
+                    scaleMatrix[x][y] = regionReader.getColor(x,y);
+                }
+            }
+            pic.setScaleMatrix(scaleMatrix);
+            handleZoom();
+            configurationImageView();
+
+        }          
+        
+    }
+
+
+
+  
 
 
 

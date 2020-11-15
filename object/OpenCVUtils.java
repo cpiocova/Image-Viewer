@@ -118,37 +118,23 @@ public class OpenCVUtils {
     public static Mat kmeans(Mat entry, int k) {
         
         Imgproc.cvtColor(entry, entry, Imgproc.COLOR_BGRA2BGR);
-        
         int n = entry.cols() * entry.rows();
-
         Mat samples = entry.reshape(1, n);
-
         Mat samples32f = new Mat();
-
         samples.convertTo(samples32f, CvType.CV_32F, 1.0 / 255.0);
-
         Mat labels = new Mat();
-
-        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 200, 0.05);
-
         Mat centers = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 200, 0.05);
 
         Core.kmeans(samples32f, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
         
         centers.convertTo(centers, CvType.CV_8UC1, 255.0);
         centers.reshape(3);
-
-
-
         Mat dst = entry.clone();
-//        Mat dst = new Mat();
-
         int rows = 0;
 
         for(int y = 0; y < entry.rows(); y++) {
-
             for(int x = 0; x < entry.cols(); x++) {
-
                 int label = (int)labels.get(rows,0)[0];
 
                 int r = (int)centers.get(label, 2)[0];
@@ -161,10 +147,47 @@ public class OpenCVUtils {
                 rows++;
             }
         }
-
         return dst;
-
     }
-    
+
+    public static Mat kmeansThreshold(Mat entry, int k) {
+        
+        Imgproc.cvtColor(entry, entry, Imgproc.COLOR_BGRA2BGR);
+        int n = entry.cols() * entry.rows();
+        Mat samples = entry.reshape(1, n);
+        Mat samples32f = new Mat();
+        samples.convertTo(samples32f, CvType.CV_32F, 1.0 / 255.0);
+        Mat labels = new Mat();
+        Mat centers = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 200, 0.05);
+
+        Core.kmeans(samples32f, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
+        
+        centers.convertTo(centers, CvType.CV_8UC1, 255.0);
+        centers.reshape(3);
+        Mat dst = entry.clone();
+        int rows = 0;
+
+        for(int y = 0; y < entry.rows(); y++) {
+            for(int x = 0; x < entry.cols(); x++) {
+                int label = (int)labels.get(rows,0)[0];
+                int r,g,b;
+                if(label == 1) {
+                    r = 0;
+                    g = 0;
+                    b = 0;                    
+                } else {
+                    r = 255;
+                    g = 255;
+                    b = 255;     
+                }
+                dst.put(y, x, b,g,r);
+                rows++;
+            }
+        }
+        return dst;
+    }
+
+
     
 }

@@ -118,7 +118,7 @@ public class Convolution {
     ArrayList messyColors = new ArrayList();
     PixelReader pixelReader = imageModified.getPixelReader();
     for(int i = 0; i < coordinates.size(); i++) {
-        Point info = (Point) coordinates.get(i);
+        PointXY info = (PointXY) coordinates.get(i);
         int pX = info.getPosX();
         int pY = info.getPosY();
         messyColors.add(pixelReader.getArgb(pX, pY));
@@ -140,7 +140,7 @@ public class Convolution {
         double blue = 0;
         
         for(int i = 0; i < coordinates.size(); i++) {
-            Point info = (Point) coordinates.get(i);
+            PointXY info = (PointXY) coordinates.get(i);
             int pX = info.getPosX();
             int pY = info.getPosY();
             int iX = info.getIndexRow();
@@ -363,7 +363,7 @@ public class Convolution {
    private double setArraySum() {
        double arraySum = 0;
        for(int i = 0; i < coordinates.size(); i++) {
-        Point info = (Point) coordinates.get(i);
+        PointXY info = (PointXY) coordinates.get(i);
         int iX = info.getIndexRow();
         int iY = info.getIndexColumn();   
         arraySum = arraySum + matrixConvolution[iX][iY];           
@@ -413,14 +413,14 @@ public class Convolution {
        for(int i = 0; i < pivotY; i++){
            int west = coordY - i;
            if(west >= 0) {
-               coordinates.add(new Point(coordX, west, indexRow, pivotY - i - 1));
+               coordinates.add(new PointXY(coordX, west, indexRow, pivotY - i - 1));
                countElements++;
            }
        }
        for(int i = 0; i < width - pivotY; i++){
            int east = coordY + i + 1;
            if(east < imageHeight - 1) {
-                coordinates.add(new Point(coordX, east, indexRow, pivotY + i));
+                coordinates.add(new PointXY(coordX, east, indexRow, pivotY + i));
                countElements++;
            }
        }       
@@ -428,14 +428,14 @@ public class Convolution {
    }
    
    public void searchRoberts(int coordX, int coordY) {
-        coordinates.add(new Point(coordX, coordY, 0, 0));
+        coordinates.add(new PointXY(coordX, coordY, 0, 0));
         countElements++;
 
         int east = coordY + 1;
         int south = coordX + 1;
         
         if(east < imageHeight && south < imageWidth)  {
-            coordinates.add(new Point(south, east, 1, 1));
+            coordinates.add(new PointXY(south, east, 1, 1));
             countElements++;
         }
        
