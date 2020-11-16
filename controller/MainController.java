@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -45,6 +46,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -94,6 +96,7 @@ public class MainController implements Initializable {
     private int imageHeight;
     
     private PointXY pixelPicker;
+    private PointXY pixelDelta;
     
     private int imageX;
     private int imageY;
@@ -277,8 +280,6 @@ public class MainController implements Initializable {
     @FXML
     private RadioButton regionNeighbor8;
     @FXML
-    private CheckBox colorPickerButton;
-    @FXML
     private Label colorPickerRGB;
     private Slider sliderToKMeans;
     private Label labelKMeans;
@@ -286,6 +287,18 @@ public class MainController implements Initializable {
     private TextField inputKMeans;
     @FXML
     private Slider sliderToTolerance;
+    @FXML
+    private ToggleGroup toggleButtonImage;
+    @FXML
+    private ToggleButton toggleRotation;
+    @FXML
+    private ToggleButton togglePanning;
+    @FXML
+    private AnchorPane mainPaneScene;
+    @FXML
+    private ToggleButton togglePickerButton;
+
+
 
     
    
@@ -443,41 +456,131 @@ public class MainController implements Initializable {
         
         sliderToTolerance.valueProperty().addListener(sliderTolerance);
         
-        
+        initEventListener();        
+    }
+    
+    private void initEventListener() {
+                
         imageView.setPickOnBounds(true);
         imageView.setOnMouseDragged(e -> {
-            if(image != null && colorPickerButton.isSelected()) {
-                double zoomValue = sliderToZoom.getValue();
+            if(image != null) {
+                if(togglePickerButton.isSelected()) {
+                    handleDraggedPickColor(e);
+                }else if(togglePanning.isSelected()) {
+                    handlePanning(e);
+                }
+            }
+        });
+        
+        imageView.setOnMousePressed(e -> {
+            if(image != null) {
+                if(togglePanning.isSelected()) {
+                    double zoomValue = sliderToZoom.getValue();
+                    int x = (int) (e.getX() / zoomValue);
+                    int y = (int) (e.getY() / zoomValue);
+                    
+                    pixelDelta = new PointXY(x, y, 0,0);
+                }
+            }
 
-                int eX = (int) (e.getX() / zoomValue);
-                int eY = (int) (e.getY() / zoomValue);
-                
-                if(eX < 0) eX = 0;
-                if(eX > imageWidth - 1) eX = imageWidth - 1;
-                if(eY < 0) eY = 0;
-                if(eY > imageHeight - 1) eY = imageHeight - 1;
-                
-                
-                pixelReader = writableImage.getPixelReader();
-                Color pick = pixelReader.getColor(eX, eY);
-                pixelPicker = new PointXY(eX, eY, 0, 0);
-                int red = (int) (pick.getRed() * 255);
-                int green = (int) (pick.getGreen() * 255);
-                int blue = (int) (pick.getBlue() * 255);
-                showColorPick.setStyle(
-                        "-fx-background-color: rgba("
-                        + red + ","
-                        + green + "," 
-                        + blue + "," 
-                        +"1.0"
-                        + ");"
-                );
-                colorPickerRGB.setText("rgb(" + red + "," + blue + "," + green + ")");
+        });
+
+        imageView.setOnMouseEntered(e -> {
+            if(image != null) {
+                if(togglePanning.isSelected()) { 
+                    mainPaneScene.getScene().getRoot().setCursor(Cursor.MOVE);
+                } else if(toggleRotation.isSelected()) {
+                    mainPaneScene.getScene().getRoot().setCursor(Cursor.CLOSED_HAND);
+                } else if(togglePickerButton.isSelected()) {
+                    mainPaneScene.getScene().getRoot().setCursor(Cursor.CROSSHAIR);
+                }
+            }
+        });
+        
+        imageView.setOnMouseExited(e -> {
+            if(image != null) {
+                mainPaneScene.getScene().getRoot().setCursor(Cursor.DEFAULT);
             }
         });
         
     }
     
+    private void handleDraggedPickColor(MouseEvent e) {
+        double zoomValue = sliderToZoom.getValue();
+
+        int eX = (int) (e.getX() / zoomValue);
+        int eY = (int) (e.getY() / zoomValue);
+
+        if(eX < 0) eX = 0;
+        if(eX > imageWidth - 1) eX = imageWidth - 1;
+        if(eY < 0) eY = 0;
+        if(eY > imageHeight - 1) eY = imageHeight - 1;
+
+
+        pixelReader = writableImage.getPixelReader();
+        Color pick = pixelReader.getColor(eX, eY);
+        pixelPicker = new PointXY(eX, eY, 0, 0);
+        int red = (int) (pick.getRed() * 255);
+        int green = (int) (pick.getGreen() * 255);
+        int blue = (int) (pick.getBlue() * 255);
+        showColorPick.setStyle(
+                "-fx-background-color: rgba("
+                + red + ","
+                + green + "," 
+                + blue + "," 
+                +"1.0"
+                + ");"
+        );
+        colorPickerRGB.setText("rgb(" + red + "," + blue + "," + green + ")");
+    }
+    
+    
+    private void handlePanning(MouseEvent e) {
+        double zoomValue = sliderToZoom.getValue();
+
+        int eX = (int) (e.getX() / zoomValue);
+        int eY = (int) (e.getY() / zoomValue);
+
+        if(eX < 0) eX = 0;
+        if(eX > imageWidth - 1) eX = imageWidth - 1;
+        if(eY < 0) eY = 0;
+        if(eY > imageHeight - 1) eY = imageHeight - 1;
+        
+        int deltaX = pixelDelta.getPosX();
+        int deltaY = pixelDelta.getPosY();
+        
+        int diffX = deltaX - eX;
+        int diffY = deltaY - eY;
+        
+        int yInit = Integer.signum(diffY) > 0 ? 0 : Math.abs(diffY) ;
+        int yEnd = Integer.signum(diffY) > 0 ? imageHeight - Math.abs(diffY) : imageHeight;
+        
+        int xInit = Integer.signum(diffX) > 0 ? 0 : Math.abs(diffX);
+        int xEnd = Integer.signum(diffX) > 0 ? imageWidth - Math.abs(diffX) : imageWidth;
+        
+        Color[][] matrixWhite = new Color[imageWidth][imageHeight];
+        Color[][] current = pic.getColorMatrix();
+        Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
+//        WritableImage imagePanning = new WritableImage(imageWidth, imageHeight);
+        PixelWriter panningWriter = writableImage.getPixelWriter();
+
+        for(int y = 0; y < imageHeight; y++) {
+            for(int x = 0; x< imageWidth; x ++) {
+                matrixWhite[x][y] = scaleMatrix[x][y] = new Color(1,1,1,1.0);
+                panningWriter.setColor(x,y,matrixWhite[x][y]);
+            }
+        }
+        
+        for(int y = yInit; y < yEnd; y++) {
+            for(int x = xInit; x < xEnd; x ++) {
+                matrixWhite[x][y] = scaleMatrix[x][y] = current[x][y];
+                panningWriter.setColor(x,y,matrixWhite[x][y]);
+            }
+        }
+
+        pic.setScaleMatrix(scaleMatrix);
+        handleZoom();
+    }
     
     
     private void setImageLoaded(Image image) {
@@ -2759,6 +2862,10 @@ public class MainController implements Initializable {
 
         }          
         
+    }
+
+    @FXML
+    private void YACUSA(MouseEvent event) {
     }
 
 

@@ -10,7 +10,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="960.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+<AnchorPane id="AnchorPane" fx:id="mainPaneScene" prefHeight="960.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
     <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -289,9 +289,8 @@
                                  <content>
                                     <AnchorPane prefHeight="257.0" prefWidth="172.0">
                                        <children>
-                                          <CheckBox fx:id="colorPickerButton" layoutX="34.0" layoutY="11.0" mnemonicParsing="false" text="Color Picker" />
-                                          <AnchorPane fx:id="showColorPick" layoutX="53.0" layoutY="31.0" prefHeight="44.0" prefWidth="46.0" style="-fx-background-color: rgba(0,0,0,0.2);" />
-                                          <Label layoutX="45.0" layoutY="72.0" prefHeight="17.0" prefWidth="73.0" text="Color Selected:">
+                                          <AnchorPane fx:id="showColorPick" layoutX="53.0" layoutY="33.0" prefHeight="44.0" prefWidth="46.0" style="-fx-background-color: rgba(0,0,0,0.2);" />
+                                          <Label layoutX="45.0" layoutY="74.0" prefHeight="17.0" prefWidth="73.0" text="Color Selected:">
                                              <font>
                                                 <Font size="10.0" />
                                              </font>
@@ -319,7 +318,7 @@
                                                 <Font size="10.0" />
                                              </font>
                                           </Label>
-                                          <Label fx:id="colorPickerRGB" layoutX="46.0" layoutY="88.0" text="-">
+                                          <Label fx:id="colorPickerRGB" layoutX="46.0" layoutY="90.0" text="-">
                                              <font>
                                                 <Font size="10.0" />
                                              </font>
@@ -330,17 +329,25 @@
                                                 <Font size="10.0" />
                                              </font>
                                           </Label>
+                                          <ToggleButton fx:id="togglePickerButton" layoutX="35.0" layoutY="7.0" mnemonicParsing="false" text="Enable Picker">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="toggleButtonImage" />
+                                             </toggleGroup>
+                                          </ToggleButton>
                                        </children>
                                     </AnchorPane>
                                  </content>
                               </TitledPane>
-                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="K-means">
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Quantization Methods">
                                  <content>
-                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                    <AnchorPane prefHeight="270.0" prefWidth="160.0">
                                        <children>
-                                          <Label layoutX="31.0" layoutY="68.0" text="K:" />
-                                          <Button layoutX="48.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
-                                          <TextField fx:id="inputKMeans" layoutX="53.0" layoutY="64.0" prefHeight="25.0" prefWidth="38.0" />
+                                          <Label layoutX="6.0" layoutY="38.0" text="K:" />
+                                          <Button layoutX="76.0" layoutY="34.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
+                                          <TextField fx:id="inputKMeans" layoutX="25.0" layoutY="34.0" prefHeight="25.0" prefWidth="38.0" />
+                                          <Label layoutX="6.0" layoutY="17.0" text="K-means:" />
+                                          <Button layoutX="76.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Apply" />
+                                          <Label layoutX="6.0" layoutY="87.0" text="Threshold:" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -351,7 +358,6 @@
                                        <children>
                                           <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleThresholdOtsu" text="Apply Otsu" />
                                           <Button layoutX="24.0" layoutY="89.0" mnemonicParsing="false" onAction="#handleThresholdKmeans" text="Apply K-means" />
-                                          <Button layoutX="24.0" layoutY="139.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Quantize Threshold" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -397,7 +403,7 @@
                      <children>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="230.0">
                            <children>
-                              <Label fx:id="infoUniqueColorsImage" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Label fx:id="infoUniqueColorsImage" alignment="CENTER" onMouseDragged="#YACUSA" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="55.0" prefWidth="206.0" GridPane.rowIndex="1">
@@ -418,6 +424,8 @@
       </AnchorPane>
       <Button cancelButton="true" layoutX="253.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleUndo" text="Undo" />
       <Button cancelButton="true" layoutX="584.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleRedo" text="Redo" />
+      <ToggleButton fx:id="toggleRotation" layoutX="247.0" layoutY="53.0" mnemonicParsing="false" text="Enable rotation" toggleGroup="$toggleButtonImage" />
+      <ToggleButton fx:id="togglePanning" layoutX="530.0" layoutY="53.0" mnemonicParsing="false" text="Enable panning" toggleGroup="$toggleButtonImage" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
