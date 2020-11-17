@@ -239,23 +239,6 @@
                                     </AnchorPane>
                                  </content>
                               </TitledPane>
-                              <TitledPane animated="false" prefHeight="232.0" prefWidth="170.0" text="Zoom">
-                                 <content>
-                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
-                                       <children>
-                                          <Slider fx:id="sliderToZoom" blockIncrement="0.1" layoutX="19.0" layoutY="117.0" majorTickUnit="1.0" max="20.0" min="0.1" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="125.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                                          <Label fx:id="labelZoom" layoutX="66.0" layoutY="89.0" text="1.0x" />
-                                          <RadioButton fx:id="zoomNeighbor" layoutX="17.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
-                                             <toggleGroup>
-                                                <ToggleGroup fx:id="zoomMethod" />
-                                             </toggleGroup>
-                                          </RadioButton>
-                                          <RadioButton fx:id="zoomInterpolation" layoutX="17.0" layoutY="60.0" mnemonicParsing="false" onAction="#handleZoom" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
-                                          <CheckBox fx:id="overflowZoom" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Overflow" />
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </TitledPane>
                               <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Arbitrary Kernel">
                                  <content>
                                     <AnchorPane prefHeight="167.0" prefWidth="142.0">
@@ -371,9 +354,9 @@
             </ScrollPane>
          </children>
       </AnchorPane>
-      <Button defaultButton="true" layoutX="348.0" layoutY="3.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
-      <Label fx:id="labelLoadMessage" layoutX="370.0" layoutY="480.0" prefHeight="25.0" prefWidth="125.0" textFill="#05adf0cc" />
-      <Button fx:id="btnDefault" layoutX="350.0" layoutY="540.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
+      <Button defaultButton="true" layoutX="354.0" layoutY="49.0" mnemonicParsing="false" onAction="#generateHistogram" prefHeight="25.0" prefWidth="170.0" text="View histogram" />
+      <Label fx:id="labelLoadMessage" layoutX="346.0" layoutY="14.0" prefHeight="25.0" prefWidth="170.0" textFill="#05adf0cc" />
+      <Button fx:id="btnDefault" layoutX="364.0" layoutY="580.0" mnemonicParsing="false" onAction="#convertToDefault" prefHeight="25.0" prefWidth="170.0" text="Reset Image" />
       <AnchorPane layoutX="247.0" layoutY="84.0" prefHeight="419.0" prefWidth="383.0">
          <children>
             <ScrollPane prefHeight="358.0" prefWidth="383.0">
@@ -387,7 +370,7 @@
             </ScrollPane>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="248.0" layoutY="596.0" prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane layoutX="248.0" layoutY="647.0" prefHeight="222.0" prefWidth="383.0">
          <children>
             <AnchorPane prefHeight="221.0" prefWidth="383.0" style="-fx-background-color: rgba(0,0,0,0.05);">
                <children>
@@ -423,10 +406,20 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <Button cancelButton="true" layoutX="253.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleUndo" text="Undo" />
-      <Button cancelButton="true" layoutX="584.0" layoutY="540.0" mnemonicParsing="false" onAction="#handleRedo" text="Redo" />
-      <ToggleButton fx:id="toggleRotation" layoutX="247.0" layoutY="53.0" mnemonicParsing="false" text="Enable rotation" toggleGroup="$toggleButtonImage" />
-      <ToggleButton fx:id="togglePanning" layoutX="530.0" layoutY="53.0" mnemonicParsing="false" text="Enable panning" toggleGroup="$toggleButtonImage" />
+      <Button cancelButton="true" layoutX="253.0" layoutY="580.0" mnemonicParsing="false" onAction="#handleUndo" text="Undo" />
+      <Button cancelButton="true" layoutX="584.0" layoutY="580.0" mnemonicParsing="false" onAction="#handleRedo" text="Redo" />
+      <ToggleButton fx:id="toggleRotation" layoutX="532.0" layoutY="49.0" mnemonicParsing="false" text="Enable rotation" toggleGroup="$toggleButtonImage" />
+      <ToggleButton fx:id="togglePanning" layoutX="248.0" layoutY="49.0" mnemonicParsing="false" text="Enable panning" toggleGroup="$toggleButtonImage" />
+      <RadioButton fx:id="zoomNeighbor" layoutX="264.0" layoutY="512.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Nearest Neighbor">
+         <toggleGroup>
+            <ToggleGroup fx:id="zoomMethod" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="zoomInterpolation" layoutX="392.0" layoutY="513.0" mnemonicParsing="false" onAction="#handleZoom" text="Bilinear Interpolation" toggleGroup="$zoomMethod" />
+      <Slider fx:id="sliderToZoom" blockIncrement="0.1" layoutX="301.0" layoutY="474.0" majorTickUnit="1.0" max="20.0" min="0.1" minorTickCount="0" onMouseDragged="#handleZoom" onMouseReleased="#handleZoom" prefHeight="14.0" prefWidth="295.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+      <Label fx:id="labelZoom" layoutX="602.0" layoutY="472.0" text="1.0x" />
+      <Label layoutX="262.0" layoutY="472.0" text="Zoom" />
+      <CheckBox fx:id="overflowZoom" layoutX="551.0" layoutY="513.0" mnemonicParsing="false" onAction="#handleZoom" selected="true" text="Overflow" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

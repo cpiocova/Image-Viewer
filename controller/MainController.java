@@ -495,7 +495,7 @@ public class MainController implements Initializable {
         imageView.setOnMouseReleased(e -> {
             if(image != null) {
                 if(togglePanning.isSelected()) {
-                    sliderContext();
+                    panningContext();
                 }
             }
 
@@ -1449,7 +1449,7 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "rotateP", dimensions);
+            Stack step = new Stack(changeImage, "growth", dimensions);
             userActions.addStep(step);    
         }
     }
@@ -1673,18 +1673,44 @@ public class MainController implements Initializable {
         }
     }   
     
+  
+    private void generalContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "general", dimensions);
+            userActions.addStep(step);                      
+        }
+    }
     
-    private void kMeansContext(ActionEvent event) {
+    private void kMeansContext() {
         if(image != null) {
             sliderContext();
             restartKMeans();
 
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "filterArbitrary", dimensions);
+            Stack step = new Stack(changeImage, "kmeans", dimensions);
             userActions.addStep(step);                      
         }
-    }
+    }    
+    
+    private void panningContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "panning", dimensions);
+            userActions.addStep(step);                      
+        }
+    }    
+
+    
+    
+    
 
     @FXML
     private void convertToDefault(ActionEvent event) {
@@ -1735,6 +1761,8 @@ public class MainController implements Initializable {
         restartPrewitt();
         restartRoberts();
         restartLoG();
+        restartGrowth();
+        restartKMeans();
         handleZoom();
     }
 
@@ -1825,8 +1853,7 @@ public class MainController implements Initializable {
         regionImage = null;
     }
     private void restartKMeans() {
-//        labelKMeans.setText("1");
-//        sliderToKMeans.setValue(1);   
+          inputKMeans.setText("");
     }
  
 
@@ -1856,7 +1883,7 @@ public class MainController implements Initializable {
     
     public void setEqualizedImage(WritableImage imageStrecth) {
         writableImage = imageStrecth;
-        sliderContext();
+        generalContext();
     }
 
 //
@@ -2738,38 +2765,64 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleErosion() {
-        Mat dst = new Mat();
-        Mat src = OpenCVUtils.image2Mat(writableImage);
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
-        
-        Imgproc.erode(src, dst, kernel);
-        
-        writableImage = OpenCVUtils.mat2WritableImage(dst);
-        sliderContext();
+        if(image != null) {
+            Mat dst = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+
+            Imgproc.erode(src, dst, kernel);
+
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            generalContext();            
+        }
     }
 
     @FXML
     private void handleDilation() {
-        Mat dst = new Mat();
-        Mat src = OpenCVUtils.image2Mat(writableImage);
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
-        
-        Imgproc.dilate(src, dst, kernel);
-        
-        writableImage = OpenCVUtils.mat2WritableImage(dst);
-        sliderContext();
+        if(image != null) {
+            Mat dst = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+
+            Imgproc.dilate(src, dst, kernel);
+
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            generalContext();            
+        }
     }
 
     @FXML
     private void handleAperture() {
-        handleErosion();
-        handleDilation();
+        if(image != null) {
+    //        handleErosion();        
+    //        handleDilation();        
+            Mat dst = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+
+            Imgproc.erode(src, dst, kernel);
+            Imgproc.dilate(dst, dst, kernel);
+
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            generalContext();   
+        }    
     }
 
     @FXML
     private void handleClosure() {
-        handleDilation();        
-        handleErosion();
+        if(image != null) {
+    //        handleDilation();        
+    //        handleErosion();
+            Mat dst = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+
+            Imgproc.dilate(src, dst, kernel);
+            Imgproc.erode(dst, dst, kernel);
+
+            writableImage = OpenCVUtils.mat2WritableImage(dst);
+            generalContext();        
+        }
     }
 
 
@@ -2777,14 +2830,14 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleKMeans() {
-        if(image != null) {
-            String k = inputKMeans.getText();
+        String k = inputKMeans.getText();
+        if(image != null && k != null && !k.isEmpty() && isNumeric(k)) {
             int kNumber = Integer.parseInt(k);
-            if(k != null && !k.isEmpty() && isNumeric(k) && kNumber >= 1 && kNumber <= uniqueColorsList.size() ) {
+            if(kNumber >= 1 && kNumber <= uniqueColorsList.size() ) {
                 Mat src = OpenCVUtils.image2Mat(writableImage);
                 Mat dst = OpenCVUtils.kmeans(src, kNumber); 
                 writableImage = OpenCVUtils.mat2WritableImage(dst);
-                sliderContext();    
+                kMeansContext();    
             }
         }
     }
@@ -2798,7 +2851,7 @@ public class MainController implements Initializable {
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
             Imgproc.threshold(gray, dst, 0, 255, Imgproc.THRESH_OTSU); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            sliderContext();
+            generalContext();
         }        
     }
 
@@ -2808,7 +2861,7 @@ public class MainController implements Initializable {
             Mat src = OpenCVUtils.image2Mat(writableImage);
             Mat dst = OpenCVUtils.kmeansThreshold(src, 2); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            sliderContext();
+            generalContext();
         }
     }
 
@@ -2819,7 +2872,7 @@ public class MainController implements Initializable {
             Mat src = OpenCVUtils.image2Mat(writableImage);
             Imgproc.threshold(src, dst, 180, 200, Imgproc.THRESH_BINARY); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            sliderContext();
+            generalContext();
         }        
     }
 
@@ -2853,8 +2906,7 @@ public class MainController implements Initializable {
             
             Imgproc.floodFill(src, mask, new Point(posX,posY), new Scalar(b,g,r), new Rect(), new Scalar(t, t, t), new Scalar(t, t, t), flags);
 
-            
-//            writableImage = OpenCVUtils.mat2WritableImage(src);
+
             regionImage = OpenCVUtils.mat2WritableImage(src);
             PixelReader regionReader = regionImage.getPixelReader();
             Color[][] scaleMatrix = new Color[imageWidth][imageHeight];
