@@ -358,7 +358,7 @@
                                     <AnchorPane prefHeight="167.0" prefWidth="142.0">
                                        <children>
                                           <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleThresholdOtsu" text="Apply Otsu" />
-                                          <Button layoutX="24.0" layoutY="89.0" mnemonicParsing="false" onAction="#handleThresholdKmeans" text="Apply K-means" />
+                                          <Button layoutX="24.0" layoutY="89.0" mnemonicParsing="false" onAction="#handleThresholdKmeans" text="Apply 2-means" />
                                        </children>
                                     </AnchorPane>
                                  </content>

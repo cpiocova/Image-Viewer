@@ -669,23 +669,27 @@ public class MainController implements Initializable {
                 case "bmp":                
                     restartZoom();
                     bmpLoader(imgPath);
-                    restartUI();
                     break;
                 case "pbm":
                     restartZoom();
                     pbmLoader(imgPath);
-                    restartUI();
                     break;
                 case "ppm":
                 case "pgm":
                     restartZoom();
                     pgmLoader(imgPath);
-                    restartUI();
                     break;
                   default:
                     labelLoadMessage.setText("Incompatible Format.");
                     break;
             }
+            restartUI();
+            WritableImage changeImage = imageWriter();
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "load", dimensions);
+            userActions.addStep(step);   
+            
         }       
     }
     
@@ -1317,11 +1321,7 @@ public class MainController implements Initializable {
         }
                 
         pixelReader = writableImage.getPixelReader();
-//        for (int y = 0; y < height; y++) {
-//            for (int x = 0; x < width; x++) {
-//                addColorsUnique(pixelReader.getArgb(x, y));
-//            }
-//        }
+
         
         pic.setImageOriginal(writableNetpbm);
         pic.setImageModified(writableNetpbm);
@@ -1349,11 +1349,6 @@ public class MainController implements Initializable {
         }
                 
         pixelReader = writableImage.getPixelReader();
-//        for (int y = 0; y < imageHeight; y++) {
-//            for (int x = 0; x < imageWidth; x++) {
-//                addColorsUnique(pixelReader.getArgb(x, y));
-//            }
-//        }
         
         pic.setImageOriginal(writableNetpbm);
         pic.setImageModified(writableNetpbm);
@@ -1399,9 +1394,10 @@ public class MainController implements Initializable {
         if(image != null) {
             sliderContext();
             
-            WritableImage changeImage = imageWriter();            
+            WritableImage changeImage = imageWriter();
             
-            Stack step = new Stack(changeImage, "negative");
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "negative", dimensions);
             userActions.addStep(step);            
         }
     }
@@ -1411,42 +1407,53 @@ public class MainController implements Initializable {
             sliderContext();
             WritableImage changeImage = imageWriter();  
              
-            Stack step = new Stack(changeImage, "blackwhite");
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "blackwhite", dimensions);
             userActions.addStep(step);                    
         }
     }
     
-       @FXML
+    private void rotateNegaviteContext() {
+          if(image != null) {
+            sliderContext();
+            WritableImage changeImage = imageWriter();  
+             
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "rotateN", dimensions);
+            userActions.addStep(step);                    
+        }      
+    }
+    
+    private void rotatePositiveContext() {
+         if(image != null) {
+            sliderContext();
+            WritableImage changeImage = imageWriter();  
+             
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "rotateP", dimensions);
+            userActions.addStep(step);                    
+        }       
+    }
+
+    
+    @FXML
     private void growthContext(ActionEvent event) {
         if(image != null && regionImage != null) {
             writableImage = regionImage;
             sliderContext();
-            restartRegionsGrowth();
+            restartGrowth();
+            
+            WritableImage changeImage = imageWriter();
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "rotateP", dimensions);
+            userActions.addStep(step);    
         }
     }
-    
-    private void rotateNegativeContext() {
-        if(image != null) {
-            sliderContext();
-//                        
-//            Stack step = new Stack(null, "rotateNegative");
-//            userActions.addStep(step);
-            userActions.resetSteps();
-        }       
-        
-    }
-    
-    private void rotatePositiveContext() {
-        if(image != null) {
-            sliderContext();
-//                        
-//            Stack step = new Stack(null, "rotatePositive");
-//            userActions.addStep(step);  
-            userActions.resetSteps();
-        }       
-        
-    }
-    
+     
     
     @FXML
     private void grayscaleContext(ActionEvent event) {
@@ -1458,7 +1465,8 @@ public class MainController implements Initializable {
                 if(grayscaleValue == 1.0 ) pic.setGrayScaleFlag(true);
                 
                 WritableImage changeImage = imageWriter();  
-                Stack step = new Stack(changeImage, "grayscale");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "grayscale", dimensions);
                 userActions.addStep(step);   
             }            
         }
@@ -1473,7 +1481,8 @@ public class MainController implements Initializable {
                 restartBrightness();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "brightness");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "brightness", dimensions);
                 userActions.addStep(step);   
             }            
         }
@@ -1488,7 +1497,8 @@ public class MainController implements Initializable {
                 restartContrast();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "contrast");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "contrast", dimensions);
                 userActions.addStep(step);  
             }            
         }
@@ -1503,7 +1513,8 @@ public class MainController implements Initializable {
             restartThresholding(); 
             
             WritableImage changeImage = imageWriter();
-            Stack step = new Stack(changeImage, "thresholding");
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "thresholding", dimensions);
             userActions.addStep(step);              
         }
     }
@@ -1518,7 +1529,8 @@ public class MainController implements Initializable {
                 restartAverage();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterAverage");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterAverage", dimensions);
                 userActions.addStep(step);              
             }                    
         }
@@ -1534,7 +1546,8 @@ public class MainController implements Initializable {
                 restartMedian();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterMedian");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterMedian", dimensions);
                 userActions.addStep(step);                      
             }        
             
@@ -1551,7 +1564,8 @@ public class MainController implements Initializable {
                 restartGaussian();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterGaussian");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterGaussian", dimensions);
                 userActions.addStep(step);                     
             }        
             
@@ -1568,7 +1582,8 @@ public class MainController implements Initializable {
                 restartLaplacian();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterLaplacian");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterLaplacian", dimensions);
                 userActions.addStep(step);                     
             }        
             
@@ -1585,7 +1600,8 @@ public class MainController implements Initializable {
                 restartSobel();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterSobel");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterSobel", dimensions);
                 userActions.addStep(step);                        
             }
             
@@ -1602,7 +1618,8 @@ public class MainController implements Initializable {
                 restartPrewitt();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterPrewitt");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterPrewitt", dimensions);
                 userActions.addStep(step);                       
             }
             
@@ -1618,7 +1635,8 @@ public class MainController implements Initializable {
                 restartRoberts();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterRoberts");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterRoberts", dimensions);
                 userActions.addStep(step);                       
             }
             
@@ -1635,7 +1653,8 @@ public class MainController implements Initializable {
                 restartLoG();
                 
                 WritableImage changeImage = imageWriter();
-                Stack step = new Stack(changeImage, "filterLoG");
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "filterLoG", dimensions);
                 userActions.addStep(step);                      
             }
             
@@ -1648,7 +1667,8 @@ public class MainController implements Initializable {
             restartArbitrary();
             
             WritableImage changeImage = imageWriter();
-            Stack step = new Stack(changeImage, "filterArbitrary");
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "filterArbitrary", dimensions);
             userActions.addStep(step);                      
         }
     }   
@@ -1660,7 +1680,8 @@ public class MainController implements Initializable {
             restartKMeans();
 
             WritableImage changeImage = imageWriter();
-            Stack step = new Stack(changeImage, "filterArbitrary");
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "filterArbitrary", dimensions);
             userActions.addStep(step);                      
         }
     }
@@ -1692,6 +1713,11 @@ public class MainController implements Initializable {
             restartUI();
             recalculateInfo();
             userActions.resetSteps();
+            WritableImage changeImage = imageWriter();
+            
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "load", dimensions);
+            userActions.addStep(step);   
         }
 
     }
@@ -1790,9 +1816,13 @@ public class MainController implements Initializable {
         sliderToArbitraryY.setValue(1);     
     }
     
-    private void restartRegionsGrowth() {
+    private void restartGrowth() {
         colorPickerRGB.setText("-");
-        showColorPick.setStyle("-fx-background-color: rgba(0,0,0,0.2)");   
+        showColorPick.setStyle("-fx-background-color: rgba(0,0,0,0.2)"); 
+        togglePickerButton.setSelected(false);
+        sliderToTolerance.setValue(1);
+        pixelPicker = null;
+        regionImage = null;
     }
     private void restartKMeans() {
 //        labelKMeans.setText("1");
@@ -1829,45 +1859,44 @@ public class MainController implements Initializable {
         sliderContext();
     }
 
-
-    private void handleRotate(String direction) {
-        if(image != null) {
-            restartBrightness();
-            restartContrast();
-            restartGrayscale();            
-            restartThresholding();
-            restartAverage();
-            restartMedian();
-            restartGaussian();
-            restartLaplacian();
-            restartLoG();
-            restartSobel();
-            restartPrewitt();
-            restartRoberts();
-            int width = imageHeight;
-            int height = imageWidth;
-            Color [][] rotate = new Color[imageHeight][imageWidth];
-            writableImage = new WritableImage(imageHeight, imageWidth);
-            pixelWriter = writableImage.getPixelWriter();
-            
-            if(direction == "positive") {
-                rotate = rotatePositive(width, height, rotate);
-            } else {
-                rotate = rotateNegative(width, height, rotate);
-            }
-
-            setImageSize(width, height);
-            pic.setDimensions(new ImageSize(width, height));
-            pic.setColorMatrix(rotate);
-            pic.setScaleMatrix(rotate);
-            pic.setImageModified(writableImage);
-            handleZoom();
-            //Not Context
-            configurationImageView();
-                
-        }
-    
-    }
+//
+//    private void handleRotate(String direction) {
+//        if(image != null) {
+//            restartBrightness();
+//            restartContrast();
+//            restartGrayscale();            
+//            restartThresholding();
+//            restartAverage();
+//            restartMedian();
+//            restartGaussian();
+//            restartLaplacian();
+//            restartLoG();
+//            restartSobel();
+//            restartPrewitt();
+//            restartRoberts();
+//            int width = imageHeight;
+//            int height = imageWidth;
+//            Color [][] rotate = new Color[imageHeight][imageWidth];
+//            writableImage = new WritableImage(imageHeight, imageWidth);
+//            pixelWriter = writableImage.getPixelWriter();
+//            
+//            if(direction == "positive") {
+//                rotate = rotatePositive(width, height, rotate);
+//            } else {
+//                rotate = rotateNegative(width, height, rotate);
+//            }
+//
+//            setImageSize(width, height);
+//            pic.setDimensions(new ImageSize(width, height));
+//            pic.setColorMatrix(rotate);
+//            pic.setScaleMatrix(rotate);
+//            pic.setImageModified(writableImage);
+//            handleZoom();
+//            //Not Context
+//            configurationImageView();
+//                
+//        }
+//    }
     
     @FXML
     private void handleRotateNegative() {                
@@ -1904,7 +1933,7 @@ public class MainController implements Initializable {
             pic.setScaleMatrix(rotate);
             pic.setImageModified(writableImage);
             handleZoom();
-            rotateNegativeContext();
+            rotateNegaviteContext();
             configurationImageView(); 
         }
     }
@@ -2702,52 +2731,6 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleUndo(ActionEvent event) {
-        if(image != null) {
-            if(userActions.canDecrease()) {
-                userActions.decreasePointer();
-                Stack stack = userActions.getStackPointer();
-                WritableImage imageStack = stack.getImageCurrent();
-                if(imageStack != null) {
-                    writableImage = imageStack;
-                }else {
-                    boolean rotationInvert = stack.getOrientationRotate();
-                    if(rotationInvert) {
-                        handleRotate("negative");
-                    } else {
-                        handleRotate("positive");
-                    }
-                }
-                sliderContext();                
-            }
-        }
-    }
-
-    @FXML
-    private void handleRedo(ActionEvent event) {
-        if(image != null) {
-            if(userActions.canIncrease()) {
-                userActions.increasePointer();
-                Stack stack = userActions.getStackPointer();
-                WritableImage imageStack = stack.getImageCurrent();
-                if(imageStack != null) {
-                    writableImage = imageStack;
-                } else {
-                    boolean rotationDirect = stack.getOrientationRotate();
-                    if(rotationDirect) {
-                        handleRotate("positive");
-                    } else {
-                        handleRotate("negative");
-                    }
-                }
-                sliderContext();                
-            }
-
-        }
-
-    }
-
-    @FXML
     private void setStructuringElem() {
 //        Mat element = Imgproc.getStructuringElement(elementType, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
 //            new PointXY(kernelSize, kernelSize));
@@ -2842,7 +2825,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleGrowth() {
-        if(image != null) {
+        if(image != null && pixelPicker != null) {
             int flags;
             int neighbors = regionNeighbors.getToggles().indexOf(regionNeighbors.getSelectedToggle());
             int fill = regionRank.getToggles().indexOf(regionRank.getSelectedToggle());
@@ -2891,9 +2874,41 @@ public class MainController implements Initializable {
     @FXML
     private void handleGetColorPicker(ActionEvent event) {
         varChooseColor = buttonChooseColor.getValue();
+        handleGrowth();
     }
 
 
+        @FXML
+    private void handleUndo(ActionEvent event) {
+        if(image != null) {
+            if(userActions.canDecrease()) {
+                userActions.decreasePointer();
+                Stack stack = userActions.getStackPointer();
+                WritableImage imageStack = stack.getImageCurrent();
+                ImageSize dim = stack.getDimensions();
+                setImageSize(dim.getWidth(), dim.getHeight());
+                pic.setDimensions(dim);
+                writableImage = imageStack;
+                sliderContext();                
+            }
+        }
+    }
+
+    @FXML
+    private void handleRedo(ActionEvent event) {
+        if(image != null) {
+            if(userActions.canIncrease()) {
+                userActions.increasePointer();
+                Stack stack = userActions.getStackPointer();
+                WritableImage imageStack = stack.getImageCurrent();
+                ImageSize dim = stack.getDimensions();
+                setImageSize(dim.getWidth(), dim.getHeight());
+                pic.setDimensions(dim);
+                writableImage = imageStack;
+                sliderContext();                
+            }
+        }
+    }
 
 
 

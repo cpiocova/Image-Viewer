@@ -13,26 +13,22 @@ import javafx.scene.image.WritableImage;
  */
 public class Stack {
     private WritableImage imageCurrent;
-    private int pointerCurrent;
-    private double positionSlider;
     private String nameFilter;
-    private boolean isSlider;
+    private ImageSize dimensions;
     
-    
-    public Stack(WritableImage imageCurrent, String nameFilter) {
+    public Stack(WritableImage imageCurrent, String nameFilter, ImageSize dimensions) {
         this.imageCurrent = imageCurrent;
         this.nameFilter = nameFilter;
+        this.dimensions = dimensions;
+    }
+
+    public ImageSize getDimensions() {
+        return dimensions;
     }
 
     public WritableImage getImageCurrent() {
            return imageCurrent;        
     }
     
-    public boolean getOrientationRotate() {
-        if(nameFilter == "rotatePositive") {
-            return true;
-        }
-        return false;
-    }
     
 }
