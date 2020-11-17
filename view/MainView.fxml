@@ -19,7 +19,7 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="787.0" prefWidth="200.0">
                      <children>
                           <Button fx:id="btnLoadImage" onAction="#handleLoadImage" prefHeight="25.0" prefWidth="174.0" text="Load File" />
-                        <Accordion layoutY="25.0" prefHeight="821.0" prefWidth="174.0">
+                        <Accordion layoutY="25.0" prefHeight="840.0" prefWidth="174.0">
                           <panes>
                             <TitledPane animated="false" expanded="false" prefHeight="108.0" prefWidth="174.0" text="Save File">
                                  <content>
@@ -307,7 +307,7 @@
                                              </toggleGroup>
                                           </RadioButton>
                                           <RadioButton fx:id="regionNeighbor8" layoutX="100.0" layoutY="140.0" mnemonicParsing="false" onAction="#handleGrowth" text="8" toggleGroup="$regionNeighbors" />
-                                          <Button layoutX="54.0" layoutY="230.0" mnemonicParsing="false" onAction="#growthContext" text="Apply" />
+                                          <Button layoutX="54.0" layoutY="245.0" mnemonicParsing="false" onAction="#growthContext" text="Apply" />
                                           <Label layoutX="20.0" layoutY="104.0" text="Rank:">
                                              <font>
                                                 <Font size="10.0" />
@@ -323,8 +323,8 @@
                                                 <Font size="10.0" />
                                              </font>
                                           </Label>
-                                          <Slider fx:id="sliderToTolerance" blockIncrement="1.0" layoutX="30.0" layoutY="184.0" majorTickUnit="1.0" max="20.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGrowth" onMouseReleased="#handleGrowth" prefHeight="14.0" prefWidth="100.0" showTickLabels="true" showTickMarks="true" value="1.0" />
-                                          <Label layoutX="58.0" layoutY="168.0" text="Tolerance">
+                                          <Slider fx:id="sliderToTolerance" blockIncrement="1.0" layoutX="30.0" layoutY="210.0" majorTickUnit="1.0" max="20.0" min="1.0" minorTickCount="0" onMouseDragged="#handleGrowth" onMouseReleased="#handleGrowth" prefHeight="14.0" prefWidth="100.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label layoutX="58.0" layoutY="198.0" text="Tolerance">
                                              <font>
                                                 <Font size="10.0" />
                                              </font>
@@ -334,6 +334,7 @@
                                                 <ToggleGroup fx:id="toggleButtonImage" />
                                              </toggleGroup>
                                           </ToggleButton>
+                                          <ColorPicker fx:id="buttonChooseColor" layoutX="9.0" layoutY="169.0" onAction="#handleGetColorPicker" prefHeight="25.0" prefWidth="143.0" promptText="Choose the fill color" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -403,7 +404,7 @@
                      <children>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="230.0">
                            <children>
-                              <Label fx:id="infoUniqueColorsImage" alignment="CENTER" onMouseDragged="#YACUSA" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Label fx:id="infoUniqueColorsImage" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="55.0" prefWidth="206.0" GridPane.rowIndex="1">

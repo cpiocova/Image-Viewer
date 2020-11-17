@@ -42,6 +42,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -107,6 +108,7 @@ public class MainController implements Initializable {
     private int capacityActions;
     
     private Color [][] bufferNetpbm;
+    private Color varChooseColor;
              
     @FXML
     private ImageView imageView;
@@ -414,6 +416,8 @@ public class MainController implements Initializable {
         final int roundedValue = val.intValue();
         sliderToTolerance.valueProperty().set(roundedValue);
     };
+    @FXML
+    private ColorPicker buttonChooseColor;
 
     
     
@@ -456,7 +460,10 @@ public class MainController implements Initializable {
         
         sliderToTolerance.valueProperty().addListener(sliderTolerance);
         
-        initEventListener();        
+        initEventListener();
+        
+        buttonChooseColor.setValue(new Color(0.4352,0.76470,0.9333,1));
+        varChooseColor = buttonChooseColor.getValue();
     }
     
     private void initEventListener() {
@@ -2856,7 +2863,12 @@ public class MainController implements Initializable {
             int posX = pixelPicker.getPosX();
             int posY = pixelPicker.getPosY();
             
-            Imgproc.floodFill(src, mask, new Point(posX,posY), new Scalar(200), new Rect(), new Scalar(t, t, t), new Scalar(t, t, t), flags);
+                    
+            double r = varChooseColor.getRed() * 255;
+            double g = varChooseColor.getGreen()* 255;
+            double b = varChooseColor.getBlue()* 255;
+            
+            Imgproc.floodFill(src, mask, new Point(posX,posY), new Scalar(b,g,r), new Rect(), new Scalar(t, t, t), new Scalar(t, t, t), flags);
 
             
 //            writableImage = OpenCVUtils.mat2WritableImage(src);
@@ -2875,10 +2887,14 @@ public class MainController implements Initializable {
         }          
         
     }
-
+    
     @FXML
-    private void YACUSA(MouseEvent event) {
+    private void handleGetColorPicker(ActionEvent event) {
+        varChooseColor = buttonChooseColor.getValue();
     }
+
+
+
 
 
 
