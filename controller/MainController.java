@@ -484,6 +484,15 @@ public class MainController implements Initializable {
             }
 
         });
+        
+        imageView.setOnMouseReleased(e -> {
+            if(image != null) {
+                if(togglePanning.isSelected()) {
+                    sliderContext();
+                }
+            }
+
+        });
 
         imageView.setOnMouseEntered(e -> {
             if(image != null) {
@@ -552,12 +561,13 @@ public class MainController implements Initializable {
         int diffX = deltaX - eX;
         int diffY = deltaY - eY;
         
-        int yInit = Integer.signum(diffY) > 0 ? 0 : Math.abs(diffY) ;
+        int yInit = Integer.signum(diffY) > 0 ? 0 : Math.abs(diffY);
         int yEnd = Integer.signum(diffY) > 0 ? imageHeight - Math.abs(diffY) : imageHeight;
         
         int xInit = Integer.signum(diffX) > 0 ? 0 : Math.abs(diffX);
         int xEnd = Integer.signum(diffX) > 0 ? imageWidth - Math.abs(diffX) : imageWidth;
-        
+                
+
         Color[][] matrixWhite = new Color[imageWidth][imageHeight];
         Color[][] current = pic.getColorMatrix();
         Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
@@ -573,7 +583,9 @@ public class MainController implements Initializable {
         
         for(int y = yInit; y < yEnd; y++) {
             for(int x = xInit; x < xEnd; x ++) {
-                matrixWhite[x][y] = scaleMatrix[x][y] = current[x][y];
+                int valueX = Integer.signum(diffX) > 0 ? x + Math.abs(diffX) : x - xInit;
+                int valueY = Integer.signum(diffY) > 0 ? y + Math.abs(diffY) : y - yInit;
+                matrixWhite[x][y] = scaleMatrix[x][y] = current[valueX][valueY];
                 panningWriter.setColor(x,y,matrixWhite[x][y]);
             }
         }

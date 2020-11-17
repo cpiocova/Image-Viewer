@@ -14,14 +14,14 @@ import org.opencv.core.Core;
 
 /**
  *
- * @author Jose Pio
+ * @author Giselt Parra y Jose Pio
  */
 public class Main extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/view/MainView.fxml"));
-        stage.setTitle("Image viewer | Digital Image Processing | Jose Pio Montilva"); 
+        stage.setTitle("Image viewer | Digital Image Processing | Giselt Parra y Jose Pio Montilva"); 
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
