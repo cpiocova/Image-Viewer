@@ -50,7 +50,7 @@ public class UserActions {
     
     public void addFirstAction(Stack step) {
         stack.add(step);
-        count++;
+        count = 1; // count++
         pointer = 0;
         firstAction = 0;
         lastAction = 0;
@@ -86,7 +86,7 @@ public class UserActions {
     }
     
     public void decreasePointer() {
-        pointer = Math.abs(pointer - 1) % capacity;  
+        pointer = pointer == 0 ? capacity - 1 : (pointer - 1) % capacity;
 //        System.out.println("Pointer: " +pointer + "  - Counter: " + count);
     }
     

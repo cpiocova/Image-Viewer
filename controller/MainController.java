@@ -663,7 +663,7 @@ public class MainController implements Initializable {
                     imgPath.getName().length())
             );
             uniqueColorsList = new ArrayList();
-            capacityActions = 30;
+            capacityActions = 6;
             userActions = new UserActions(capacityActions);
             switch(pic.getFileFormat()) {
                 case "bmp":                
