@@ -21,7 +21,12 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.util.Collections;
+import object.Convolution;
 import object.DataColorRGB;
+import object.OpenCVUtils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 
 /**
@@ -408,16 +413,53 @@ public class HistogramController implements Initializable {
                 double b = histogramEQBlue[indexBlue];
                 
                 Color colorStrecth = new Color(r,g,b,1.0);
-                
-                
-//                writerStrecth.setArgb(x, y, valueStrecth);
-//                Color colorStrecth = intToColor(valueStrecth);
+
                 writerStrecth.setColor(x, y, colorStrecth);
             }
         }
                 
         mainController.setEqualizedImage(imageStrecth);
         allColors(mainController, picCopy);
+
+    }
+    
+    private WritableImage covertImageToWritableImage(Image image) {
+        pixelReaderImage = image.getPixelReader();
+        WritableImage imageEQ = new WritableImage(imageWidth, imageHeight);
+        PixelWriter pW = imageEQ.getPixelWriter();
+                      
+        for (int y = 0; y < imageHeight; y++) {
+            for (int x = 0; x < imageWidth; x++) {
+                Color color = pixelReaderImage.getColor(x,y);
+                pW.setColor(x,y,color);
+            }
+        }
+        return imageEQ;
+    }
+
+    @FXML
+    private void equalizeHistogramOpenCV(ActionEvent event) {
+        ArrayList<Mat> yCrCb = new ArrayList<Mat>();
+
+        Mat bgr = new Mat();
+        if (imagePic instanceof Image) {
+            imagePic = covertImageToWritableImage(imagePic);
+        }
+        
+        Mat src = OpenCVUtils.image2Mat((WritableImage) imagePic);
+        Imgproc.cvtColor(src, bgr, Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(bgr, bgr, Imgproc.COLOR_BGR2YCrCb);
+        
+        Core.split(bgr, yCrCb);
+        Imgproc.equalizeHist(yCrCb.get(0), yCrCb.get(0));
+	Core.merge(yCrCb, bgr);
+	Imgproc.cvtColor(bgr, bgr, Imgproc.COLOR_YCrCb2BGR);      
+//        
+
+        imagePic = OpenCVUtils.mat2WritableImage(bgr);
+        mainController.setEqualizedImage((WritableImage) imagePic);
+        allColors(mainController, picCopy);
+
 
     }
     
