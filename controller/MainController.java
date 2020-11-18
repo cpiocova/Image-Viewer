@@ -104,7 +104,7 @@ public class MainController implements Initializable {
     
     private boolean isBlackWhite;
 
-    private UserActions userActions;
+    public UserActions userActions;
     private int capacityActions;
     
     private Color [][] bufferNetpbm;
@@ -663,7 +663,7 @@ public class MainController implements Initializable {
                     imgPath.getName().length())
             );
             uniqueColorsList = new ArrayList();
-            capacityActions = 6;
+            capacityActions = 30;
             userActions = new UserActions(capacityActions);
             switch(pic.getFileFormat()) {
                 case "bmp":                
@@ -687,7 +687,7 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "load", dimensions);
+            Stack step = new Stack(changeImage, "Default Image", dimensions);
             userActions.addStep(step);   
             
         }       
@@ -719,10 +719,9 @@ public class MainController implements Initializable {
                            1.0
                    );
                    pixelWriter.setColor(x,y,negative);
-                   current[x][y] = negative;
+//                   current[x][y] = negative;
                }
             }
-
             negativeContext();
 //            handleZoom();
             configurationImageView();
@@ -767,11 +766,8 @@ public class MainController implements Initializable {
                     current[x][y] = blackwhite;
                }
             }
-//            pic.setColorMatrix(current);
-//            pic.setImageModified(writableImage);                
-//            imageView.setImage(writableImage);
+
             blackWhiteContext();
-//            handleZoom();
             configurationImageView();
         }
     }
@@ -888,7 +884,6 @@ public class MainController implements Initializable {
                    }
                 }
             pic.setScaleMatrix(scaleMatrix);
-//            imageView.setImage(writableImage);
             handleZoom();
             configurationImageView();
             int text = (int) (gv * 100);
@@ -1379,8 +1374,7 @@ public class MainController implements Initializable {
         int width = pic.getDimensions().getWidth();
         int heigth = pic.getDimensions().getHeight();
         WritableImage imageWriter = new WritableImage(width, heigth);
-        PixelWriter pW;
-        pW = imageWriter.getPixelWriter();
+        PixelWriter pW = imageWriter.getPixelWriter();
         Color [][] current = pic.getColorMatrix();
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
@@ -1397,7 +1391,7 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "negative", dimensions);
+            Stack step = new Stack(changeImage, "Negative", dimensions);
             userActions.addStep(step);            
         }
     }
@@ -1409,7 +1403,7 @@ public class MainController implements Initializable {
              
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "blackwhite", dimensions);
+            Stack step = new Stack(changeImage, "Black and White", dimensions);
             userActions.addStep(step);                    
         }
     }
@@ -1421,7 +1415,7 @@ public class MainController implements Initializable {
              
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "rotateN", dimensions);
+            Stack step = new Stack(changeImage, "Rotate -90°", dimensions);
             userActions.addStep(step);                    
         }      
     }
@@ -1433,7 +1427,7 @@ public class MainController implements Initializable {
              
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "rotateP", dimensions);
+            Stack step = new Stack(changeImage, "Rotate 90°", dimensions);
             userActions.addStep(step);                    
         }       
     }
@@ -1449,8 +1443,9 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "growth", dimensions);
-            userActions.addStep(step);    
+            Stack step = new Stack(changeImage, "Region Growth", dimensions);
+            userActions.addStep(step);
+            regionImage = null;
         }
     }
      
@@ -1466,7 +1461,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();  
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "grayscale", dimensions);
+                Stack step = new Stack(changeImage, "Grayscale", dimensions);
                 userActions.addStep(step);   
             }            
         }
@@ -1482,7 +1477,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "brightness", dimensions);
+                Stack step = new Stack(changeImage, "Brigthness", dimensions);
                 userActions.addStep(step);   
             }            
         }
@@ -1498,7 +1493,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "contrast", dimensions);
+                Stack step = new Stack(changeImage, "Contrast", dimensions);
                 userActions.addStep(step);  
             }            
         }
@@ -1514,7 +1509,7 @@ public class MainController implements Initializable {
             
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "thresholding", dimensions);
+            Stack step = new Stack(changeImage, "Thresholding", dimensions);
             userActions.addStep(step);              
         }
     }
@@ -1530,7 +1525,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterAverage", dimensions);
+                Stack step = new Stack(changeImage, "Average filter", dimensions);
                 userActions.addStep(step);              
             }                    
         }
@@ -1547,7 +1542,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterMedian", dimensions);
+                Stack step = new Stack(changeImage, "Median filter", dimensions);
                 userActions.addStep(step);                      
             }        
             
@@ -1565,7 +1560,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterGaussian", dimensions);
+                Stack step = new Stack(changeImage, "Gaussian filter", dimensions);
                 userActions.addStep(step);                     
             }        
             
@@ -1583,7 +1578,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterLaplacian", dimensions);
+                Stack step = new Stack(changeImage, "Laplacian filter", dimensions);
                 userActions.addStep(step);                     
             }        
             
@@ -1601,7 +1596,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterSobel", dimensions);
+                Stack step = new Stack(changeImage, "Sobel filter", dimensions);
                 userActions.addStep(step);                        
             }
             
@@ -1619,7 +1614,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterPrewitt", dimensions);
+                Stack step = new Stack(changeImage, "Prewitt filter", dimensions);
                 userActions.addStep(step);                       
             }
             
@@ -1636,7 +1631,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterRoberts", dimensions);
+                Stack step = new Stack(changeImage, "Roberts filter", dimensions);
                 userActions.addStep(step);                       
             }
             
@@ -1654,7 +1649,7 @@ public class MainController implements Initializable {
                 
                 WritableImage changeImage = imageWriter();
                 ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-                Stack step = new Stack(changeImage, "filterLoG", dimensions);
+                Stack step = new Stack(changeImage, "LoG filter", dimensions);
                 userActions.addStep(step);                      
             }
             
@@ -1668,19 +1663,20 @@ public class MainController implements Initializable {
             
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "filterArbitrary", dimensions);
+            Stack step = new Stack(changeImage, "Arbitrary filter", dimensions);
             userActions.addStep(step);                      
         }
     }   
     
   
-    private void generalContext() {
+    private void 
+        generalContext() {
         if(image != null) {
             sliderContext();
 
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "general", dimensions);
+            Stack step = new Stack(changeImage, "General", dimensions);
             userActions.addStep(step);                      
         }
     }
@@ -1692,7 +1688,7 @@ public class MainController implements Initializable {
 
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "kmeans", dimensions);
+            Stack step = new Stack(changeImage, "K-means", dimensions);
             userActions.addStep(step);                      
         }
     }    
@@ -1703,7 +1699,7 @@ public class MainController implements Initializable {
 
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "panning", dimensions);
+            Stack step = new Stack(changeImage, "Panning", dimensions);
             userActions.addStep(step);                      
         }
     }    
@@ -1742,7 +1738,7 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "load", dimensions);
+            Stack step = new Stack(changeImage, "Default Image", dimensions);
             userActions.addStep(step);   
         }
 
@@ -1848,7 +1844,7 @@ public class MainController implements Initializable {
         colorPickerRGB.setText("-");
         showColorPick.setStyle("-fx-background-color: rgba(0,0,0,0.2)"); 
         togglePickerButton.setSelected(false);
-        sliderToTolerance.setValue(1);
+        sliderToTolerance.setValue(0);
         pixelPicker = null;
         regionImage = null;
     }
@@ -2960,6 +2956,30 @@ public class MainController implements Initializable {
                 sliderContext();                
             }
         }
+    }
+
+    @FXML
+    private void viewHistory(ActionEvent event) {
+        if(image != null) {
+    try {
+        FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/HistoryView.fxml")));
+        Parent root =  loader.load();
+
+       HistoryController historyInstanceController = (HistoryController)loader.getController();
+
+        historyInstanceController.visualizeHistory(mainInstanceController);
+
+
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.showAndWait();
+
+   } catch (IOException ex) {
+       Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+   }           
+}
     }
 
 

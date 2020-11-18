@@ -30,5 +30,11 @@ public class Stack {
            return imageCurrent;        
     }
     
+    public String getNameFilter() {
+           return nameFilter;        
+    }
+    
+    
+    
     
 }
