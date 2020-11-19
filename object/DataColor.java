@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Jose Pio
+ * @author Jose Pio y Giselt Parra
  */
 public class DataColor implements Comparable<DataColor>{
     

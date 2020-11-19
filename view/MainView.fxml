@@ -261,11 +261,12 @@
                                  <content>
                                     <AnchorPane prefHeight="167.0" prefWidth="142.0">
                                        <children>
-                                          <Button fx:id="structuringElemButton" layoutX="24.0" layoutY="178.0" mnemonicParsing="false" onAction="#setStructuringElem" prefHeight="25.0" prefWidth="125.0" text="Set structuring elem" />
-                                          <Button fx:id="erosionButton" layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleErosion" text="Apply erosion" />
-                                          <Button fx:id="dilationButton" layoutX="24.0" layoutY="59.0" mnemonicParsing="false" onAction="#handleDilation" text="Apply dilation" />
-                                          <Button fx:id="apertureButton" layoutX="24.0" layoutY="94.0" mnemonicParsing="false" onAction="#handleAperture" text="Apply opening" />
-                                          <Button fx:id="closureButton" layoutX="24.0" layoutY="129.0" mnemonicParsing="false" onAction="#handleClosure" text="Apply closing" />
+                                          <Button fx:id="structuringElemButton" layoutX="10.0" layoutY="198.0" mnemonicParsing="false" onAction="#setStructuringElem" prefHeight="25.0" prefWidth="132.0" text="Set structuring elem" />
+                                          <Button fx:id="erosionButton" layoutX="10.0" layoutY="24.0" mnemonicParsing="false" onAction="#handleErosion" text="Apply erosion" />
+                                          <Button fx:id="dilationButton" layoutX="10.0" layoutY="59.0" mnemonicParsing="false" onAction="#handleDilation" text="Apply dilation" />
+                                          <Button fx:id="apertureButton" layoutX="10.0" layoutY="94.0" mnemonicParsing="false" onAction="#handleAperture" text="Apply opening" />
+                                          <Button fx:id="closureButton" layoutX="10.0" layoutY="129.0" mnemonicParsing="false" onAction="#handleClosure" text="Apply closing" />
+                                          <Button fx:id="defaultElemButton" layoutX="10.0" layoutY="238.0" mnemonicParsing="false" onAction="#defaultKernelConfiguration" prefHeight="25.0" prefWidth="132.0" text="Default configuration" />
                                        </children>
                                     </AnchorPane>
                                  </content>

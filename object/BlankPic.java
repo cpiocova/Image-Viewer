@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 
 /**
  *
- * @author Jose Pio
+ * @author Jose Pio y Giselt Parra
  */
 public class BlankPic {  
     private Image imageOriginal;

@@ -57,6 +57,7 @@ import javax.imageio.ImageIO;
 import object.Convolution;
 import object.OpenCVUtils;
 import object.PointXY;
+import object.StructuringElem;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -98,6 +99,8 @@ public class MainController implements Initializable {
     
     private PointXY pixelPicker;
     private PointXY pixelDelta;
+    
+    private Mat kernelStructuring;
     
     private int imageX;
     private int imageY;
@@ -428,6 +431,8 @@ public class MainController implements Initializable {
     private RadioButton radioJpg;
     @FXML
     private RadioButton radioPng;
+    @FXML
+    private Button defaultElemButton;
 
     
     
@@ -474,6 +479,8 @@ public class MainController implements Initializable {
         
         buttonChooseColor.setValue(new Color(0.4352,0.76470,0.9333,1));
         varChooseColor = buttonChooseColor.getValue();
+        
+        defaultKernelConfiguration();
     }
     
     private void initEventListener() {
@@ -2779,19 +2786,12 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void setStructuringElem() {
-//        Mat element = Imgproc.getStructuringElement(elementType, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
-//            new PointXY(kernelSize, kernelSize));
-    }
-
-    @FXML
     private void handleErosion() {
         if(image != null) {
             Mat dst = new Mat();
             Mat src = OpenCVUtils.image2Mat(writableImage);
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
 
-            Imgproc.erode(src, dst, kernel);
+            Imgproc.erode(src, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
             generalContext();            
@@ -2803,9 +2803,8 @@ public class MainController implements Initializable {
         if(image != null) {
             Mat dst = new Mat();
             Mat src = OpenCVUtils.image2Mat(writableImage);
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
 
-            Imgproc.dilate(src, dst, kernel);
+            Imgproc.dilate(src, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
             generalContext();            
@@ -2819,10 +2818,9 @@ public class MainController implements Initializable {
     //        handleDilation();        
             Mat dst = new Mat();
             Mat src = OpenCVUtils.image2Mat(writableImage);
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
 
-            Imgproc.erode(src, dst, kernel);
-            Imgproc.dilate(dst, dst, kernel);
+            Imgproc.erode(src, dst, kernelStructuring);
+            Imgproc.dilate(dst, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
             generalContext();   
@@ -2836,18 +2834,48 @@ public class MainController implements Initializable {
     //        handleErosion();
             Mat dst = new Mat();
             Mat src = OpenCVUtils.image2Mat(writableImage);
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
 
-            Imgproc.dilate(src, dst, kernel);
-            Imgproc.erode(dst, dst, kernel);
+            Imgproc.dilate(src, dst, kernelStructuring);
+            Imgproc.erode(dst, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
             generalContext();        
         }
     }
+    
+    @FXML
+    private void defaultKernelConfiguration() {
+        StructuringElem elem = new StructuringElem();
+        kernelStructuring = elem.getStructuringElem();
+    }
+    
+    @FXML
+    private void setStructuringElem() {
+        if(image != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/StructureElementsView.fxml")));
+                Parent root =  loader.load();
+
+               StructureElementsController structureElementsInstanceController = (StructureElementsController)loader.getController();
+
+                structureElementsInstanceController.setValues(mainInstanceController);
 
 
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setScene(scene);
+                stage.showAndWait();
 
+            } catch (IOException ex) {
+               Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            }           
+        }
+    }
+
+    public void receiveStructuringElem(Mat kernel) {
+        kernelStructuring = kernel;
+    }
 
     @FXML
     private void handleKMeans() {
@@ -2986,25 +3014,25 @@ public class MainController implements Initializable {
     @FXML
     private void viewHistory(ActionEvent event) {
         if(image != null) {
-    try {
-        FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/HistoryView.fxml")));
-        Parent root =  loader.load();
+            try {
+                FXMLLoader loader = new FXMLLoader((getClass().getResource("/view/HistoryView.fxml")));
+                Parent root =  loader.load();
 
-       HistoryController historyInstanceController = (HistoryController)loader.getController();
+               HistoryController historyInstanceController = (HistoryController)loader.getController();
 
-        historyInstanceController.visualizeHistory(mainInstanceController);
+                historyInstanceController.visualizeHistory(mainInstanceController);
 
 
-        Scene scene = new Scene(root);
-        Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
-        stage.showAndWait();
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setScene(scene);
+                stage.showAndWait();
 
-   } catch (IOException ex) {
-       Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-   }           
-}
+            } catch (IOException ex) {
+               Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            }           
+        }
     }
 
     @FXML

@@ -14,7 +14,7 @@ import javafx.scene.paint.Color;
 
 /**
  *
- * @author Jose Pio
+ * @author Jose Pio y Giselt Parra
  */
 public class Convolution {
     private int width;

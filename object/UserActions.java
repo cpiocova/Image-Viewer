@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Jose Pio
+ * @author Jose Pio y Giselt Parra
  */
 public class UserActions {
     private int pointer;
