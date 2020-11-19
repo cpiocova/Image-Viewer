@@ -418,6 +418,16 @@ public class MainController implements Initializable {
     };
     @FXML
     private ColorPicker buttonChooseColor;
+    @FXML
+    private TextField inputBitReduction;
+    @FXML
+    private RadioButton radioBmp;
+    @FXML
+    private RadioButton radioNetpbm;
+    @FXML
+    private RadioButton radioJpg;
+    @FXML
+    private RadioButton radioPng;
 
     
     
@@ -649,13 +659,17 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Load image in BMP or Netpbm format");
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Allowed formats (Bmp and Netpbm)", "*.bmp","*.pbm", "*.pgm", "*.ppm"),
+                new FileChooser.ExtensionFilter("Allowed formats (Bmp | Jpg | Png | Netpbm)", "*.bmp", "*.jpg", "*.png", "*.pbm", "*.pgm", "*.ppm"),
                 new FileChooser.ExtensionFilter("BMP", "*.bmp"),               
+                new FileChooser.ExtensionFilter("JPG", "*.jpg"),               
+                new FileChooser.ExtensionFilter("PNG", "*.png"),               
                 new FileChooser.ExtensionFilter("Netpbm", "*.pbm", "*.pgm", "*.ppm")
         );
 
         File imgPath = fileChooser.showOpenDialog(null);
 
+        boolean compatible = true;
+        
         if (imgPath != null) {
             pic = new BlankPic();
             pic.setFileFormat(
@@ -666,6 +680,8 @@ public class MainController implements Initializable {
             capacityActions = 30;
             userActions = new UserActions(capacityActions);
             switch(pic.getFileFormat()) {
+                case "png":
+                case "jpg":
                 case "bmp":                
                     restartZoom();
                     bmpLoader(imgPath);
@@ -681,14 +697,17 @@ public class MainController implements Initializable {
                     break;
                   default:
                     labelLoadMessage.setText("Incompatible Format.");
+                    compatible = false;
                     break;
             }
-            restartUI();
-            WritableImage changeImage = imageWriter();
-            
-            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
-            Stack step = new Stack(changeImage, "Default Image", dimensions);
-            userActions.addStep(step);   
+            if(compatible) {
+                restartUI();
+                WritableImage changeImage = imageWriter();
+
+                ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+                Stack step = new Stack(changeImage, "Default Image", dimensions);
+                userActions.addStep(step);                   
+            }
             
         }       
     }
@@ -2737,19 +2756,25 @@ public class MainController implements Initializable {
     private void handleSaveMethod(ActionEvent event) {
         if(image != null) {
             int saveButton = saveMethod.getToggles().indexOf(saveMethod.getSelectedToggle());
-            if(saveButton == 0) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save image in BMP format");
 
-                fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("BMP", "*.bmp"));
+            
+            if(radioBmp.isSelected() || radioJpg.isSelected() || radioPng.isSelected()) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save image in BMP | JPG | PNG format");
+                
+                if(radioBmp.isSelected()) fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("BMP", "*.bmp")); 
+                if(radioJpg.isSelected()) fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG", "*.jpg")); 
+                if(radioPng.isSelected()) fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG", "*.png")); 
+                
+
                 File file = fileChooser.showSaveDialog(null);
                 if(file != null){
                     bmpSaver(writableImage, file);
                 }
-            } else {
-                netBpmSaver();
-
             }
+            
+            if(radioNetpbm.isSelected()) netBpmSaver();
+            
         }
     }
 
@@ -2845,7 +2870,7 @@ public class MainController implements Initializable {
             Mat gray = new Mat();
             Mat src = OpenCVUtils.image2Mat(writableImage);
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
-            Imgproc.threshold(gray, dst, 0, 255, Imgproc.THRESH_OTSU); 
+            Imgproc.threshold(gray, dst, 127, 255, Imgproc.THRESH_OTSU); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
             generalContext();
         }        
@@ -2980,6 +3005,11 @@ public class MainController implements Initializable {
        Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
    }           
 }
+    }
+
+    @FXML
+    private void handleBitReduction(ActionEvent event) {
+        
     }
 
 

@@ -25,13 +25,15 @@
                                  <content>
                                     <AnchorPane prefHeight="85.0" prefWidth="135.0">
                                        <children>
-                                          <RadioButton layoutX="14.0" layoutY="11.0" mnemonicParsing="false" selected="true" text="Bmp">
+                                          <RadioButton fx:id="radioBmp" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" selected="true" text="Bmp">
                                              <toggleGroup>
                                                 <ToggleGroup fx:id="saveMethod" />
                                              </toggleGroup>
                                           </RadioButton>
-                                          <RadioButton layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Netpbm" toggleGroup="$saveMethod" />
-                                          <Button layoutX="59.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleSaveMethod" text="Save" />
+                                          <RadioButton fx:id="radioNetpbm" layoutX="14.0" layoutY="105.0" mnemonicParsing="false" text="Netpbm" toggleGroup="$saveMethod" />
+                                          <Button layoutX="59.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleSaveMethod" text="Save" />
+                                          <RadioButton fx:id="radioJpg" layoutX="14.0" layoutY="41.0" mnemonicParsing="false" text="Jpg" toggleGroup="$saveMethod" />
+                                          <RadioButton fx:id="radioPng" layoutX="14.0" layoutY="74.0" mnemonicParsing="false" text="Png" toggleGroup="$saveMethod" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -326,12 +328,16 @@
                                  <content>
                                     <AnchorPane prefHeight="270.0" prefWidth="160.0">
                                        <children>
-                                          <Label layoutX="6.0" layoutY="38.0" text="K:" />
-                                          <Button layoutX="76.0" layoutY="34.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
-                                          <TextField fx:id="inputKMeans" layoutX="25.0" layoutY="34.0" prefHeight="25.0" prefWidth="38.0" />
+                                          <Label layoutX="6.0" layoutY="39.0" text="K:" />
+                                          <Button layoutX="76.0" layoutY="35.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
+                                          <TextField fx:id="inputKMeans" layoutX="25.0" layoutY="35.0" prefHeight="25.0" prefWidth="38.0" />
                                           <Label layoutX="6.0" layoutY="17.0" text="K-means:" />
                                           <Button layoutX="76.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Apply" />
                                           <Label layoutX="6.0" layoutY="87.0" text="Threshold:" />
+                                          <Label layoutX="6.0" layoutY="128.0" text="Bit reduction per pixel:" />
+                                          <Label layoutX="6.0" layoutY="149.0" text="Bit:" />
+                                          <TextField fx:id="inputBitReduction" layoutX="25.0" layoutY="145.0" prefHeight="25.0" prefWidth="38.0" />
+                                          <Button layoutX="76.0" layoutY="145.0" mnemonicParsing="false" onAction="#handleBitReduction" text="Apply" />
                                        </children>
                                     </AnchorPane>
                                  </content>
