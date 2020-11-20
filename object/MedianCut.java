@@ -73,7 +73,7 @@ public class MedianCut {
     public static HashMap <Color,Color> create_Palette(Color ma[], int depth, String option, int k) { 
         int middle = (int) (ma.length)/2;
         
-        if (depth == k){
+        if (depth == k || Math.pow(2,k) >= ma.length){
             double av_red = ma[middle].getRed();
             double av_green = ma[middle].getGreen();
             double av_blue  = ma[middle].getBlue();                
@@ -102,6 +102,7 @@ public class MedianCut {
         }
         
         //1st mitad
+        
         HashMap <Color,Color>h1 = create_Palette(Arrays.copyOfRange(ma, 0, middle),depth+1,option,k);
         //2nd mitad
         HashMap <Color,Color> h2 = create_Palette(Arrays.copyOfRange(ma, middle, ma.length),depth+1,option,k);
