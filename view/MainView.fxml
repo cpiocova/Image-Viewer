@@ -339,6 +339,11 @@
                                           <Label layoutX="6.0" layoutY="149.0" text="Bit:" />
                                           <TextField fx:id="inputBitReduction" layoutX="25.0" layoutY="145.0" prefHeight="25.0" prefWidth="38.0" />
                                           <Button layoutX="76.0" layoutY="145.0" mnemonicParsing="false" onAction="#handleBitReduction" text="Apply" />
+                                          <Label layoutX="6.0" layoutY="199.0" text="Median Cut:" />
+                                          <Button layoutX="76.0" layoutY="195.0" mnemonicParsing="false" onAction="#handleMedianCut" text="Apply" />
+                                          <Label layoutX="6.0" layoutY="219.0" text="N:" />
+                                          <Slider fx:id="sliderToMedianCut" blockIncrement="1.0" layoutX="24.0" layoutY="222.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedianCut" onMouseReleased="#handleMedianCut" prefHeight="14.0" prefWidth="61.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label fx:id="labelMedianCut" layoutX="86.0" layoutY="221.0" text="1" />
                                        </children>
                                     </AnchorPane>
                                  </content>

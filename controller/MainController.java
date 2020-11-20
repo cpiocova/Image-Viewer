@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.Math.max;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -32,7 +33,11 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
@@ -55,6 +60,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import object.Convolution;
+import object.MedianCut;
+import static object.MedianCut.create_Palette;
 import object.OpenCVUtils;
 import object.PointXY;
 import object.StructuringElem;
@@ -302,7 +309,24 @@ public class MainController implements Initializable {
     private AnchorPane mainPaneScene;
     @FXML
     private ToggleButton togglePickerButton;
-
+    @FXML
+    private ColorPicker buttonChooseColor;
+    @FXML
+    private TextField inputBitReduction;
+    @FXML
+    private RadioButton radioBmp;
+    @FXML
+    private RadioButton radioNetpbm;
+    @FXML
+    private RadioButton radioJpg;
+    @FXML
+    private RadioButton radioPng;
+    @FXML
+    private Button defaultElemButton;
+    @FXML
+    private Slider sliderToMedianCut;
+    @FXML
+    private Label labelMedianCut;
 
 
     
@@ -419,20 +443,12 @@ public class MainController implements Initializable {
         final int roundedValue = val.intValue();
         sliderToTolerance.valueProperty().set(roundedValue);
     };
-    @FXML
-    private ColorPicker buttonChooseColor;
-    @FXML
-    private TextField inputBitReduction;
-    @FXML
-    private RadioButton radioBmp;
-    @FXML
-    private RadioButton radioNetpbm;
-    @FXML
-    private RadioButton radioJpg;
-    @FXML
-    private RadioButton radioPng;
-    @FXML
-    private Button defaultElemButton;
+    final ChangeListener<Number> sliderMedianCut = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToMedianCut.valueProperty().set(roundedValue);
+        labelMedianCut.setText(Integer.toString(roundedValue));
+    };
+
 
     
     
@@ -474,6 +490,8 @@ public class MainController implements Initializable {
         sliderToArbitraryY.valueProperty().addListener(sliderArbitraryY);
         
         sliderToTolerance.valueProperty().addListener(sliderTolerance);
+        
+        sliderToMedianCut.valueProperty().addListener(sliderMedianCut);
         
         initEventListener();
         
@@ -3109,6 +3127,79 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleBitReduction(ActionEvent event) {
+        
+    }
+
+    @FXML
+    private void handleMedianCut() {
+        int k = (int) sliderToMedianCut.getValue();
+        List<Color> l = new ArrayList<Color>();
+        
+        //Buscar canal con mayor rango
+        double den_red = 0;
+        double den_green = 0;
+        double den_blue = 0;
+        int c = 0;
+        
+        //Aca recorre toda la imagen y ve sumando los valores por cada canal y 
+        //al mismo tiempo llena l con los colores(los tres canales juntos)
+        Color [][] current = pic.getColorMatrix();
+        for(int y = 0; y< imageHeight; y++){
+            for(int x = 0; x< imageWidth; x++){ 
+                Color imColor = current[x][y];  
+                den_red += imColor.getRed();
+                den_green += imColor.getGreen();
+                den_blue += imColor.getBlue();
+                l.add(imColor);  
+                c++;
+            }
+        }   
+
+        //Saca promedio para ver la densidad de cada canal
+        den_red = den_red/imageHeight*imageWidth;
+        den_green = den_green/imageHeight*imageWidth;
+        den_blue = den_blue/imageHeight*imageWidth;
+        
+        //Determina por cual canal se van a ordenar los colores
+        double den_max = max(den_blue,max(den_red,den_green));
+        char channel;
+        if (den_max  == den_red) channel = 'R';
+        else if (den_max == den_green) channel = 'G';
+        else channel ='B';  
+
+        c = 0;
+        //Te quedas solo con un color de cada combinacion
+        Set<Color> uniquec = new HashSet<Color>(l); //Te quedas solo con un color de cada combinacion
+        Color [] arrayColor =  new Color[uniquec.size()];
+        //Llenas tu arreglo de colores para ordenarlos
+        for (Color x : uniquec){
+            arrayColor[c] = (x);
+            c++;
+        }
+
+        //Los mandas a ordenar mandando cual va a ser el canal
+        MedianCut.quickSort(arrayColor, 0, uniquec.size()-1, channel);
+        
+        HashMap <Color,Color> palette = create_Palette(arrayColor,0,"Media",k);
+        
+        pixelWriter = writableImage.getPixelWriter();
+        Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
+        
+        
+
+        for(int y = 0; y< imageHeight; y++){
+            for(int x = 0; x< imageWidth;x++){ 
+                Color imColor = current[x][y];  
+                Color newColor = palette.get(imColor);
+                pixelWriter.setColor(x,y,newColor);
+                scaleMatrix[x][y] = newColor;
+            }
+         } 
+        pic.setScaleMatrix(scaleMatrix);
+        handleZoom();
+        configurationImageView();
+        
+        
         
     }
 
