@@ -492,13 +492,15 @@ public class MainController implements Initializable {
                     handleDraggedPickColor(e);
                 }else if(togglePanning.isSelected()) {
                     handlePanning(e);
+                }else if(toggleRotation.isSelected()){
+                    handleRotation(e);
                 }
             }
         });
         
         imageView.setOnMousePressed(e -> {
             if(image != null) {
-                if(togglePanning.isSelected()) {
+                if(togglePanning.isSelected() || toggleRotation.isSelected()) {
                     double zoomValue = sliderToZoom.getValue();
                     int x = (int) (e.getX() / zoomValue);
                     int y = (int) (e.getY() / zoomValue);
@@ -513,6 +515,8 @@ public class MainController implements Initializable {
             if(image != null) {
                 if(togglePanning.isSelected()) {
                     panningContext();
+                } else if(toggleRotation.isSelected()) {
+                    rotationContext();
                 }
             }
 
@@ -616,6 +620,64 @@ public class MainController implements Initializable {
 
         pic.setScaleMatrix(scaleMatrix);
         handleZoom();
+    }
+    
+    private void handleRotation(MouseEvent e) {
+        double zoomValue = sliderToZoom.getValue();
+        
+        int mX = Math.round(imageWidth / 2);
+        int mY = Math.round(imageHeight / 2);
+
+        int eX = (int) (e.getX() / zoomValue);
+        int eY = (int) (e.getY() / zoomValue);
+
+        if(eX < 0) eX = 0;
+        if(eX > imageWidth - 1) eX = imageWidth - 1;
+        if(eY < 0) eY = 0;
+        if(eY > imageHeight - 1) eY = imageHeight - 1;
+        
+        int deltaX = pixelDelta.getPosX();
+        int deltaY = pixelDelta.getPosY();
+        
+        int diffX = mX - eX;
+        int diffY = mY - eY;
+        
+        
+        double radians = Math.atan2(diffY,diffX);
+        
+//        diffY = Math.abs(diffY);
+//        diffX = Math.abs(diffX);
+//        double dist = Math.sqrt((diffY*diffY)+(diffX*diffX)); 
+        
+       
+        Color[][] matrixWhite = new Color[imageWidth][imageHeight];
+        Color[][] current = pic.getColorMatrix();
+        Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
+
+        PixelWriter panningWriter = writableImage.getPixelWriter();
+        
+
+        for(int y = 0; y < imageHeight; y++) {
+            for(int x = 0; x< imageWidth; x ++) {
+                matrixWhite[x][y] = scaleMatrix[x][y] = new Color(1,1,1,1.0);
+                panningWriter.setColor(x,y,matrixWhite[x][y]);
+            }
+        }
+        
+        for(int y = 0; y < imageHeight; y++) {
+            for(int x = 0; x < imageWidth; x ++) {
+                int rX = (int) Math.round(Math.cos(radians) * (x-mX) - Math.sin(radians) * (y-mY) + mX);
+                int rY = (int) Math.round((x-mX) * Math.sin(radians) + (y-mY) * Math.cos(radians) + mY);
+                if(rX >= 0 && rX < imageWidth && rY >= 0 && rY < imageHeight) {
+                    matrixWhite[x][y] = scaleMatrix[x][y] = current[rX][rY];
+                    panningWriter.setColor(x,y,matrixWhite[x][y]);                    
+                }
+            }
+        }
+        
+        pic.setScaleMatrix(scaleMatrix);
+        handleZoom();        
+        
     }
     
     
@@ -1726,6 +1788,16 @@ public class MainController implements Initializable {
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
             Stack step = new Stack(changeImage, "Panning", dimensions);
+            userActions.addStep(step);                      
+        }
+    }    
+    private void rotationContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Rotation", dimensions);
             userActions.addStep(step);                      
         }
     }    
