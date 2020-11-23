@@ -62,9 +62,12 @@ import javax.imageio.ImageIO;
 import object.Convolution;
 import object.MedianCut;
 import static object.MedianCut.create_Palette;
+import static object.MedianCut.create_Palette_Mediana;
 import object.OpenCVUtils;
 import object.PointXY;
 import object.StructuringElem;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -108,6 +111,10 @@ public class MainController implements Initializable {
     private PointXY pixelDelta;
     
     private Mat kernelStructuring;
+    
+    private Mat complexImage;
+
+    private ArrayList planes;
     
     private int imageX;
     private int imageY;
@@ -312,8 +319,6 @@ public class MainController implements Initializable {
     @FXML
     private ColorPicker buttonChooseColor;
     @FXML
-    private TextField inputBitReduction;
-    @FXML
     private RadioButton radioBmp;
     @FXML
     private RadioButton radioNetpbm;
@@ -327,6 +332,12 @@ public class MainController implements Initializable {
     private Slider sliderToMedianCut;
     @FXML
     private Label labelMedianCut;
+        
+    @FXML
+    private Label labelMedianaCut;
+    @FXML
+    private Slider sliderToMedianaCut;
+
 
 
     
@@ -448,6 +459,13 @@ public class MainController implements Initializable {
         sliderToMedianCut.valueProperty().set(roundedValue);
         labelMedianCut.setText(Integer.toString(roundedValue));
     };
+    final ChangeListener<Number> sliderMedianaCut = (obs, old, val) -> {
+        final int roundedValue = val.intValue();
+        sliderToMedianaCut.valueProperty().set(roundedValue);
+        labelMedianaCut.setText(Integer.toString(roundedValue));
+    };
+    
+    
 
 
     
@@ -1775,8 +1793,7 @@ public class MainController implements Initializable {
     }   
     
   
-    private void 
-        generalContext() {
+    private void generalContext() {
         if(image != null) {
             sliderContext();
 
@@ -1787,6 +1804,95 @@ public class MainController implements Initializable {
         }
     }
     
+    private void quantizeThresholdContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Quantize Threshold", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void otsuContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Otsu", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void thresholdKMeansContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Threshold K-means", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void erosionContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Erosion", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void dilationContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Dilate", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void apertureContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Opening", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void closureContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Closing", dimensions);
+            userActions.addStep(step);                      
+        }        
+    }
+    
+    private void equalizedContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Equalization", dimensions);
+            userActions.addStep(step);                      
+        }        
+        
+    }
+            
     private void kMeansContext() {
         if(image != null) {
             sliderContext();
@@ -1824,12 +1930,27 @@ public class MainController implements Initializable {
     private void medianCutContext(ActionEvent event) {
         if(image != null) {
             sliderContext();
+            restartMedianCut();
 
             WritableImage changeImage = imageWriter();
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
             Stack step = new Stack(changeImage, "Median Cut", dimensions);
             userActions.addStep(step);                      
         }
+    }
+    
+    @FXML
+    private void medianaCutContext(ActionEvent event) {
+        if(image != null) {
+            sliderContext();
+            restartMedianaCut();
+
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Median Cut", dimensions);
+            userActions.addStep(step);                      
+        }        
     }
 
 
@@ -1888,6 +2009,8 @@ public class MainController implements Initializable {
         restartLoG();
         restartGrowth();
         restartKMeans();
+        restartMedianCut();
+        restartMedianaCut();
         handleZoom();
     }
 
@@ -1980,6 +2103,16 @@ public class MainController implements Initializable {
     private void restartKMeans() {
           inputKMeans.setText("");
     }
+    
+    private void restartMedianCut() {
+          sliderToMedianCut.setValue(1);
+          labelMedianCut.setText("1");
+    }
+    
+    private void restartMedianaCut() {
+          sliderToMedianaCut.setValue(1);
+          labelMedianaCut.setText("1");
+    }
  
 
     @FXML
@@ -2008,7 +2141,7 @@ public class MainController implements Initializable {
     
     public void setEqualizedImage(WritableImage imageStrecth) {
         writableImage = imageStrecth;
-        generalContext();
+        equalizedContext();
     }
 
 //
@@ -2897,7 +3030,7 @@ public class MainController implements Initializable {
             Imgproc.erode(src, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();            
+            erosionContext();            
         }
     }
 
@@ -2910,7 +3043,7 @@ public class MainController implements Initializable {
             Imgproc.dilate(src, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();            
+            dilationContext();            
         }
     }
 
@@ -2926,7 +3059,7 @@ public class MainController implements Initializable {
             Imgproc.dilate(dst, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();   
+            apertureContext();   
         }    
     }
 
@@ -2942,7 +3075,7 @@ public class MainController implements Initializable {
             Imgproc.erode(dst, dst, kernelStructuring);
 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();        
+            closureContext();        
         }
     }
     
@@ -3003,7 +3136,7 @@ public class MainController implements Initializable {
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
             Imgproc.threshold(gray, dst, 127, 255, Imgproc.THRESH_OTSU); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();
+            otsuContext();
         }        
     }
 
@@ -3013,7 +3146,7 @@ public class MainController implements Initializable {
             Mat src = OpenCVUtils.image2Mat(writableImage);
             Mat dst = OpenCVUtils.kmeansThreshold(src, 2); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();
+            thresholdKMeansContext();
         }
     }
 
@@ -3024,7 +3157,7 @@ public class MainController implements Initializable {
             Mat src = OpenCVUtils.image2Mat(writableImage);
             Imgproc.threshold(src, dst, 180, 200, Imgproc.THRESH_BINARY); 
             writableImage = OpenCVUtils.mat2WritableImage(dst);
-            generalContext();
+            quantizeThresholdContext();
         }        
     }
 
@@ -3138,10 +3271,6 @@ public class MainController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleBitReduction(ActionEvent event) {
-        
-    }
 
     @FXML
     private void handleMedianCut() {
@@ -3215,4 +3344,131 @@ public class MainController implements Initializable {
         }        
     } 
     
+    @FXML
+    private void handleMedianaCut() {
+        if(image != null) {
+            int k = (int) sliderToMedianaCut.getValue();
+            List<Color> l = new ArrayList<Color>();
+
+            //Buscar canal con mayor rango
+            double den_red = 0;
+            double den_green = 0;
+            double den_blue = 0;
+            int c = 0;
+
+            //Aca recorre toda la imagen y ve sumando los valores por cada canal y 
+            //al mismo tiempo llena l con los colores(los tres canales juntos)
+            Color [][] current = pic.getColorMatrix();
+            for(int y = 0; y< imageHeight; y++){
+                for(int x = 0; x< imageWidth; x++){ 
+                    Color imColor = current[x][y];  
+                    den_red += imColor.getRed();
+                    den_green += imColor.getGreen();
+                    den_blue += imColor.getBlue();
+                    l.add(imColor);  
+                    c++;
+                }
+            }   
+
+            //Saca promedio para ver la densidad de cada canal
+            den_red = den_red/imageHeight*imageWidth;
+            den_green = den_green/imageHeight*imageWidth;
+            den_blue = den_blue/imageHeight*imageWidth;
+
+            //Determina por cual canal se van a ordenar los colores
+            double den_max = max(den_blue,max(den_red,den_green));
+            char channel;
+            if (den_max  == den_red) channel = 'R';
+            else if (den_max == den_green) channel = 'G';
+            else channel ='B';  
+
+            c = 0;
+            //Te quedas solo con un color de cada combinacion
+            Set<Color> uniquec = new HashSet<Color>(l); //Te quedas solo con un color de cada combinacion
+            Color [] arrayColor =  new Color[uniquec.size()];
+            //Llenas tu arreglo de colores para ordenarlos
+            for (Color x : uniquec){
+                arrayColor[c] = (x);
+                c++;
+            }
+
+            //Los mandas a ordenar mandando cual va a ser el canal
+            MedianCut.quickSort(arrayColor, 0, uniquec.size()-1, channel);
+            HashMap <Color,Color> palette = create_Palette_Mediana(arrayColor,0,"Mediana",k);
+
+            pixelWriter = writableImage.getPixelWriter();
+            Color[][] scaleMatrix = new Color [imageWidth][imageHeight];
+
+
+
+            for(int y = 0; y< imageHeight; y++){
+                for(int x = 0; x< imageWidth;x++){ 
+                    Color imColor = current[x][y];  
+                    Color newColor = palette.get(imColor);
+                    pixelWriter.setColor(x,y,newColor);
+                    scaleMatrix[x][y] = newColor;
+                }
+             } 
+            pic.setScaleMatrix(scaleMatrix);
+            handleZoom();
+            configurationImageView();
+
+        }        
+    } 
+
+    @FXML
+    private void handleDFT(ActionEvent event) {
+        complexImage = new Mat();
+        this.planes = new ArrayList<>();
+        Mat src = OpenCVUtils.image2Mat(writableImage);
+        Imgproc.cvtColor(src, src, Imgproc.COLOR_BGRA2GRAY);
+        src.convertTo(src, CvType.CV_32F);
+
+        this.planes.add(src);
+        this.planes.add(Mat.zeros(src.size(), CvType.CV_32F));
+
+        Core.merge(this.planes, complexImage);
+        Core.dft(complexImage, complexImage);
+
+        Mat magnitude = OpenCVUtils.createOptimizedMagnitude(this.complexImage);
+        
+//        complexImage = magnitude;
+
+        writableImage = OpenCVUtils.mat2WritableImage(magnitude);
+        generalContext();   
+    }
+
+    @FXML
+    private void handleLowPass(ActionEvent event) {
+
+        Imgproc.blur(complexImage, complexImage, new Size(5, 5));
+        
+        writableImage = OpenCVUtils.mat2WritableImage(complexImage);
+        generalContext();  
+
+    }
+
+    @FXML
+    private void handleDFTInverse(ActionEvent event) {
+        
+//        complexImage.convertTo(complexImage, CvType.CV_32F);
+
+        Core.idft(complexImage, complexImage);
+
+        Mat restoredImage = new Mat();
+        Core.split(this.complexImage, this.planes);
+        Core.normalize((Mat) this.planes.get(0), restoredImage, 0, 255, Core.NORM_MINMAX);
+
+        restoredImage.convertTo(restoredImage, CvType.CV_8U);
+        Imgproc.cvtColor(restoredImage, restoredImage, Imgproc.COLOR_GRAY2BGR);
+
+        writableImage = OpenCVUtils.mat2WritableImage(restoredImage);
+        generalContext();   
+
+
+//        this.antitransformButton.setDisable(true);
+    }
+    
+
+ 
 }

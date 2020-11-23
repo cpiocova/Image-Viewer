@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.image.Image;
@@ -26,6 +28,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Rect;
 import org.opencv.core.TermCriteria;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -187,6 +190,40 @@ public class OpenCVUtils {
         }
         return dst;
     }
+    
+        public static Mat createOptimizedMagnitude(Mat complexImage){
+        List<Mat> newPlanes = new ArrayList<>();
+        Mat mag = new Mat();
+        Core.split(complexImage, newPlanes);
+        Core.magnitude(newPlanes.get(0), newPlanes.get(1), mag);
+
+        Core.add(Mat.ones(mag.size(), CvType.CV_32F), mag, mag);
+        Core.log(mag, mag);
+        shiftDFT(mag);
+        mag.convertTo(mag, CvType.CV_8UC1);
+        Core.normalize(mag, mag, 0, 255, Core.NORM_MINMAX, CvType.CV_8UC1);
+        return mag;
+    }
+
+    private static void shiftDFT(Mat image){
+        image = image.submat(new Rect(0, 0, image.cols() & -2, image.rows() & -2));
+        int cx = image.cols() / 2;
+        int cy = image.rows() / 2;
+
+        Mat q0 = new Mat(image, new Rect(0, 0, cx, cy));
+        Mat q1 = new Mat(image, new Rect(cx, 0, cx, cy));
+        Mat q2 = new Mat(image, new Rect(0, cy, cx, cy));
+        Mat q3 = new Mat(image, new Rect(cx, cy, cx, cy));
+
+        Mat tmp = new Mat();
+        q0.copyTo(tmp);
+        q3.copyTo(q0);
+        tmp.copyTo(q3);
+
+        q1.copyTo(tmp);
+        q2.copyTo(q1);
+        tmp.copyTo(q2);
+    } 
 
 
     

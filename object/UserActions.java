@@ -42,10 +42,10 @@ public class UserActions {
         if(lastAction == firstAction) firstAction = (firstAction + 1) % capacity;
         count++;
         if(count <= capacity) {
-            System.out.println("Pointer Add:" + pointer);
+//            System.out.println("Pointer Add:" + pointer);
             stack.add(step);
         } else {
-            System.out.println("Pointer Set: " + pointer);
+//            System.out.println("Pointer Set: " + pointer);
             stack.set(pointer, step);
         }
     }
@@ -56,7 +56,7 @@ public class UserActions {
         pointer = 0;
         firstAction = 0;
         lastAction = 0;
-        System.out.println("Pointer Init: " + pointer);
+//        System.out.println("Pointer Init: " + pointer);
 
     }
     
@@ -67,7 +67,7 @@ public class UserActions {
         firstAction = -1;
         lastAction = -1;
         ready = false;
-        System.out.println("RESET " + pointer);
+//        System.out.println("RESET " + pointer);
     }
     
     public boolean canIncrease() {
@@ -111,13 +111,13 @@ public class UserActions {
     
     public void increasePointer() {
         pointer = (pointer + 1) % capacity;   
-        System.out.println("Pointer: " +pointer);
+//        System.out.println("Pointer: " +pointer);
         if(ready == false) ready = true;
     }
     
     public void decreasePointer() {
         pointer = pointer == 0 ? capacity - 1 : pointer - 1;
-        System.out.println("Pointer: " +pointer);
+//        System.out.println("Pointer: " +pointer);
         if(ready == false) ready = true;
     }
     

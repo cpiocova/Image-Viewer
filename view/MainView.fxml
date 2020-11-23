@@ -330,20 +330,21 @@
                                     <AnchorPane prefHeight="270.0" prefWidth="160.0">
                                        <children>
                                           <Label layoutX="6.0" layoutY="39.0" text="K:" />
-                                          <Button layoutX="76.0" layoutY="35.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
+                                          <Button layoutX="96.0" layoutY="35.0" mnemonicParsing="false" onAction="#handleKMeans" text="Apply" />
                                           <TextField fx:id="inputKMeans" layoutX="25.0" layoutY="35.0" prefHeight="25.0" prefWidth="38.0" />
                                           <Label layoutX="6.0" layoutY="17.0" text="K-means:" />
-                                          <Button layoutX="76.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Apply" />
+                                          <Button layoutX="96.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleQuantizeThreshold" text="Apply" />
                                           <Label layoutX="6.0" layoutY="87.0" text="Threshold:" />
-                                          <Label layoutX="6.0" layoutY="128.0" text="Bit reduction per pixel:" />
-                                          <Label layoutX="6.0" layoutY="149.0" text="Bit:" />
-                                          <TextField fx:id="inputBitReduction" layoutX="25.0" layoutY="145.0" prefHeight="25.0" prefWidth="38.0" />
-                                          <Button layoutX="76.0" layoutY="145.0" mnemonicParsing="false" onAction="#handleBitReduction" text="Apply" />
+                                          <Label layoutX="6.0" layoutY="128.0" text="&quot;Mediana Cut&quot;:" />
+                                          <Button layoutX="96.0" layoutY="125.0" mnemonicParsing="false" onAction="#medianaCutContext" text="Apply" />
                                           <Label layoutX="6.0" layoutY="199.0" text="Median Cut:" />
-                                          <Button layoutX="76.0" layoutY="195.0" mnemonicParsing="false" onAction="#medianCutContext" text="Apply" />
+                                          <Button layoutX="96.0" layoutY="195.0" mnemonicParsing="false" onAction="#medianCutContext" text="Apply" />
                                           <Label layoutX="6.0" layoutY="219.0" text="N:" />
                                           <Slider fx:id="sliderToMedianCut" blockIncrement="1.0" layoutX="24.0" layoutY="222.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedianCut" onMouseReleased="#handleMedianCut" prefHeight="14.0" prefWidth="61.0" showTickLabels="true" showTickMarks="true" value="1.0" />
                                           <Label fx:id="labelMedianCut" layoutX="86.0" layoutY="221.0" text="1" />
+                                          <Label fx:id="labelMedianaCut" layoutX="86.0" layoutY="151.0" text="1" />
+                                          <Slider fx:id="sliderToMedianaCut" blockIncrement="1.0" layoutX="24.0" layoutY="152.0" majorTickUnit="1.0" max="7.0" min="1.0" minorTickCount="0" onMouseDragged="#handleMedianaCut" onMouseReleased="#handleMedianaCut" prefHeight="14.0" prefWidth="61.0" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                          <Label layoutX="6.0" layoutY="149.0" text="N:" />
                                        </children>
                                     </AnchorPane>
                                  </content>
@@ -354,6 +355,17 @@
                                        <children>
                                           <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleThresholdOtsu" text="Apply Otsu" />
                                           <Button layoutX="24.0" layoutY="89.0" mnemonicParsing="false" onAction="#handleThresholdKmeans" text="Apply 2-means" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" prefHeight="56.0" prefWidth="168.0" text="Fourier Transform">
+                                 <content>
+                                    <AnchorPane prefHeight="167.0" prefWidth="142.0">
+                                       <children>
+                                          <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleDFT" text="Apply DFT" />
+                                          <Button layoutX="24.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleLowPass" text="Apply 2-means" />
+                                          <Button layoutX="24.0" layoutY="124.0" mnemonicParsing="false" onAction="#handleDFTInverse" text="Apply DFT Inverse" />
                                        </children>
                                     </AnchorPane>
                                  </content>
