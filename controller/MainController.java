@@ -1804,6 +1804,28 @@ public class MainController implements Initializable {
         }
     }
     
+    private void dftContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "DFT", dimensions);
+            userActions.addStep(step);                      
+        }
+    }
+    
+    private void dftiContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "DFT Inverse", dimensions);
+            userActions.addStep(step);                      
+        }
+    }
+    
     private void quantizeThresholdContext() {
         if(image != null) {
             sliderContext();
@@ -3435,7 +3457,7 @@ public class MainController implements Initializable {
 //        complexImage = magnitude;
 
         writableImage = OpenCVUtils.mat2WritableImage(magnitude);
-        generalContext();   
+        dftContext();   
     }
 
     @FXML
@@ -3463,7 +3485,7 @@ public class MainController implements Initializable {
         Imgproc.cvtColor(restoredImage, restoredImage, Imgproc.COLOR_GRAY2BGR);
 
         writableImage = OpenCVUtils.mat2WritableImage(restoredImage);
-        generalContext();   
+        dftiContext();   
 
 
 //        this.antitransformButton.setDisable(true);

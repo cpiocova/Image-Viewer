@@ -364,7 +364,7 @@
                                     <AnchorPane prefHeight="167.0" prefWidth="142.0">
                                        <children>
                                           <Button layoutX="24.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleDFT" text="Apply DFT" />
-                                          <Button layoutX="24.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleLowPass" text="Apply 2-means" />
+                                          <Button layoutX="24.0" layoutY="84.0" mnemonicParsing="false" onAction="#handleLowPass" text="Low Pass" />
                                           <Button layoutX="24.0" layoutY="124.0" mnemonicParsing="false" onAction="#handleDFTInverse" text="Apply DFT Inverse" />
                                        </children>
                                     </AnchorPane>
