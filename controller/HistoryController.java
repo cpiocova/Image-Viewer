@@ -146,10 +146,6 @@ public class HistoryController implements Initializable {
             filterRedo2.setText("Filter applied: " + nameFilterRedo2);
             sizeRedo2.setText("Size: " + dimRedo2.getHeight() + " x " + dimRedo2.getWidth());
         }
-        
-        
-
-         
      }
     
 }
