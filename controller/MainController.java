@@ -46,6 +46,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.RadioButton;
@@ -69,6 +70,7 @@ import object.StructuringElem;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import static org.opencv.core.Mat.zeros;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -1804,6 +1806,17 @@ public class MainController implements Initializable {
         }
     }
     
+    private void lowPassContext() {
+        if(image != null) {
+            sliderContext();
+
+            WritableImage changeImage = imageWriter();
+            ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
+            Stack step = new Stack(changeImage, "Low Pass Filter", dimensions);
+            userActions.addStep(step);                      
+        }
+    }
+    
     private void dftContext() {
         if(image != null) {
             sliderContext();
@@ -2011,6 +2024,7 @@ public class MainController implements Initializable {
             
             ImageSize dimensions = new ImageSize(imageWidth, imageHeight);
             Stack step = new Stack(changeImage, "Default Image", dimensions);
+            complexImage = null;
             userActions.addStep(step);   
         }
 
@@ -3437,121 +3451,78 @@ public class MainController implements Initializable {
 
         }        
     } 
-
-//    @FXML
-//    private void handleDFT(ActionEvent event) {
-//        complexImage = new Mat();
-//        this.planes = new ArrayList<>();
-//        Mat src = OpenCVUtils.image2Mat(writableImage);
-//        Imgproc.cvtColor(src, src, Imgproc.COLOR_BGRA2GRAY);
-//        src.convertTo(src, CvType.CV_32F);
-//
-//        this.planes.add(src);
-//        this.planes.add(Mat.zeros(src.size(), CvType.CV_32F));
-//
-//        Core.merge(this.planes, complexImage);
-//        Core.dft(complexImage, complexImage);
-//
-//        Mat magnitude = OpenCVUtils.createOptimizedMagnitude(this.complexImage);
-//        
-//        writableImage = OpenCVUtils.mat2WritableImage(magnitude);
-//        dftContext();   
-//    }
-    
-        @FXML
-    private void handleDFT(ActionEvent event) {
-        complexImage = new Mat();
-        Mat src = OpenCVUtils.image2Mat(writableImage);
-        src.convertTo(src, CvType.CV_32F);
-        Mat b, g, r;
-        List<Mat> channels = new ArrayList<Mat>();
-        Core.split(src, channels);
-        b = channels.get(0);
-        g = channels.get(1);
-        r = channels.get(2);  
-
-        //AZUL
-        Mat complexImageb = new Mat();
-        List<Mat> bp =new ArrayList<Mat>();
-        bp.add(b);
-        bp.add(Mat.zeros(b.size(), CvType.CV_32F));
-        Core.merge(bp, complexImageb);
-        Core.dft(complexImageb, complexImageb);
-        Mat bmag = OpenCVUtils.createOptimizedMagnitude(complexImageb);
-             
-        
-        //VERDE
-        Mat complexImageg = new Mat();
-        List<Mat> gp =new ArrayList<Mat>();
-        gp.add(g);
-        gp.add(Mat.zeros(g.size(), CvType.CV_32F));
-        Core.merge(gp, complexImageg);
-        Core.dft(complexImageg, complexImageg);
-        Mat gmag = OpenCVUtils.createOptimizedMagnitude(complexImageg);
-        
-        //ROJO
-        Mat complexImager = new Mat();
-        List<Mat> rp =new ArrayList<Mat>();
-        rp.add(r);
-        rp.add(Mat.zeros(r.size(), CvType.CV_32F));
-        Core.merge(rp, complexImager);
-        Core.dft(complexImager, complexImager);
-        Mat rmag = OpenCVUtils.createOptimizedMagnitude(complexImager);   
-        
-        List<Mat> complexplanes = new ArrayList<Mat>();  
-        complexplanes.add(complexImageb);
-        Core.merge(complexplanes,complexImage);
-        complexplanes.add(complexImageg);
-        Core.merge(complexplanes,complexImage);
-        complexplanes.add(complexImager);
-        Core.merge(complexplanes,complexImage);
-        
-        Mat magnitude = new Mat();
-        List<Mat> planes = new ArrayList<Mat>();
-
-        planes.add(bmag);
-        Core.merge(planes, magnitude);        
-        planes.add(gmag);
-        Core.merge(planes, magnitude);
-        planes.add(rmag);
-        Core.merge(planes, magnitude);
    
-        writableImage = OpenCVUtils.mat2WritableImage(magnitude);
-        dftContext();   
+    @FXML
+    private void handleDFT(ActionEvent event) {
+        if(image != null && complexImage == null) {
+            complexImage = new Mat();
+            Mat src = OpenCVUtils.image2Mat(writableImage);
+            src.convertTo(src, CvType.CV_32F);
+            Mat b, g, r;
+            List<Mat> channels = new ArrayList<Mat>();
+            Core.split(src, channels);
+            b = channels.get(0);
+            g = channels.get(1);
+            r = channels.get(2);  
+
+            //AZUL
+            Mat complexImageb = new Mat();
+            List<Mat> bp =new ArrayList<Mat>();
+            bp.add(b);
+            bp.add(Mat.zeros(b.size(), CvType.CV_32F));
+            Core.merge(bp, complexImageb);
+            Core.dft(complexImageb, complexImageb);
+            Mat bmag = OpenCVUtils.createOptimizedMagnitude(complexImageb);
+
+
+            //VERDE
+            Mat complexImageg = new Mat();
+            List<Mat> gp =new ArrayList<Mat>();
+            gp.add(g);
+            gp.add(Mat.zeros(g.size(), CvType.CV_32F));
+            Core.merge(gp, complexImageg);
+            Core.dft(complexImageg, complexImageg);
+            Mat gmag = OpenCVUtils.createOptimizedMagnitude(complexImageg);
+
+            //ROJO
+            Mat complexImager = new Mat();
+            List<Mat> rp =new ArrayList<Mat>();
+            rp.add(r);
+            rp.add(Mat.zeros(r.size(), CvType.CV_32F));
+            Core.merge(rp, complexImager);
+            Core.dft(complexImager, complexImager);
+            Mat rmag = OpenCVUtils.createOptimizedMagnitude(complexImager);   
+
+            List<Mat> complexplanes = new ArrayList<Mat>();  
+            complexplanes.add(complexImageb);
+            Core.merge(complexplanes,complexImage);
+            complexplanes.add(complexImageg);
+            Core.merge(complexplanes,complexImage);
+            complexplanes.add(complexImager);
+            Core.merge(complexplanes,complexImage);
+
+            Mat magnitude = new Mat();
+            List<Mat> planes = new ArrayList<Mat>();
+
+            planes.add(bmag);
+            Core.merge(planes, magnitude);        
+            planes.add(gmag);
+            Core.merge(planes, magnitude);
+            planes.add(rmag);
+            Core.merge(planes, magnitude);
+
+            writableImage = OpenCVUtils.mat2WritableImage(magnitude);
+            dftContext();   
+            
+        }
     } 
 
     @FXML
-    private void handleLowPass(ActionEvent event) {
-
-        Imgproc.blur(complexImage, complexImage, new Size(5, 5));
+    private void handleLowPass(ActionEvent event) throws IOException {
+        if(image != null && complexImage != null) {
         
-        writableImage = OpenCVUtils.mat2WritableImage(complexImage);
-        generalContext();  
-
-    }
-
-//    @FXML
-//    private void handleDFTInverse(ActionEvent event) {
-//        
-//        Core.idft(complexImage, complexImage);
-//
-//        Mat restoredImage = new Mat();
-//        Core.split(this.complexImage, this.planes);
-//        Core.normalize((Mat) this.planes.get(0), restoredImage, 0, 255, Core.NORM_MINMAX);
-//
-//        restoredImage.convertTo(restoredImage, CvType.CV_8U);
-//        Imgproc.cvtColor(restoredImage, restoredImage, Imgproc.COLOR_GRAY2BGR);
-//
-//        writableImage = OpenCVUtils.mat2WritableImage(restoredImage);
-//        dftiContext();   
-//
-//
-//    }
-    
-    @FXML
-    private void handleDFTInverse(ActionEvent event) {
-        complexImage.convertTo(complexImage, CvType.CV_32F);
-        
+        float n = (float) (imageHeight-(imageHeight/3));
+ 
         Mat b = new Mat();
         Mat g = new Mat();
         Mat r = new Mat();
@@ -3571,39 +3542,210 @@ public class MainController implements Initializable {
         
         apendicer.add(channels.get(4));
         apendicer.add(channels.get(5));
-        Core.merge(apendicer, r);
+        Core.merge(apendicer, r);        
         
-        Mat restoredImageb = new Mat();
-        List<Mat> bplanes = new ArrayList<Mat>();
-        Core.idft(b, b);
-        Core.split(b, bplanes);
-        Core.normalize((Mat) bplanes.get(0), restoredImageb, 0, 255, Core.NORM_MINMAX);
+        //B
+        Mat bmagnitude = b; 
+        Mat gmagnitude = g; 
+        Mat rmagnitude = r; 
         
-        Mat restoredImageg = new Mat();
-        List<Mat> gplanes = new ArrayList<Mat>();
-        Core.idft(g, g);
-        Core.split(g, gplanes);
-        Core.normalize((Mat) gplanes.get(0), restoredImageg, 0, 255, Core.NORM_MINMAX);
+        Mat bnew_real = zeros(imageHeight, imageWidth, CvType.CV_32F);
+        Mat bnew_img = zeros(imageHeight, imageWidth, CvType.CV_32F);
         
-        Mat restoredImager = new Mat();
-        List<Mat> rplanes = new ArrayList<Mat>();
-        Core.idft(r, r);
-        Core.split(r, rplanes);
-        Core.normalize((Mat) rplanes.get(0), restoredImager, 0, 255, Core.NORM_MINMAX);
+        Mat gnew_real = zeros(imageHeight, imageWidth, CvType.CV_32F);
+        Mat gnew_img = zeros(imageHeight, imageWidth, CvType.CV_32F);
+                
+        Mat rnew_real = zeros(imageHeight, imageWidth, CvType.CV_32F);
+        Mat rnew_img = zeros(imageHeight, imageWidth, CvType.CV_32F);
         
-        Mat restoredImage = new Mat();
+        for(int i= 0;i<imageHeight;i++){
+            for(int j=0;j<imageWidth;j++){
+                float cuenta = (float) Math.sqrt(Math.pow(i-imageHeight/2, 2) + Math.pow(j-imageWidth/2, 2));
+                if (cuenta < n){
+                    bnew_real.put(i, j, bmagnitude.get(i,j)[0]);
+                    bnew_img.put(i, j, bmagnitude.get(i,j)[1]);
+                                       
+                    gnew_real.put(i, j, gmagnitude.get(i,j)[0]);
+                    gnew_img.put(i, j, gmagnitude.get(i,j)[1]);                    
+                    
+                    rnew_real.put(i, j, rmagnitude.get(i,j)[0]);
+                    rnew_img.put(i, j, rmagnitude.get(i,j)[1]);
+                }
+            }
+        }  
+        //B
+        Mat lb = new Mat();
+        List<Mat> appendb = new ArrayList<Mat>();
+        appendb.add(bnew_real);
+        appendb.add(bnew_img);
+        Core.merge(appendb, lb);
+//        System.out.println(lb.dump());
+        
+        //G
+        Mat lg = new Mat();
+        List<Mat> appendg = new ArrayList<Mat>();
+        appendg.add(gnew_real);
+        appendg.add(gnew_img);
+        Core.merge(appendg, lg);
+//        System.out.println(lg.dump());
+               
+        //R
+        Mat lr = new Mat();
+        List<Mat> appendr = new ArrayList<Mat>();
+        appendr.add(rnew_real);
+        appendr.add(rnew_img);
+        Core.merge(appendr, lr);
+//        System.out.println(lr.dump());
+        
+        //BGR
+        Mat mask = new Mat();
         List<Mat> planes = new ArrayList<Mat>();    
-        planes.add(restoredImageb);
-        Core.merge(planes,restoredImage); 
-        planes.add(restoredImageg);
-        Core.merge(planes,restoredImage);
-        planes.add(restoredImager);
-        Core.merge(planes,restoredImage);
+        planes.add(lb);
+        Core.merge(planes,mask); 
+        planes.add(lg);
+        Core.merge(planes,mask);
+        planes.add(lr);
+        Core.merge(planes,mask);       
+        
+//        System.out.println(mask.dump());
+        
+        List<Mat> channel = new ArrayList<Mat>();
+        Core.split(mask, channel);
+        
+//        System.out.println(channel.get(0).dump());
+//        System.out.println(channel.get(1).dump());
+//        System.out.println("Low Pass Fitler done");
+        complexImage = mask;
+//        writableImage = OpenCVUtils.mat2WritableImage(mask);
+        lowPassContext();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setTitle("Information");
+        alert.setContentText("Low pass filter applied successfully.");
+        alert.showAndWait();
+        }
+    }
+    
+    @FXML
+    private void handleDFTInverse(ActionEvent event) {
+        if(image != null && complexImage != null) {
+            complexImage.convertTo(complexImage, CvType.CV_32F);
 
-        restoredImage.convertTo(restoredImage, CvType.CV_8U);
+            Mat b = new Mat();
+            Mat g = new Mat();
+            Mat r = new Mat();
+            List<Mat> apendiceb = new ArrayList<Mat>();
+            List<Mat> apendiceg = new ArrayList<Mat>();
+            List<Mat> apendicer = new ArrayList<Mat>();
+            List<Mat> channels = new ArrayList<Mat>();
+            Core.split(complexImage, channels);
 
-        writableImage = OpenCVUtils.mat2WritableImage(restoredImage);
-        dftiContext();   
+            apendiceb.add(channels.get(0));
+            apendiceb.add(channels.get(1));
+            Core.merge(apendiceb, b);
+
+            apendiceg.add(channels.get(2));
+            apendiceg.add(channels.get(3));
+            Core.merge(apendiceg, g);
+
+            apendicer.add(channels.get(4));
+            apendicer.add(channels.get(5));
+            Core.merge(apendicer, r);
+
+            Mat restoredImageb = new Mat();
+            List<Mat> bplanes = new ArrayList<Mat>();
+            Core.idft(b, b);
+            Core.split(b, bplanes);
+            Core.normalize((Mat) bplanes.get(0), restoredImageb, 0, 255, Core.NORM_MINMAX);
+
+            Mat restoredImageg = new Mat();
+            List<Mat> gplanes = new ArrayList<Mat>();
+            Core.idft(g, g);
+            Core.split(g, gplanes);
+            Core.normalize((Mat) gplanes.get(0), restoredImageg, 0, 255, Core.NORM_MINMAX);
+
+            Mat restoredImager = new Mat();
+            List<Mat> rplanes = new ArrayList<Mat>();
+            Core.idft(r, r);
+            Core.split(r, rplanes);
+            Core.normalize((Mat) rplanes.get(0), restoredImager, 0, 255, Core.NORM_MINMAX);
+
+            Mat restoredImage = new Mat();
+            List<Mat> planes = new ArrayList<Mat>();    
+            planes.add(restoredImageb);
+            Core.merge(planes,restoredImage); 
+            planes.add(restoredImageg);
+            Core.merge(planes,restoredImage);
+            planes.add(restoredImager);
+            Core.merge(planes,restoredImage);
+
+            restoredImage.convertTo(restoredImage, CvType.CV_8U);
+
+            writableImage = OpenCVUtils.mat2WritableImage(restoredImage);
+            dftiContext();
+            complexImage = null;
+        }
+
+    }
+
+    @FXML
+    private void handleOtsuManual(ActionEvent event) {
+	double total = imageHeight * imageWidth;
+
+	int c = 0;
+	// aqui va un arreglo con las frecuencias en escala de gris
+	double [] pix = new double[256]; 
+
+	int s = 0;
+	//este es un producto punto entre el arreglo y los numeros del 0-256. Ni idea
+	for(int i = 0; i < 256; i++) s += pix[i]*i;  
+	     
+	double sum = 0;
+	double wb = 0;
+	double maximo = 0.0;
+	double umbral = 0;
+
+	for(int i=1; i< 256; i++){
+	    double wf = wb;
+	    if((wb > 0) & (wf > 0)){
+		double mf = (s - sum)/wf;
+		double val = wb * wf * ((sum/wb)-mf) * ((sum/wb)-mf);
+                System.out.println(val);
+		if (val >= maximo){
+		    umbral = i;
+		    maximo = val;
+		}
+	    }
+	    wb += pix[i];
+	    sum += (i-1)*pix[i];
+	}
+
+
+	Color [][] current = pic.getColorMatrix();
+	double thresholdingValue = umbral;
+	Color [][] scaleMatrix = new Color[imageWidth][imageHeight];
+	pixelWriter = writableImage.getPixelWriter();
+	for (int y = 0; y < imageHeight; y++) {
+		for (int x = 0; x < imageWidth; x++) {
+		    double average = (
+			   current[x][y].getRed() +
+			   current[x][y].getGreen() +
+			   current[x][y].getBlue()
+			   )/3;
+		   Color thresholding;
+		    if(average > thresholdingValue) {
+			thresholding = new Color(1, 1, 1, 1.0);
+		    }else{
+			thresholding = new Color(0, 0, 0, 1.0);
+		    }
+
+		    pixelWriter.setColor(x,y,thresholding);
+		    scaleMatrix[x][y] = thresholding;
+		}
+	}
+        pic.setScaleMatrix(scaleMatrix);
+        handleZoom();
+        configurationImageView();
     }
     
 
