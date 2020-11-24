@@ -91,7 +91,7 @@ public class UserActions {
         for(int i = 0; i <= num; i++) {
             int fordward = pointer + i > capacity - 1 ? Math.abs(capacity - (pointer + i)) : pointer + i;
             if(fordward == lastAction) {
-                return num - i == 0;
+                return num == i;
             }
         }
         return true;
@@ -103,7 +103,7 @@ public class UserActions {
         for(int i = 0; i <= num; i++) {
             int backward = pointer - i < 0 ? capacity - Math.abs(pointer -i) : pointer - i;
             if(backward == firstAction) {
-                return num - i == 0;
+                return num == i;
             }
         }
         return true;

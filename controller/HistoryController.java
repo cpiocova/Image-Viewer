@@ -142,9 +142,9 @@ public class HistoryController implements Initializable {
             String nameFilterRedo2 = pointRedo2.getNameFilter();
             ImageSize dimRedo2 = pointRedo2.getDimensions();
 
-            imageRedo1.setImage(imgRedo2);
-            filterRedo1.setText("Filter applied: " + nameFilterRedo2);
-            sizeRedo1.setText("Size: " + dimRedo2.getHeight() + " x " + dimRedo2.getWidth());
+            imageRedo2.setImage(imgRedo2);
+            filterRedo2.setText("Filter applied: " + nameFilterRedo2);
+            sizeRedo2.setText("Size: " + dimRedo2.getHeight() + " x " + dimRedo2.getWidth());
         }
         
         

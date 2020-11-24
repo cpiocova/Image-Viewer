@@ -3706,7 +3706,7 @@ public class MainController implements Initializable {
 	double umbral = 0;
 
 	for(int i=1; i< 256; i++){
-	    double wf = wb;
+	    double wf = -wb;
 	    if((wb > 0) & (wf > 0)){
 		double mf = (s - sum)/wf;
 		double val = wb * wf * ((sum/wb)-mf) * ((sum/wb)-mf);
